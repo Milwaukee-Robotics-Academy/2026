@@ -1,17 +1,10 @@
 {
-  "conversionFactors": {
-    "angle": {
-      "gearRatio": 46.42,
-      "factor": 0
-    },
-    "drive": {
-      "gearRatio": 5.50,
-      "diameter": 3,
-      "factor": 0
-    }
-  },
+"conversionFactors": {
+    "angle": {"gearRatio": 46.42},
+    "drive": {"gearRatio": 4.71, "diameter": 3}
+},
   "currentLimit": {
-    "drive": 40,
+    "drive": 20,
     "angle": 20
   },
   "rampRate": {
