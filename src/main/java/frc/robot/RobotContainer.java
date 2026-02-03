@@ -24,7 +24,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+import java.lang.module.ModuleDescriptor.Version;
+
 import swervelib.SwerveInputStream;
+//import frc.robot.subsystems.QuestNavSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -36,6 +39,7 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final         CommandXboxController operatorXbox = new CommandXboxController(1);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
@@ -196,6 +200,16 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
       //driverXbox.y().onTrue(drivebase.driveToDistanceCommandDefer(drivebase::getPose, 2, 14));
       driverXbox.y().whileTrue(drivebase.driveForward());
+      operatorXbox.rightTrigger().onTrue(Commands.none());
+      operatorXbox.rightBumper().onTrue(Commands.none());
+      operatorXbox.leftTrigger().whileTrue(Commands.none());
+      operatorXbox.x().onTrue(Commands.none());
+      operatorXbox.y().onTrue(Commands.none());
+      operatorXbox.b().onTrue(Commands.none());
+      operatorXbox.povUp().whileTrue(Commands.none()); 
+      operatorXbox.povDown().onTrue(Commands.none()); 
+      operatorXbox.povLeft().onTrue(Commands.none());
+      operatorXbox.povLeft().onTrue(Commands.none());
     }
 
   }
