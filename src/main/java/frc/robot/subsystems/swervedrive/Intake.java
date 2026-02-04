@@ -47,6 +47,25 @@ public class Intake {
     }
     
     public Arm(){
-        
+         //initialize motor 10 as a SparkMax motor
+        m_motor_10 = new SparkMax(10, MotorType.kBrushless);
+
+        //set up configs for SparkMax motors
+        SparkMaxConfig global_config = new SparkMaxConfig();
+        SparkMaxConfig motor_9_config = new SparkMaxConfig();
+
+        //configure motor settings
+        global_config
+            //only use 40 if NOT 550 
+            .smartCurrentLimit(40);
+            //learn more about idle mode in the API docs
+            .idleMode(IdleMode.kBrake);
+            //learn more about persist mode in the API docs
+            .persistMode(PersistMode.kPersist);
+
+        motor_10_config
+            .apply(global_config);
+
+        m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);    
     }
 }
