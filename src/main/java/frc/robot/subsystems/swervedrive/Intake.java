@@ -68,4 +68,34 @@ public class Intake {
 
         m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);    
     }
+    private void unlockAlgae()
+   {
+     intakeState = intakeStates.UNLOCKED;
+     encoderLockValue = 0;
+   }
+ 
+   private void intake(){
+     unlockAlgae();
+     m_motor_9.set(0.5);
+   }
+ 
+   private void stopIntake(){
+     m_motor_9.set(0);
+   }
+ 
+   private void reverse(){
+     unlockAlgae();
+     m_motor_9.set(-0.5);
+   }
+ 
+   private void raiseArm(){
+     m_motor_10.set(0.25);
+   }
+   public void stopArm(){
+    m_motor_10.set(0);
+  }
+  public void lowerArm(){
+    m_motor_10.set(-0.25);
+  }
 }
+
