@@ -206,13 +206,13 @@ public class RobotContainer
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand()
+  private Command getAutonomousCommand()
   {
     // Pass in the selected auto from the SmartDashboard as our desired autnomous commmand 
     return autoChooser.getSelected();
   }
 
-  public void setMotorBrake(boolean brake)
+  private void setMotorBrake(boolean brake)
   {
     drivebase.setMotorBrake(brake);
   }
