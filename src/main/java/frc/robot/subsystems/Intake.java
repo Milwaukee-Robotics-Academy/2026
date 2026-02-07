@@ -1,8 +1,7 @@
 package frc.robot.subsystems;
 
-import java.security.PrivateKey;
-
-import com.revrobotics.RelativeEncoder;
+//import java.security.PrivateKey;
+//import com.revrobotics.RelativeEncoder;
 
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -11,11 +10,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj2.command.Command;
+//import edu.wpi.first.wpilibj2.command.InstantCommand;
+//import edu.wpi.first.wpilibj2.command.RunCommand;
+//import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Intake {
     // intake motor
@@ -74,7 +73,7 @@ public class Intake {
         m_motor_9.set(0);
     }
 
-    // methods to control the arm
+    // methods to control the ar
     private void lowerArm() {
         m_motor_10.set(0.25);
     }
@@ -87,5 +86,5 @@ public class Intake {
         m_motor_10.set(0);
     }
 
-    
+
 }
