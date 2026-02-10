@@ -51,6 +51,7 @@ import swervelib.parser.SwerveDriveConfiguration;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.subsystems.QuestNavSubsystem;
 
 public class SwerveSubsystem extends SubsystemBase
 {
@@ -68,6 +69,12 @@ public class SwerveSubsystem extends SubsystemBase
    * PhotonVision class to keep an accurate odometry.
    */
   private       Vision      vision;
+
+  /**
+   * QuestNav class for odometry.
+   *
+   */
+  private       QuestNavSubsystem questNav;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -134,6 +141,11 @@ public class SwerveSubsystem extends SubsystemBase
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
+  public void setupQuestNav()
+  {
+    questNav = new QuestNavSubsystem();
+  }
+  
   @Override
   public void periodic()
   {
@@ -141,7 +153,9 @@ public class SwerveSubsystem extends SubsystemBase
     if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+      questNav.periodic();
+      // Old vision code
+      //vision.updatePoseEstimation(swerveDrive);
     }
   }
 
