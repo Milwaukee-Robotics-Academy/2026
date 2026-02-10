@@ -6,6 +6,11 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
@@ -14,9 +19,9 @@ import com.revrobotics.PersistMode;
 //import edu.wpi.first.wpilibj2.command.Command;
 //import edu.wpi.first.wpilibj2.command.InstantCommand;
 //import edu.wpi.first.wpilibj2.command.RunCommand;
-//import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Intake {
+public class Intake extends SubsystemBase{
     // intake motor
     private SparkMax m_motor_9;
     // arm motor
@@ -84,5 +89,31 @@ public class Intake {
 
     private void stopArm() {
         m_motor_10.set(0);
+    }
+
+
+    public Command lowerArmCommand(){
+    return new RunCommand(this::lowerArm, this).withName("LowerArm");
+    }
+
+    public Command raiseArmCommand(){
+    return new RunCommand(this::raiseArm, this).withName("RaiseArm");
+    }
+
+    public Command stopArmCommand(){
+    return new RunCommand(this::stopArm, this).withName("StopArm");
+    }
+
+
+    public Command forwardIntakeCommand(){
+    return new InstantCommand(this::forwardIntake, this).withName("ForwardIntake");
+    }
+
+    public Command reverseIntakeCommand(){
+    return new InstantCommand(this::reverseIntake, this).withName("ReverseIntake");
+    }
+
+    public Command stopIntakeCommand(){
+    return new InstantCommand(this::stopIntake, this).withName("StopIntake");
     }
 }
