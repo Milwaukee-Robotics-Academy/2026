@@ -85,6 +85,4 @@ public class Intake {
     private void stopArm() {
         m_motor_10.set(0);
     }
-
-
 }
