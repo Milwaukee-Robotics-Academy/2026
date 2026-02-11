@@ -3,11 +3,18 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
 
-public class Shooter {
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class Shooter extends SubsystemBase {
     // feeder motor
     //private SparkMax m_motor_11;
 
@@ -83,5 +90,30 @@ public class Shooter {
     }
     private void stopFeeder() {
         m_motor_11.set(0);
+    }
+
+    public Command forwardFeederCommand(){
+    return new RunCommand(this::forwardFeeder, this).withName("ForwardFeeder");
+    }
+
+    public Command reverseFeederCommand(){
+    return new RunCommand(this::reverseFeeder, this).withName("ReverseFeeder");
+    }
+
+    public Command stopFeederCommand(){
+    return new RunCommand(this::stopFeeder, this).withName("StopFeeder");
+    }
+
+
+    public Command forwardShooterCommand(){
+    return new InstantCommand(this::forwardShooter, this).withName("ForwardShooter");
+    }
+
+    public Command reverseShooterCommand(){
+    return new InstantCommand(this::reverseShooter, this).withName("ReverseShooter");
+    }
+
+    public Command stopShooterCommand(){
+    return new InstantCommand(this::stopShooter, this).withName("StopShooter");
     }
 }
