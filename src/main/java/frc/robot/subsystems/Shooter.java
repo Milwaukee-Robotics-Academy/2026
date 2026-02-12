@@ -116,4 +116,55 @@ public class Shooter extends SubsystemBase {
     public Command stopShooterCommand(){
     return new InstantCommand(this::stopShooter, this).withName("StopShooter");
     }
+    
+
+
+    public Trigger forwardIFeederTrigger(){
+    return new Trigger(() -> (feederForwarding()));
+    }
+
+    public boolean feederForwarding(){
+        return m_motor_11.get() > 0.1;
+    }
+
+    public Trigger reverseFeederTrigger(){
+    return new Trigger(() -> (feederReversing()));
+    }
+
+    public boolean feederReversing(){
+        return m_motor_11.get() > -0.1;
+    }
+
+     public Trigger stopFeederTrigger(){
+        return new Trigger(() -> (!feederStopping()));
+    }
+    public boolean feederStopping(){
+        return m_motor_11.get() == 0;
+    }
+    //Feeder Triggers
+        public Trigger forwardShooterTrigger(){
+    return new Trigger(() -> (shooterForwarding()));
+    }
+
+    public boolean shooterForwarding(){
+        return m_motor_12.get() > 0.1;
+        return m_motor_13.get() > 0.1;
+    }
+
+    public Trigger shooterReversingTrigger(){
+    return new Trigger(() -> (shooterReversing()));
+    }
+
+    public boolean shooterReversing(){
+        return m_motor_12.get() < -0.1;
+        return m_motor_13.get() < -0.1;
+    }
+
+     public Trigger stopShooterTrigger(){
+        return new Trigger(() -> (!shooterStopping()));
+    }
+    public boolean shooterStopping(){
+        return m_motor_12.get() == 0;
+        return m_motor_13.get() == 0;
+    }
 }

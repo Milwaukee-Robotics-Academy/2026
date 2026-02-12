@@ -20,6 +20,7 @@ import com.revrobotics.PersistMode;
 //import edu.wpi.first.wpilibj2.command.InstantCommand;
 //import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Intake extends SubsystemBase{
     // intake motor
@@ -115,5 +116,51 @@ public class Intake extends SubsystemBase{
 
     public Command stopIntakeCommand(){
     return new InstantCommand(this::stopIntake, this).withName("StopIntake");
+    }
+
+    public Trigger forwardIntakeTrigger(){
+    return new Trigger(() -> (intakeForwarding()));
+    }
+
+    public boolean intakeForwarding(){
+        return m_motor_10.get() > 0.1;
+    }
+
+    public Trigger reverseIntakeTrigger(){
+    return new Trigger(() -> (intakeReversing()));
+    }
+
+    public boolean intakeReversing(){
+        return m_motor_10.get() > -0.1;
+    }
+
+     public Trigger stopIntakeTrigger(){
+        return new Trigger(() -> (!intakeStopping()));
+    }
+    public boolean intakeStopping(){
+        return m_motor_10.get() > 0;
+    }
+    //Arm Triggers
+        public Trigger raiseArmTrigger(){
+    return new Trigger(() -> (armRaising()));
+    }
+
+    public boolean armRaising(){
+        return m_motor_9.get() > 0.1;
+    }
+
+    public Trigger lowerArmTrigger(){
+    return new Trigger(() -> (armlowering()));
+    }
+
+    public boolean armlowering(){
+        return m_motor_9.get() > -0.1;
+    }
+
+     public Trigger middleArmTrigger(){
+        return new Trigger(() -> (!armMiddled()));
+    }
+    public boolean armMiddled(){
+        return m_motor_9.get() > 0;
     }
 }
