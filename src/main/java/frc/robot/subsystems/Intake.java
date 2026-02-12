@@ -107,15 +107,15 @@ public class Intake extends SubsystemBase{
 
 
     public Command forwardIntakeCommand(){
-    return new InstantCommand(this::forwardIntake, this).withName("ForwardIntake");
+    return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
     }
 
     public Command reverseIntakeCommand(){
-    return new InstantCommand(this::reverseIntake, this).withName("ReverseIntake");
+    return new RunCommand(this::reverseIntake, this).withName("ReverseIntake");
     }
 
     public Command stopIntakeCommand(){
-    return new InstantCommand(this::stopIntake, this).withName("StopIntake");
+    return new RunCommand(this::stopIntake, this).withName("StopIntake");
     }
 
     public Trigger forwardIntakeTrigger(){
@@ -131,7 +131,7 @@ public class Intake extends SubsystemBase{
     }
 
     public boolean intakeReversing(){
-        return m_motor_10.get() > -0.1;
+        return m_motor_10.get() < -0.1;
     }
 
      public Trigger stopIntakeTrigger(){
@@ -150,10 +150,10 @@ public class Intake extends SubsystemBase{
     }
 
     public Trigger lowerArmTrigger(){
-    return new Trigger(() -> (armlowering()));
+    return new Trigger(() -> (armLowering()));
     }
 
-    public boolean armlowering(){
+    public boolean armLowering(){
         return m_motor_9.get() > -0.1;
     }
 
