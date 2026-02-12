@@ -13,6 +13,7 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Shooter extends SubsystemBase {
     // feeder motor
@@ -147,8 +148,7 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean shooterForwarding(){
-        return m_motor_12.get() > 0.1;
-        return m_motor_13.get() > 0.1;
+       return m_motor_12.get() > 0.1 && m_motor_13.get() > 0.1;
     }
 
     public Trigger shooterReversingTrigger(){
@@ -156,15 +156,13 @@ public class Shooter extends SubsystemBase {
     }
 
     public boolean shooterReversing(){
-        return m_motor_12.get() < -0.1;
-        return m_motor_13.get() < -0.1;
+        return m_motor_12.get() < -0.1 && m_motor_13.get() < -0.1;
     }
 
      public Trigger stopShooterTrigger(){
         return new Trigger(() -> (!shooterStopping()));
     }
     public boolean shooterStopping(){
-        return m_motor_12.get() == 0;
-        return m_motor_13.get() == 0;
+        return m_motor_12.get() == 0 && m_motor_13.get() == 0;
     }
 }
