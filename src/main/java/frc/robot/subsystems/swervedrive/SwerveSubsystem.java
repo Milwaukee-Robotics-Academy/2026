@@ -52,6 +52,10 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.subsystems.QuestNavSubsystem;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 public class SwerveSubsystem extends SubsystemBase
 {
@@ -74,6 +78,8 @@ public class SwerveSubsystem extends SubsystemBase
    * QuestNav class for odometry.
    *
    */
+  private       SwerveDrivePoseEstimator poseEstimator;
+
   private       QuestNavSubsystem questNav;
 
   /**
@@ -140,11 +146,6 @@ public class SwerveSubsystem extends SubsystemBase
   {
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
-
-  public void setupQuestNav()
-  {
-    questNav = new QuestNavSubsystem();
-  }
   
   @Override
   public void periodic()
@@ -153,7 +154,7 @@ public class SwerveSubsystem extends SubsystemBase
     if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
-      questNav.periodic();
+      questNav.poseOdometry(swerveDrive);
       // Old vision code
       //vision.updatePoseEstimation(swerveDrive);
     }
@@ -726,11 +727,18 @@ public class SwerveSubsystem extends SubsystemBase
 
   /**
    * Add a fake vision reading for testing purposes.
-   */
   public void addFakeVisionReading()
   {
     swerveDrive.addVisionMeasurement(new Pose2d(3, 3, Rotation2d.fromDegrees(65)), Timer.getFPGATimestamp());
   }
+  */
+
+  /**
+  // Add questNav vision measurement to swerve drive
+  public void addVisionMeasurement(Pose2d pose, double timestamp, Matrix<N3,N1> stdDevs) {
+    poseEstimator.addVisionMeasurement(pose, timestamp, stdDevs);
+  }
+    */
 
   /**
    * Gets the swerve drive object.
