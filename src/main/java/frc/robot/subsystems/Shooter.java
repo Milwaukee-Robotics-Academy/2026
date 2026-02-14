@@ -16,18 +16,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Shooter extends SubsystemBase {
-    // feeder motor
-    //private SparkMax m_motor_11;
+    
+    private SparkMax m_motor_11; //feeder motor
 
-    //shooter motors
-    private SparkMax m_motor_12;
-    private SparkMax m_motor_13;
-    private SparkMax m_motor_11;
+    private SparkMax m_motor_12; //shooter motor 1
+    private SparkMax m_motor_13; //shooter motor 2
 
 
+    // ==================== CONFIGURE SHOOTER MOTORS ====================
 
-    // this method controls the intake wheels
     public Shooter() {
+
         //initialize motor 12 and 13 as a SparkMax motor
         m_motor_12 = new SparkMax(12, MotorType.kBrushless);
         m_motor_13 = new SparkMax(13, MotorType.kBrushless);
@@ -49,9 +48,12 @@ public class Shooter extends SubsystemBase {
 
         m_motor_12.configure(motor_12_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_13.configure(motor_13_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        }
+    }
+
+    // ==================== CONFIGURE FEEDER MOTORS ====================
 
     public void Feeder() {
+
          //initialize motor 11 as a SparkMax motor
         m_motor_11 = new SparkMax(11, MotorType.kBrushless);
 
@@ -68,7 +70,9 @@ public class Shooter extends SubsystemBase {
             .apply(global_config);
 
         m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);    
-        }
+    }
+
+    // ==================== SET SHOOTER SPEED ====================
 
     private void forwardShooter() {
         m_motor_12.set(0.5);
@@ -83,6 +87,8 @@ public class Shooter extends SubsystemBase {
         m_motor_13.set(0);
     }
 
+    // ==================== SET FEEDER SPEED ====================
+
     private void forwardFeeder() {
         m_motor_11.set(0.5);
     }
@@ -93,76 +99,28 @@ public class Shooter extends SubsystemBase {
         m_motor_11.set(0);
     }
 
-    public Command forwardFeederCommand(){
-    return new RunCommand(this::forwardFeeder, this).withName("ForwardFeeder");
-    }
-
-    public Command reverseFeederCommand(){
-    return new RunCommand(this::reverseFeeder, this).withName("ReverseFeeder");
-    }
-
-    public Command stopFeederCommand(){
-    return new RunCommand(this::stopFeeder, this).withName("StopFeeder");
-    }
-
+    // ==================== SHOOTER COMMANDS ====================
 
     public Command forwardShooterCommand(){
-    return new RunCommand(this::forwardShooter, this).withName("ForwardShooter");
+        return new InstantCommand(this::forwardShooter, this).withName("ForwardShooter");
     }
-
     public Command reverseShooterCommand(){
-    return new RunCommand(this::reverseShooter, this).withName("ReverseShooter");
+        return new InstantCommand(this::reverseShooter, this).withName("ReverseShooter");
     }
-
     public Command stopShooterCommand(){
-    return new RunCommand(this::stopShooter, this).withName("StopShooter");
-    }
-    
-
-
-    public Trigger forwardIFeederTrigger(){
-    return new Trigger(() -> (feederForwarding()));
+        return new InstantCommand(this::stopShooter, this).withName("StopShooter");
     }
 
-    public boolean feederForwarding(){
-        return m_motor_11.get() > 0.1;
+    // ==================== FEEDER COMMANDS ====================
+
+    public Command forwardFeederCommand(){
+        return new RunCommand(this::forwardFeeder, this).withName("ForwardFeeder");
+    }
+    public Command reverseFeederCommand(){
+        return new RunCommand(this::reverseFeeder, this).withName("ReverseFeeder");
+    }
+    public Command stopFeederCommand(){
+        return new RunCommand(this::stopFeeder, this).withName("StopFeeder");
     }
 
-    public Trigger reverseFeederTrigger(){
-    return new Trigger(() -> (feederReversing()));
-    }
-
-    public boolean feederReversing(){
-        return m_motor_11.get() > -0.1;
-    }
-
-     public Trigger stopFeederTrigger(){
-        return new Trigger(() -> (!feederStopping()));
-    }
-    public boolean feederStopping(){
-        return m_motor_11.get() == 0;
-    }
-    //Feeder Triggers
-        public Trigger forwardShooterTrigger(){
-    return new Trigger(() -> (shooterForwarding()));
-    }
-
-    public boolean shooterForwarding(){
-       return m_motor_12.get() > 0.1 && m_motor_13.get() > 0.1;
-    }
-
-    public Trigger shooterReversingTrigger(){
-    return new Trigger(() -> (shooterReversing()));
-    }
-
-    public boolean shooterReversing(){
-        return m_motor_12.get() < -0.1 && m_motor_13.get() < -0.1;
-    }
-
-     public Trigger stopShooterTrigger(){
-        return new Trigger(() -> (!shooterStopping()));
-    }
-    public boolean shooterStopping(){
-        return m_motor_12.get() == 0 && m_motor_13.get() == 0;
-    }
 }

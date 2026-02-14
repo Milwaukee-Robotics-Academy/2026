@@ -8,7 +8,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
+//import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -20,13 +20,15 @@ import com.revrobotics.PersistMode;
 //import edu.wpi.first.wpilibj2.command.InstantCommand;
 //import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+//import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Intake extends SubsystemBase{
-    // intake motor
-    private SparkMax m_motor_9;
-    // arm motor
-    private SparkMax m_motor_10;
+    
+    
+    private SparkMax m_motor_9;  // intake motor
+    private SparkMax m_motor_10; // arm motor
+
+    // ==================== CONFIGURE INTAKE WHEEL MOTORS ====================
     
     public Intake() {
         //initialize motor 9 as a SparkMax motor
@@ -45,8 +47,9 @@ public class Intake extends SubsystemBase{
             .apply(global_config);
 
         m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-
     }
+
+    // ==================== CONFIGURE ARM MOTORS ====================
 
     public void Arm(){
          //initialize motor 10 as a SparkMax motor
@@ -67,8 +70,8 @@ public class Intake extends SubsystemBase{
         m_motor_10.configure(motor_10_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);    
     }
     
+    // ==================== SET INTAKE WHEEL SPEED ====================
 
-    // methods to control the intake wheels
     private void forwardIntake() {
         m_motor_9.set(0.5);
     }
@@ -79,88 +82,40 @@ public class Intake extends SubsystemBase{
         m_motor_9.set(0);
     }
 
-    // methods to control the ar
+    // ==================== SET ARM MOTOR SPEED ====================
+
     private void lowerArm() {
         m_motor_10.set(0.25);
     }
-
     private void raiseArm() {
         m_motor_10.set(-0.25);
     }
-
     private void stopArm() {
         m_motor_10.set(0);
     }
 
-
-    public Command lowerArmCommand(){
-    return new RunCommand(this::lowerArm, this).withName("LowerArm");
-    }
-
-    public Command raiseArmCommand(){
-    return new RunCommand(this::raiseArm, this).withName("RaiseArm");
-    }
-
-    public Command stopArmCommand(){
-    return new RunCommand(this::stopArm, this).withName("StopArm");
-    }
-
+    // ==================== INTAKE WHEEL COMMANDS ====================
 
     public Command forwardIntakeCommand(){
-    return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
+        return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
     }
-
     public Command reverseIntakeCommand(){
-    return new RunCommand(this::reverseIntake, this).withName("ReverseIntake");
+        return new RunCommand(this::reverseIntake, this).withName("ReverseIntake");
     }
-
     public Command stopIntakeCommand(){
-    return new RunCommand(this::stopIntake, this).withName("StopIntake");
+        return new RunCommand(this::stopIntake, this).withName("StopIntake");
     }
 
-    public Trigger forwardIntakeTrigger(){
-    return new Trigger(() -> (intakeForwarding()));
+    // ==================== ARM COMMANDS ====================
+
+    public Command lowerArmCommand(){
+        return new RunCommand(this::lowerArm, this).withName("LowerArm");
+    }
+    public Command raiseArmCommand(){
+        return new RunCommand(this::raiseArm, this).withName("RaiseArm");
+    }
+    public Command stopArmCommand(){
+        return new RunCommand(this::stopArm, this).withName("StopArm");
     }
 
-    public boolean intakeForwarding(){
-        return m_motor_10.get() > 0.1;
-    }
-
-    public Trigger reverseIntakeTrigger(){
-    return new Trigger(() -> (intakeReversing()));
-    }
-
-    public boolean intakeReversing(){
-        return m_motor_10.get() < -0.1;
-    }
-
-     public Trigger stopIntakeTrigger(){
-        return new Trigger(() -> (!intakeStopping()));
-    }
-    public boolean intakeStopping(){
-        return m_motor_10.get() > 0;
-    }
-    //Arm Triggers
-        public Trigger raiseArmTrigger(){
-    return new Trigger(() -> (armRaising()));
-    }
-
-    public boolean armRaising(){
-        return m_motor_9.get() > 0.1;
-    }
-
-    public Trigger lowerArmTrigger(){
-    return new Trigger(() -> (armLowering()));
-    }
-
-    public boolean armLowering(){
-        return m_motor_9.get() > -0.1;
-    }
-
-     public Trigger middleArmTrigger(){
-        return new Trigger(() -> (!armMiddled()));
-    }
-    public boolean armMiddled(){
-        return m_motor_9.get() > 0;
-    }
 }
