@@ -23,7 +23,7 @@ public class Shooter extends SubsystemBase {
     private SparkMax m_motor_13; //shooter motor 2
 
 
-    // ==================== CONFIGURE MOTOR MOTORS ====================
+    // ==================== CONSTRUCTOR (CONFIGURE MOTOR MOTORS) ====================
 
     public Shooter() {
 
@@ -55,7 +55,7 @@ public class Shooter extends SubsystemBase {
         m_motor_13.configure(motor_13_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    // ==================== SET SHOOTER SPEED ====================
+    // ==================== SHOOTER METHODS ====================
 
     private void forwardShooter() {
         m_motor_12.set(0.5);
@@ -70,7 +70,22 @@ public class Shooter extends SubsystemBase {
         m_motor_13.set(0);
     }
 
-    // ==================== SET FEEDER SPEED ====================
+     //Get current shooter velocity in RPM
+
+    public double getShooterVelocityRPM() {
+        return m_encoder_12.getVelocity();  // Returns RPM
+    }
+
+    /**
+     * Check if shooter is at target speed and ready to shoot
+     */
+    public boolean isShooterReady() {
+        double currentRPM = getShooterVelocityRPM();
+        return Math.abs(currentRPM - TARGET_SHOOTER_RPM) < SPEED_TOLERANCE_RPM;
+    }
+
+
+    // ==================== FEEDER METHODS ====================
 
     private void forwardFeeder() {
         m_motor_11.set(0.5);
@@ -84,15 +99,31 @@ public class Shooter extends SubsystemBase {
 
     // ==================== SHOOTER COMMANDS ====================
 
+   public Command smartFeederCommand() {
+    return new RunCommand(() -> {
+        if (isShooterReady()) {
+            forwardFeeder();  // Run feeder when shooter at speed
+        } else {
+            stopFeeder();     // Auto-pause when shooter slows down
+        }
+    }, this).withName("SmartFeeder");
+    }
+
+    public boolean isShooterReady() {
+        return Math.abs(getShooterVelocityRPM() - TARGET_SHOOTER_RPM) < SPEED_TOLERANCE_RPM;
+    }
+   
+    // Basic forward shooter command (can be used for testing or manual control)
     public Command forwardShooterCommand(){
         return new RunCommand(this::forwardShooter, this).withName("ForwardShooter");
     }
-    public Command reverseShooterCommand(){
-        return new RunCommand(this::reverseShooter, this).withName("ReverseShooter");
-    }
-    public Command stopShooterCommand(){
-        return new RunCommand(this::stopShooter, this).withName("StopShooter");
-    }
+
+    // public Command reverseShooterCommand(){
+    //     return new RunCommand(this::reverseShooter, this).withName("ReverseShooter");
+    // }
+    // public Command stopShooterCommand(){
+    //     return new RunCommand(this::stopShooter, this).withName("StopShooter");
+    // }
 
     // ==================== FEEDER COMMANDS ====================
 

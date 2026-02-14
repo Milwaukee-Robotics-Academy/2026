@@ -219,8 +219,7 @@ public class RobotContainer
       operatorXbox.povUp().onTrue(m_intake.armUpCommand());
       operatorXbox.povRight().onTrue(driveSetpointGenKeyboard)rue(m_intake.armMiddleCommand());   
       //shooter
-      //operatorXbox.leftBumper().whileTrue(m_shooter.startShooterCommand());
-      //operatorXbox.rightBumper().whileTrue(m_shooter.stopShooterCommand());
+      operatorXbox.rightTrigger().whileTrue(m_shooter.smartFeederCommand());
     }
 
   }
