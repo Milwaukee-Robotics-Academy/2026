@@ -7,18 +7,18 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj2.command.Command;
-//import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
+import com.revrobotics.spark.SparkClosedLoopController;
 
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command;
 //import edu.wpi.first.wpilibj2.command.InstantCommand;
-//import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -27,6 +27,14 @@ public class Intake extends SubsystemBase{
     
     private SparkMax m_motor_9;  // intake motor
     private SparkMax m_motor_10; // arm motor
+
+    private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
+    private SparkClosedLoopController m_armPID; //closed loop controller for arm position
+
+    //arm position setpoints (play with these values to find best fit for the positions)
+    private final double ARM_DOWN_POSITION = 0.2; 
+    private final double ARM_MIDDLE_POSITION = 0.125;   
+    private final double ARM_UP_POSITION = 0.0;   
 
     // ==================== CONFIGURE INTAKE WHEEL MOTORS ====================
     
@@ -67,6 +75,15 @@ public class Intake extends SubsystemBase{
         motor_10_config
             .apply(global_config);
 
+        motor_10_config.absoluteEncoder
+             .positionConversionFactor(1.0)   //1 rotation = 1.0 units
+             .inverted(false);              // change to true if the encoder reads backwards
+
+        motor_10_config.closedLoop
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
+            .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
+            .outputRange(-0.5, 0.5);                   //limit speed to 50%
+
         m_motor_10.configure(motor_10_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);    
     }
     
@@ -82,16 +99,30 @@ public class Intake extends SubsystemBase{
         m_motor_9.set(0);
     }
 
-    // ==================== SET ARM MOTOR SPEED ====================
+    // ==================== SET ARM POSITION ====================
 
-    private void lowerArm() {
-        m_motor_10.set(0.25);
+    private void setArmPosition(double position) {
+        m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
     }
-    private void raiseArm() {
-        m_motor_10.set(-0.25);
+
+    public void moveArmDown() {
+        setArmPosition(ARM_DOWN_POSITION);
     }
-    private void stopArm() {
-        m_motor_10.set(0);
+    public void moveArmMiddle() {
+        setArmPosition(ARM_MIDDLE_POSITION);
+    }
+    public void moveArmUp() {
+        setArmPosition(ARM_UP_POSITION);
+    }   
+
+    public double getArmPosition() {
+        return m_armEncoder.getPosition();
+    }
+
+    // check if arm is at target position within a certain tolerance
+    public boolean armAtTarget(double targetPosition) {
+        double tolerance = 0.02; //within 0.02 rotations  
+        return Math.abs(getArmPosition() - targetPosition) < tolerance;
     }
 
     // ==================== INTAKE WHEEL COMMANDS ====================

@@ -211,7 +211,16 @@ public class RobotContainer
       driverXbox.y().whileTrue(drivebase.driveForward());
 
       // ==================== OPERATOR COMMANDS ====================
-
+      //wheels 
+      operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
+      operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
+      //arm 
+      operatorXbox.povDown().whileTrue(m_intake.lowerArmCommand());
+      operatorXbox.povUp().whileTrue(m_intake.raiseArmCommand());
+      operatorXbox.povRight().whileTrue(m_intake.stopArmCommand());   
+      //shooter
+      //operatorXbox.leftBumper().whileTrue(m_shooter.startShooterCommand());
+      //operatorXbox.rightBumper().whileTrue(m_shooter.stopShooterCommand());
     }
 
   }
