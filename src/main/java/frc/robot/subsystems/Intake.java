@@ -7,7 +7,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import com.revrobotics.spark.config.ClosedLoopConfig;
+// import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -18,7 +18,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import edu.wpi.first.wpilibj2.command.Command;
 //import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -139,14 +139,20 @@ public class Intake extends SubsystemBase{
 
     // ==================== ARM COMMANDS ====================
 
-    public Command lowerArmCommand(){
-        return new RunCommand(this::lowerArm, this).withName("LowerArm");
+    public Command armDownCommand(){
+        return new RunCommand(this::moveArmDown, this).withName("armDown");
     }
-    public Command raiseArmCommand(){
-        return new RunCommand(this::raiseArm, this).withName("RaiseArm");
+    public Command armMiddleCommand(){
+        return new RunCommand(this::moveArmMiddle, this).withName("armMiddle");
     }
-    public Command stopArmCommand(){
-        return new RunCommand(this::stopArm, this).withName("StopArm");
+    public Command armUpCommand(){
+        return new RunCommand(this::moveArmUp, this).withName("armUp");
     }
 
+    @Override 
+    public void periodic() {
+        // This method will be called once per scheduler run
+        // You can use this to update SmartDashboard values or perform other periodic tasks
+        SmartDashboard.putNumber("Arm Position", getArmPosition());
+    }
 }

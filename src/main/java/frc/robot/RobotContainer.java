@@ -215,9 +215,9 @@ public class RobotContainer
       operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
       operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
       //arm 
-      operatorXbox.povDown().whileTrue(m_intake.lowerArmCommand());
-      operatorXbox.povUp().whileTrue(m_intake.raiseArmCommand());
-      operatorXbox.povRight().whileTrue(m_intake.stopArmCommand());   
+      operatorXbox.povDown().onTrue(m_intake.armDownCommand());
+      operatorXbox.povUp().onTrue(m_intake.armUpCommand());
+      operatorXbox.povRight().onTrue(driveSetpointGenKeyboard)rue(m_intake.armMiddleCommand());   
       //shooter
       //operatorXbox.leftBumper().whileTrue(m_shooter.startShooterCommand());
       //operatorXbox.rightBumper().whileTrue(m_shooter.stopShooterCommand());
