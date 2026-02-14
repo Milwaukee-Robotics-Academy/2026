@@ -36,15 +36,17 @@ public class Intake extends SubsystemBase{
     private final double ARM_MIDDLE_POSITION = 0.125;   
     private final double ARM_UP_POSITION = 0.0;   
 
-    // ==================== CONFIGURE INTAKE WHEEL MOTORS ====================
+    // ==================== CONFIGURE ALL MOTORS ====================
     
     public Intake() {
         //initialize motor 9 as a SparkMax motor
         m_motor_9 = new SparkMax(9, MotorType.kBrushless);
+        m_motor_10 = new SparkMax(10, MotorType.kBrushless);
 
         //set up configs for SparkMax motors
         SparkMaxConfig global_config = new SparkMaxConfig();
         SparkMaxConfig motor_9_config = new SparkMaxConfig();
+        SparkMaxConfig motor_10_config = new SparkMaxConfig();
 
         //configure motor settings
         global_config
@@ -54,25 +56,7 @@ public class Intake extends SubsystemBase{
         motor_9_config
             .apply(global_config);
 
-        m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-    }
-
-    // ==================== CONFIGURE ARM MOTORS ====================
-
-    public void Arm(){
-         //initialize motor 10 as a SparkMax motor
-        m_motor_10 = new SparkMax(10, MotorType.kBrushless);
-
-        //set up configs for SparkMax motors
-        SparkMaxConfig global_config = new SparkMaxConfig();
-        SparkMaxConfig motor_10_config = new SparkMaxConfig();
-
-        //configure motor settings
-         global_config
-            .smartCurrentLimit(40) // only use 40 if NOT 550 motor
-            .idleMode(IdleMode.kBrake);
-
-        motor_10_config
+         motor_10_config
             .apply(global_config);
 
         motor_10_config.absoluteEncoder
@@ -84,9 +68,10 @@ public class Intake extends SubsystemBase{
             .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
             .outputRange(-0.5, 0.5);                   //limit speed to 50%
 
-        m_motor_10.configure(motor_10_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);    
+        m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+        m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     }
-    
+
     // ==================== SET INTAKE WHEEL SPEED ====================
 
     private void forwardIntake() {

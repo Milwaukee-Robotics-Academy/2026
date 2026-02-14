@@ -23,16 +23,18 @@ public class Shooter extends SubsystemBase {
     private SparkMax m_motor_13; //shooter motor 2
 
 
-    // ==================== CONFIGURE SHOOTER MOTORS ====================
+    // ==================== CONFIGURE MOTOR MOTORS ====================
 
     public Shooter() {
 
-        //initialize motor 12 and 13 as a SparkMax motor
-        m_motor_12 = new SparkMax(12, MotorType.kBrushless);
-        m_motor_13 = new SparkMax(13, MotorType.kBrushless);
+        //initialize motor 11, 12, and 13 as a SparkMax motor
+        m_motor_11 = new SparkMax(11, MotorType.kBrushless); // feeder motor
+        m_motor_12 = new SparkMax(12, MotorType.kBrushless); // shooter motor 1
+        m_motor_13 = new SparkMax(13, MotorType.kBrushless); // shooter motor 2
 
         //set up configs for SparkMax motors
         SparkMaxConfig global_config = new SparkMaxConfig();
+        SparkMaxConfig motor_11_config = new SparkMaxConfig();
         SparkMaxConfig motor_12_config = new SparkMaxConfig();
         SparkMaxConfig motor_13_config = new SparkMaxConfig();
 
@@ -41,35 +43,16 @@ public class Shooter extends SubsystemBase {
             .smartCurrentLimit(40) // only use 40 if NOT 550 motor
             .idleMode(IdleMode.kBrake);
 
+        motor_11_config
+            .apply(global_config);
         motor_12_config
             .apply(global_config);
         motor_13_config
             .apply(global_config);
 
+        m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_12.configure(motor_12_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_13.configure(motor_13_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    }
-
-    // ==================== CONFIGURE FEEDER MOTORS ====================
-
-    public void Feeder() {
-
-         //initialize motor 11 as a SparkMax motor
-        m_motor_11 = new SparkMax(11, MotorType.kBrushless);
-
-        //set up configs for SparkMax motors
-        SparkMaxConfig global_config = new SparkMaxConfig();
-        SparkMaxConfig motor_11_config = new SparkMaxConfig();
-
-        //configure motor settings
-         global_config
-            .smartCurrentLimit(40) // only use 40 if NOT 550 motor
-            .idleMode(IdleMode.kBrake);
-
-        motor_11_config
-            .apply(global_config);
-
-        m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);    
     }
 
     // ==================== SET SHOOTER SPEED ====================
