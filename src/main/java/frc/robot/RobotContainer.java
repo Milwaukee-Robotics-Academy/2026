@@ -196,6 +196,12 @@ public class RobotContainer
       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
+
+      // test to determine shooter directions (make sure to comment out .follow() in Shooter constructor when testing directions)
+      // CRITICAL: Only test ONE motor at a time to determine direction, comment out the other command when testing
+      operatorXbox.rightBumper().whileTrue(m_shooter.testMotor12Forward());
+      // operatorXbox.leftBumper().whileTrue(m_shooter.testMotor13Forward());
+
     } else
     {
 
@@ -238,14 +244,12 @@ public class RobotContainer
    *
    * @return the command to run in autonomous
    */
-  private Command getAutonomousCommand()
-  {
+  private Command getAutonomousCommand() {
     // Pass in the selected auto from the SmartDashboard as our desired autnomous commmand 
     return autoChooser.getSelected();
   }
 
-  private void setMotorBrake(boolean brake)
-  {
+  private void setMotorBrake(boolean brake) {
     drivebase.setMotorBrake(brake);
   }
 }

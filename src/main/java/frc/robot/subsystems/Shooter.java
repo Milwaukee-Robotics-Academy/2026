@@ -5,7 +5,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.Command;
-//import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -55,8 +55,8 @@ public class Shooter extends SubsystemBase {
 
         // configure encoder settings
         global_config.encoder
-            .positionConversionFactor(1.0)
-            .velocityConversionFactor(1.0);
+            .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
+            .velocityConversionFactor(1.0);  // 1 RPM = 1.0 units
 
         // apply global config to all motors
         motor_11_config
@@ -67,8 +67,8 @@ public class Shooter extends SubsystemBase {
             .apply(global_config);
         
         // CRITICAL: Make motor 13 follow motor 12 (false = same direction, true = opposite direction if motors are mirrored)
-        // CHECK THIS BEFORE DEPLOYING!!!!!!
-        // Consider testing motor directions ALONE first
+        // TEST THIS BEFORE DEPLOYING!!!!!!
+        // !!!! Comment out .follow() when testing !!!!
         motor_13_config.follow(12, true);  
 
         m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -92,7 +92,7 @@ public class Shooter extends SubsystemBase {
 
     // Get current shooter velocity in RPM
     public double getShooterVelocityRPM() {
-        return m_encoder_12.getVelocity();  // Returns RPM, only read leader
+        return m_encoder_12.getVelocity();  // Returns RPM, only read leader (motor 12)
     }
 
     // Check if shooter is at target speed and ready to shoot
@@ -115,9 +115,38 @@ public class Shooter extends SubsystemBase {
         m_motor_11.set(0);
     }
 
-    // ==================== SHOOTER COMMANDS ====================
+    // ==================== TESTING COMMANDS (DELETE AFTER TESTING) ====================
+ 
+    // INSTRUCTIONS FOR MOTOR DIRECTION TESTING:
+    // 1. Comment out motor_13_config.follow(12, true) in constructor
+    // 2. Deploy with ONLY testMotor12Forward uncommented (in shooter AND robot container)
+    // 3. Press button, note motor 12 direction
+    // 4. Stop robot
+    // 5. Comment testMotor12Forward, uncomment testMotor13Forward (in shooter AND robot container)
+    // 6. Deploy, press button, note motor 13 direction
+    // 7. Compare directions:
+    //    - Same direction → use follow(12, false)
+    //    - Opposite → use follow(12, true)
+    // 8. Update constructor, delete this entire section
+    //
+    // public Command testMotor12Forward() {
+    //     return runOnce(() -> m_motor_12.set(0.2));
+    // }
+    
+    // public Command testMotor13Forward() {
+    //     return runOnce(() -> m_motor_13.set(0.2));  // POSITIVE 0.2, not negative!
+    // }
+    
+    // public Command testStopAll() {
+    //     return runOnce(() -> {
+    //         m_motor_12.set(0);
+    //         m_motor_13.set(0);
+    //     });
+    // }
 
-   public Command smartFeederCommand() {
+    // ==================== SHOOTER COMMANDS ====================
+    
+    public Command smartFeederCommand() {
     return new RunCommand(() -> {
         if (isShooterReady()) {
             forwardFeeder();  // Run feeder when shooter at speed
@@ -135,9 +164,9 @@ public class Shooter extends SubsystemBase {
     // public Command reverseShooterCommand(){
     //     return new RunCommand(this::reverseShooter, this).withName("ReverseShooter");
     // }
-    // public Command stopShooterCommand(){
-    //     return new RunCommand(this::stopShooter, this).withName("StopShooter");
-    // }
+    public Command stopShooterCommand(){
+        return new InstantCommand(this::stopShooter, this).withName("StopShooter");
+    }
 
     // ==================== FEEDER COMMANDS ====================
 
@@ -157,6 +186,7 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Shooter/Current RPM", getShooterVelocityRPM());
         SmartDashboard.putNumber("Shooter/Target RPM", TARGET_SHOOTER_RPM);
         SmartDashboard.putBoolean("Shooter/Ready", isShooterReady());
+        SmartDashboard.putBoolean("Shooter/Feeder Running", m_motor_11.get() > 0.1); 
     }
 
 }
