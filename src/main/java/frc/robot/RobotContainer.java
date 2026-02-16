@@ -211,15 +211,24 @@ public class RobotContainer
       driverXbox.y().whileTrue(drivebase.driveForward());
 
       // ==================== OPERATOR COMMANDS ====================
-      //wheels 
+      //intake wheels 
       operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
       operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
+
       //arm 
       operatorXbox.povDown().onTrue(m_intake.armDownCommand());
       operatorXbox.povUp().onTrue(m_intake.armUpCommand());
-      operatorXbox.povRight().onTrue(driveSetpointGenKeyboard)rue(m_intake.armMiddleCommand());   
+      operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
+
       //shooter
+      // Option 1: Right Trigger - Smart feeder (auto-pauses and resumes)
       operatorXbox.rightTrigger().whileTrue(m_shooter.smartFeederCommand());
+
+      // Option 2: Right Bumper - Spin up shooter (tesing)
+      operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
+
+      // Option 3: Left Bumper - Force feeder (testing/override, no safety)
+      operatorXbox.leftBumper().whileTrue(m_shooter.forwardFeederCommand());
     }
 
   }

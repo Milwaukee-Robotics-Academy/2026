@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase{
     private final double ARM_MIDDLE_POSITION = 0.125;   
     private final double ARM_UP_POSITION = 0.0;   
 
-    // ==================== CONFIGURE ALL MOTORS ====================
+    // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
     
     public Intake() {
         //initialize motor 9 as a SparkMax motor
@@ -60,7 +60,7 @@ public class Intake extends SubsystemBase{
             .apply(global_config);
 
         motor_10_config.absoluteEncoder
-             .positionConversionFactor(1.0)   //1 rotation = 1.0 units
+             .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
              .inverted(false);              // change to true if the encoder reads backwards
 
         motor_10_config.closedLoop
@@ -125,13 +125,13 @@ public class Intake extends SubsystemBase{
     // ==================== ARM COMMANDS ====================
 
     public Command armDownCommand(){
-        return new RunCommand(this::moveArmDown, this).withName("armDown");
+        return new RunCommand(this::moveArmDown, this).withName("ArmDown");
     }
     public Command armMiddleCommand(){
-        return new RunCommand(this::moveArmMiddle, this).withName("armMiddle");
+        return new RunCommand(this::moveArmMiddle, this).withName("ArmMiddle");
     }
     public Command armUpCommand(){
-        return new RunCommand(this::moveArmUp, this).withName("armUp");
+        return new RunCommand(this::moveArmUp, this).withName("ArmUp");
     }
 
     @Override 
