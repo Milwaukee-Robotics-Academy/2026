@@ -22,6 +22,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.ClimbDown;
+import frc.robot.commands.ClimbUp;
+import frc.robot.commands.Eject;
+import frc.robot.commands.Intake;
+import frc.robot.commands.LaunchSequence;
+import frc.robot.subsystems.CANFuelSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -39,6 +46,8 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
+  private final CANFuelSubsystem m_fuelSubsystem = new CANFuelSubsystem();
+  private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -197,6 +206,22 @@ public class RobotContainer
       //driverXbox.y().onTrue(drivebase.driveToDistanceCommandDefer(drivebase::getPose, 2, 14));
       driverXbox.y().whileTrue(m_drivebase.driveForward());
     }
+    // While the left bumper on operator controller is held, intake Fuel
+    driverXbox.leftBumper().whileTrue(new Intake(m_fuelSubsystem));
+    // While the right bumper on the operator controller is held, spin up for 1
+    // second, then launch fuel. When the button is released, stop.
+    driverXbox.rightBumper().whileTrue(new LaunchSequence(m_fuelSubsystem));
+    // While the A button is held on the operator controller, eject fuel back out
+    // the intake
+    driverXbox.a().whileTrue(new Eject(m_fuelSubsystem));
+   // While the down arrow on the directional pad is held it will unclimb the robot
+    driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
+    // While the up arrow on the directional pad is held it will cimb the robot
+    driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
+
+    m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.run(() -> m_fuelSubsystem.stop()));
+
+    m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
 
   }
 
