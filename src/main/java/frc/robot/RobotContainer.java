@@ -4,8 +4,11 @@
 
 package frc.robot;
 
+import java.io.File;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,10 +25,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import java.io.File;
-import java.lang.module.ModuleDescriptor.Version;
-
 import swervelib.SwerveInputStream;
 //import frc.robot.subsystems.QuestNavSubsystem;
 
@@ -46,6 +47,7 @@ public class RobotContainer
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
+  private final Intake m_Intake = new Intake();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -183,6 +185,7 @@ public class RobotContainer
     if (DriverStation.isTest())
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+    m_Intake.setDefaultCommand(m_Intake.stopCommand());
 
       driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
@@ -196,19 +199,19 @@ public class RobotContainer
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      driverXbox.leftBumper().whileTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
       //driverXbox.y().onTrue(drivebase.driveToDistanceCommandDefer(drivebase::getPose, 2, 14));
       driverXbox.y().whileTrue(drivebase.driveForward());
       operatorXbox.rightTrigger().onTrue(Commands.none());
-      operatorXbox.rightBumper().onTrue(Commands.none());
+      operatorXbox.rightBumper().onTrue(m_Intake.intakeCommand());
       operatorXbox.leftTrigger().whileTrue(Commands.none());
-      operatorXbox.x().onTrue(Commands.none());
+      operatorXbox.leftBumper().onTrue(m_Intake.outtakeCommand());
+      operatorXbox.x().whileTrue(m_Intake.goUpFunctionCommand());
       operatorXbox.y().onTrue(Commands.none());
-      operatorXbox.b().onTrue(Commands.none());
+      operatorXbox.b().whileTrue(m_Intake.goDownFunctionCommand());
       operatorXbox.povUp().whileTrue(Commands.none()); 
       operatorXbox.povDown().onTrue(Commands.none()); 
-      operatorXbox.povLeft().onTrue(Commands.none());
       operatorXbox.povLeft().onTrue(Commands.none());
     }
 

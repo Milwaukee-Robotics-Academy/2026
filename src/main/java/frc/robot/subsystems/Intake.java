@@ -20,8 +20,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
   private SparkMax m_motor_9;
   private SparkMax m_motor_10;
+  private SparkMax m_motor_11;
   private RelativeEncoder m_encoder_9;
   private RelativeEncoder m_encoder_10;
+  private RelativeEncoder m_encoder_11;
 
     
 
@@ -50,26 +52,29 @@ public class Intake extends SubsystemBase {
 
 
   private void intake(){
-    m_motor_9.set(0.5);
+    m_motor_11.set(0.5);
   }
 
   private void stopIntake(){
-    m_motor_9.set(0);
+    m_motor_11.set(0);
   }
 
   private void outtake(){
-    m_motor_9.set(-0.5);
+    m_motor_11.set(-0.5);
   }
 
   private void raiseArm(){
+    m_motor_9.set(0.25);
     m_motor_10.set(0.25);
   }
 
   private void stopArm(){
+    m_motor_9.set(0);
     m_motor_10.set(0);
   }
 
   private void lowerArm(){
+    m_motor_9.set(-0.25);
     m_motor_10.set(-0.25);
   }
 
@@ -97,9 +102,9 @@ public class Intake extends SubsystemBase {
   @Override
     public void periodic() {
       // This method will be called once per scheduler run
-      SmartDashboard.putNumber("Intake Algae", m_encoder_9.getPosition());
-      SmartDashboard.putNumber("Outtake Algae", m_encoder_10.getPosition());
+      SmartDashboard.putNumber("Arm Lifter Left", m_encoder_9.getPosition());
+      SmartDashboard.putNumber("Arm Lifter Right", m_encoder_10.getPosition());
+      SmartDashboard.putNumber("Intake", m_encoder_11.getPosition());
     
     }
 }
- 
