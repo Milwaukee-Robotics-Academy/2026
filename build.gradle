@@ -8,7 +8,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-sourceSets {
+sourceSets 
     main {
         java {
            srcDir '../../yagsl/java/'
