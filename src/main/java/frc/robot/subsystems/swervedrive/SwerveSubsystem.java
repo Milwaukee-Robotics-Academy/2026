@@ -134,7 +134,24 @@ public class SwerveSubsystem extends SubsystemBase
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
-  @Override
+  /**
+   * Configure PathPlanner AutoBuilder and warm up pathfinding resources.
+   *
+   * This method reads the GUI robot configuration, sets up the AutoBuilder
+   * with the appropriate pose/velocity suppliers and a holonomic controller,
+   * and schedules a warmup task for pathfinding. Exceptions during
+   * configuration are printed to the console.
+   */
+
+  /**
+   * Periodic update called by the WPILib scheduler (runs roughly every 20ms).
+   *
+   * When vision-driven odometry updates are enabled via {@code visionDriveTest},
+   * this method will manually update the underlying {@link SwerveDrive} odometry
+   * and feed the vision estimator with the latest pose estimate.
+   *
+   * This method must remain non-blocking and quick to execute.
+  */
   public void periodic()
   {
     // When vision is enabled we must manually update odometry in SwerveDrive
@@ -145,10 +162,18 @@ public class SwerveSubsystem extends SubsystemBase
     }
   }
 
+  /**
+   * Simulation-only periodic update called by the WPILib scheduler while
+   * running in simulation.
+   *
+   * Leave empty for real robot runs. Use this hook to update simulation-only
+   * state when running in the simulator.
+   */
   @Override
   public void simulationPeriodic()
   {
   }
+
 
   /**
    * Setup AutoBuilder for PathPlanner.
