@@ -4,20 +4,16 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.FuelConstants;
 
 import static frc.robot.Constants.FuelConstants.*;
@@ -69,13 +65,15 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
     SmartDashboard.putNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
     SmartDashboard.putNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT);
-    //SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
+    // SmartDashboard.putNumber("Spin-up feeder roller value",
+    // SPIN_UP_FEEDER_VOLTAGE);
   }
 
   /**
    * Set the output for both launcher/intake motors.
    *
-   * @param power Motor output in the range supported by SparkMax (typically -1.0..1.0)
+   * @param power Motor output in the range supported by SparkMax (typically
+   *              -1.0..1.0)
    */
   public void setIntakeLauncherRoller(double power) {
     LeftIntakeLauncher.set(power);
@@ -85,7 +83,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   /**
    * Set the output for the indexer / feeder roller.
    *
-   * @param power Motor output in the range supported by SparkMax (typically -1.0..1.0)
+   * @param power Motor output in the range supported by SparkMax (typically
+   *              -1.0..1.0)
    */
   public void setFeederRoller(double power) {
     Indexer.set(power); // positive for shooting
@@ -105,19 +104,19 @@ public class CANFuelSubsystem extends SubsystemBase {
    *
    * Values are read from SmartDashboard keys so they can be tuned at runtime.
    *
-   * @return a Command that starts the intake and stops it when finished/interrupted
+   * @return a Command that starts the intake and stops it when
+   *         finished/interrupted
    */
   public Command intakeCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-      () -> {
-        double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
-        double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
-        setIntakeLauncherRoller(intakePercent);
-        setFeederRoller(feederPercent);
-      },
-      this::stop,
-      this
-    ).withName("Intake");
+        () -> {
+          double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
+          double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
+          setIntakeLauncherRoller(intakePercent);
+          setFeederRoller(feederPercent);
+        },
+        this::stop,
+        this).withName("Intake");
   }
 
   /**
@@ -127,16 +126,15 @@ public class CANFuelSubsystem extends SubsystemBase {
    */
   public Command ejectCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-      () -> {
-        double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
-        double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
-        // reverse the intake and feeder to eject
-        setIntakeLauncherRoller(-intakePercent);
-        setFeederRoller(-feederPercent);
-      },
-      this::stop,
-      this
-    ).withName("Eject");
+        () -> {
+          double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
+          double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
+          // reverse the intake and feeder to eject
+          setIntakeLauncherRoller(-intakePercent);
+          setFeederRoller(-feederPercent);
+        },
+        this::stop,
+        this).withName("Eject");
   }
 
   /**
@@ -148,15 +146,15 @@ public class CANFuelSubsystem extends SubsystemBase {
    */
   public Command spinUpCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-      () -> {
-        double launcherPercent = SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT);
-        double feederPercent = SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
-        setIntakeLauncherRoller(launcherPercent);
-        setFeederRoller(feederPercent);
-      },
-      this::stop,
-      this
-    ).withName("SpinUp");
+        () -> {
+          double launcherPercent = SmartDashboard.getNumber("Launching launcher roller value",
+              LAUNCHING_LAUNCHER_PERCENT);
+          double feederPercent = SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
+          setIntakeLauncherRoller(launcherPercent);
+          setFeederRoller(feederPercent);
+        },
+        this::stop,
+        this).withName("SpinUp");
   }
 
   /**
@@ -164,18 +162,18 @@ public class CANFuelSubsystem extends SubsystemBase {
    *
    * @return a Command that runs the full launch routine
    */
-  public Command launchCommand(){
+  public Command launchCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-      () -> {
-    setIntakeLauncherRoller(
-            SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
-    setFeederRoller(SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT));
-      },
-      this::stop,
-      this
-    ).withName("Launch");
-    
+        () -> {
+          setIntakeLauncherRoller(
+              SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
+          setFeederRoller(SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT));
+        },
+        this::stop,
+        this).withName("Launch");
+
   }
+
   /**
    * Convenience sequence that spins up the launcher for a configured timeout,
    * then runs the full launch command.
@@ -183,12 +181,13 @@ public class CANFuelSubsystem extends SubsystemBase {
    * @return a SequentialCommandGroup performing spin-up then launch
    */
   public Command launchSequenceCommand() {
-    // Spin up the launcher briefly, then run launcher+feeder to shoot until interrupted
+    // Spin up the launcher briefly, then run launcher+feeder to shoot until
+    // interrupted
     return new edu.wpi.first.wpilibj2.command.SequentialCommandGroup(
-      spinUpCommand().withTimeout(FuelConstants.SPIN_UP_SECONDS),
-      launchCommand()
-    );
+        spinUpCommand().withTimeout(FuelConstants.SPIN_UP_SECONDS),
+        launchCommand());
   }
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
