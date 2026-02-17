@@ -207,13 +207,13 @@ public class RobotContainer
       driverXbox.y().whileTrue(m_drivebase.driveForward());
     }
     // While the left bumper on operator controller is held, intake Fuel
-    driverXbox.leftBumper().whileTrue(new Intake(m_fuelSubsystem));
+    driverXbox.leftBumper().whileTrue(m_fuelSubsystem.intakeCommand());
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
-    driverXbox.rightBumper().whileTrue(new LaunchSequence(m_fuelSubsystem));
+    driverXbox.rightBumper().whileTrue(m_fuelSubsystem.launchSequenceCommand());
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
-    driverXbox.a().whileTrue(new Eject(m_fuelSubsystem));
+    driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
    // While the down arrow on the directional pad is held it will unclimb the robot
     driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
