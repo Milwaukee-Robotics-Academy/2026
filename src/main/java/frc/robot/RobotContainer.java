@@ -48,7 +48,7 @@ public class RobotContainer
                                                                                 "swerve/maxSwerve"));
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
-  private final Vision m_vision;
+  //private final Vision m_vision;
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -111,6 +111,8 @@ public class RobotContainer
    */
   public RobotContainer()
   {
+    //m_vision = new Vision(drivebase.getSwerveDrive());
+    
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
