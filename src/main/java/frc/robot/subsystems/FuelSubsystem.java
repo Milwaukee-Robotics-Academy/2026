@@ -4,11 +4,7 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -26,55 +22,37 @@ import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.local.SparkWrapper;
 import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.DegreesPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.Rotations;
-import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
-import static edu.wpi.first.units.Units.VoltsPerRadianPerSecond;
-import static yams.mechanisms.SmartMechanism.gearbox;
-import static yams.mechanisms.SmartMechanism.gearing;
-
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-
 import edu.wpi.first.math.Pair;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import yams.gearing.GearBox;
-import yams.gearing.MechanismGearing;
-import yams.mechanisms.config.FlyWheelConfig;
-import yams.mechanisms.velocity.FlyWheel;
-import yams.motorcontrollers.SmartMotorController;
-import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
-import yams.motorcontrollers.local.SparkWrapper;
-
 import static frc.robot.Constants.FuelConstants.*;
 
+/**
+ * Subsystem controlling the fuel (ball) shooter and indexer.
+ *
+ * This subsystem wraps low-level motor controllers and a FlyWheel helper
+ * to provide velocity control, duty-cycle control, and common command
+ * sequences (intake, eject, spin-up, launch sequences).
+ */
 public class FuelSubsystem extends SubsystemBase {
 
+  /** Left launcher motor controller (brushless) - primary controller */
   private final SparkMax leftIntakeLauncher = new SparkMax(FuelConstants.LEFT_INTAKE_LAUNCHER_MOTOR_ID,
-      MotorType.kBrushless);
+    MotorType.kBrushless);
+  /** Right launcher motor controller (brushless) - follower */
   private final SparkMax rightIntakeLauncher = new SparkMax(FuelConstants.RIGHT_INTAKE_LAUNCHER_MOTOR_ID,
-      MotorType.kBrushless);
+    MotorType.kBrushless);
+  /** Configuration for the left launcher motor controller */
   private final SmartMotorControllerConfig leftIntakeLauncherConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(0.00016541, 0, 0, RPM.of(5000), RotationsPerSecondPerSecond.of(2500))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
@@ -116,11 +94,10 @@ public class FuelSubsystem extends SubsystemBase {
 
 
   /**
-   * Construct the CANFuelSubsystem.
+   * Construct the FuelSubsystem.
    *
-   * This sets up motor controllers for the intake/launcher and indexer, applies
-   * default SmartDashboard tuning values, and configures current limits and
-   * motor inversion where appropriate.
+   * Puts default SmartDashboard values for tuning and leaves motor controllers
+   * configured via the SmartMotorController and FlyWheel helper classes.
    */
   public FuelSubsystem() {
 
@@ -137,26 +114,60 @@ public class FuelSubsystem extends SubsystemBase {
     // SPIN_UP_FEEDER_VOLTAGE);
   }
 
+  /**
+   * Get the current flywheel angular velocity.
+   *
+   * @return current flywheel speed as an {@link AngularVelocity}
+   */
   public AngularVelocity getVelocity() {
     return intakeLauncherFlywheel.getSpeed();
   }
 
+  /**
+   * Create a command that sets the flywheel to the requested angular velocity.
+   *
+   * @param speed requested angular velocity
+   * @return a Command that will run the closed-loop velocity control
+   */
   public Command setVelocity(AngularVelocity speed) {
     return intakeLauncherFlywheel.setSpeed(speed);
   }
 
+  /**
+   * Create a command that sets the flywheel using an open-loop duty cycle.
+   *
+   * @param dutyCycle duty cycle (-1.0..1.0)
+   * @return a Command that will set the flywheel duty cycle while running
+   */
   public Command setDutyCycle(double dutyCycle) {
     return intakeLauncherFlywheel.set(dutyCycle);
   }
 
+  /**
+   * Create a command that sets the flywheel to a velocity supplied each loop.
+   *
+   * @param speed supplier of requested angular velocity
+   * @return a Command that will run closed-loop control using the supplier
+   */
   public Command setVelocity(Supplier<AngularVelocity> speed) {
     return intakeLauncherFlywheel.setSpeed(speed);
   }
 
+  /**
+   * Create a command that sets the flywheel duty cycle using a supplier.
+   *
+   * @param dutyCycle supplier of duty cycle (-1.0..1.0)
+   * @return a Command that will set the flywheel duty cycle
+   */
   public Command setDutyCycle(Supplier<Double> dutyCycle) {
     return intakeLauncherFlywheel.set(dutyCycle);
   }
 
+  /**
+   * Generate a SysId routine command for the flywheel (used for system identification).
+   *
+   * @return a Command that performs system identification on the flywheel
+   */
   public Command sysId() {
     return intakeLauncherFlywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5));
   }
