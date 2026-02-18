@@ -25,8 +25,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase{
     
     
-    private SparkMax m_motor_9;  // intake motor
-    private SparkMax m_motor_10; // arm motor
+    // ===private SparkMax m_motor_9; ===  // intake motor
+    // ===private SparkMax m_motor_10; === // arm motor
 
     private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
     private SparkClosedLoopController m_armPID; //closed loop controller for arm position
@@ -39,50 +39,50 @@ public class Intake extends SubsystemBase{
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
     
     public Intake() {
-        //initialize motor 9 as a SparkMax motor
-        m_motor_9 = new SparkMax(9, MotorType.kBrushless);
-        m_motor_10 = new SparkMax(10, MotorType.kBrushless);
+        // //initialize motor 9 as a SparkMax motor
+        // m_motor_9 = new SparkMax(9, MotorType.kBrushless);
+        // m_motor_10 = new SparkMax(10, MotorType.kBrushless);
 
-        //set up configs for SparkMax motors
-        SparkMaxConfig global_config = new SparkMaxConfig();
-        SparkMaxConfig motor_9_config = new SparkMaxConfig();
-        SparkMaxConfig motor_10_config = new SparkMaxConfig();
+        // //set up configs for SparkMax motors
+        // SparkMaxConfig global_config = new SparkMaxConfig();
+        // SparkMaxConfig motor_9_config = new SparkMaxConfig();
+        // SparkMaxConfig motor_10_config = new SparkMaxConfig();
 
-        //configure motor settings
-        global_config
-            .smartCurrentLimit(40) // only use 40 if NOT 550 motor
-            .idleMode(IdleMode.kBrake);
+        // //configure motor settings
+        // global_config
+        //     .smartCurrentLimit(40) // only use 40 if NOT 550 motor
+        //     .idleMode(IdleMode.kBrake);
 
-        motor_9_config
-            .apply(global_config);
+        // motor_9_config
+        //     .apply(global_config);
 
-         motor_10_config
-            .apply(global_config);
+        //  motor_10_config
+        //     .apply(global_config);
 
-        motor_10_config.absoluteEncoder
-             .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
-             .inverted(false);              // change to true if the encoder reads backwards
+        // motor_10_config.absoluteEncoder
+        //      .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
+        //      .inverted(false);              // change to true if the encoder reads backwards
 
-        motor_10_config.closedLoop
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
-            .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
-            .outputRange(-0.5, 0.5);                   //limit speed to 50%
+        // motor_10_config.closedLoop
+        //     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
+        //     .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
+        //     .outputRange(-0.5, 0.5);                   //limit speed to 50%
 
-        m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-        m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+        // m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+        // m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     }
 
     // ==================== SET INTAKE WHEEL SPEED ====================
 
-    private void forwardIntake() {
-        m_motor_9.set(0.5);
-    }
-    private void reverseIntake() {
-        m_motor_9.set(-0.5);
-    }
-    private void stopIntake() {
-        m_motor_9.set(0);
-    }
+    // private void forwardIntake() {
+    //     m_motor_9.set(0.5);
+    // }
+    // private void reverseIntake() {
+    //     m_motor_9.set(-0.5);
+    // }
+    // private void stopIntake() {
+    //     m_motor_9.set(0);
+    // }
 
     // ==================== SET ARM POSITION ====================
 
@@ -112,15 +112,15 @@ public class Intake extends SubsystemBase{
 
     // ==================== INTAKE WHEEL COMMANDS ====================
 
-    public Command forwardIntakeCommand(){
-        return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
-    }
-    public Command reverseIntakeCommand(){
-        return new RunCommand(this::reverseIntake, this).withName("ReverseIntake");
-    }
-    public Command stopIntakeCommand(){
-        return new RunCommand(this::stopIntake, this).withName("StopIntake");
-    }
+    // public Command forwardIntakeCommand(){
+    //     return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
+    // }
+    // public Command reverseIntakeCommand(){
+    //     return new RunCommand(this::reverseIntake, this).withName("ReverseIntake");
+    // }
+    // public Command stopIntakeCommand(){
+    //     return new RunCommand(this::stopIntake, this).withName("StopIntake");
+    // }
 
     // ==================== ARM COMMANDS ====================
 

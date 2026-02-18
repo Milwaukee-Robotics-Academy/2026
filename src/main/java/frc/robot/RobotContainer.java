@@ -222,8 +222,8 @@ public class RobotContainer
 
       // ==================== OPERATOR COMMANDS ====================
       //intake wheels 
-      operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
-      operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
+      // operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
+      // operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
 
       //arm 
       operatorXbox.povDown().onTrue(m_intake.armDownCommand());
