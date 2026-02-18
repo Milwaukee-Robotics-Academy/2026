@@ -119,7 +119,7 @@ public class FuelSubsystem extends SubsystemBase {
    *
    * @return current flywheel speed as an {@link AngularVelocity}
    */
-  public AngularVelocity getVelocity() {
+  public AngularVelocity getIntakeLauncherVelocity() {
     return intakeLauncherFlywheel.getSpeed();
   }
 
@@ -129,7 +129,7 @@ public class FuelSubsystem extends SubsystemBase {
    * @param speed requested angular velocity
    * @return a Command that will run the closed-loop velocity control
    */
-  public Command setVelocity(AngularVelocity speed) {
+  public Command setIntakeLauncherVelocity(AngularVelocity speed) {
     return intakeLauncherFlywheel.setSpeed(speed);
   }
 
@@ -139,7 +139,7 @@ public class FuelSubsystem extends SubsystemBase {
    * @param dutyCycle duty cycle (-1.0..1.0)
    * @return a Command that will set the flywheel duty cycle while running
    */
-  public Command setDutyCycle(double dutyCycle) {
+  public Command setIntakeLauncherDutyCycle(double dutyCycle) {
     return intakeLauncherFlywheel.set(dutyCycle);
   }
 
@@ -149,7 +149,7 @@ public class FuelSubsystem extends SubsystemBase {
    * @param speed supplier of requested angular velocity
    * @return a Command that will run closed-loop control using the supplier
    */
-  public Command setVelocity(Supplier<AngularVelocity> speed) {
+  public Command setIntakeLauncherVelocity(Supplier<AngularVelocity> speed) {
     return intakeLauncherFlywheel.setSpeed(speed);
   }
 
@@ -159,7 +159,7 @@ public class FuelSubsystem extends SubsystemBase {
    * @param dutyCycle supplier of duty cycle (-1.0..1.0)
    * @return a Command that will set the flywheel duty cycle
    */
-  public Command setDutyCycle(Supplier<Double> dutyCycle) {
+  public Command setIntakeLauncherDutyCycle(Supplier<Double> dutyCycle) {
     return intakeLauncherFlywheel.set(dutyCycle);
   }
 
@@ -180,7 +180,7 @@ public class FuelSubsystem extends SubsystemBase {
    * @param power Motor output in the range supported by SparkMax (typically
    *              -1.0..1.0)
    */
-  public void setFeederRoller(double power) {
+  public void setIndexer(double power) {
     indexerController.setDutyCycle(power); // positive for shooting
   }
 
@@ -205,8 +205,8 @@ public class FuelSubsystem extends SubsystemBase {
         () -> {
           double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
           double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
-       //   setIntakeLauncherRoller(intakePercent);
-          setFeederRoller(feederPercent);
+          setIntakeLauncherDutyCycle(intakePercent);
+          setIndexer(feederPercent);
         },
         this::stop,
         this).withName("Intake");
@@ -223,8 +223,8 @@ public class FuelSubsystem extends SubsystemBase {
           double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
           double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
           // reverse the intake and feeder to eject
-   // TODO       setIntakeLauncherRoller(-intakePercent);
-          setFeederRoller(-feederPercent);
+          setIntakeLauncherDutyCycle(-intakePercent);
+          setIndexer(-feederPercent);
         },
         this::stop,
         this).withName("Eject");
@@ -243,8 +243,8 @@ public class FuelSubsystem extends SubsystemBase {
           double launcherPercent = SmartDashboard.getNumber("Launching launcher roller value",
               LAUNCHING_LAUNCHER_PERCENT);
           double feederPercent = SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
-    // TODO           setIntakeLauncherRoller(launcherPercent);
-          setFeederRoller(feederPercent);
+          setIntakeLauncherDutyCycle(launcherPercent);
+          setIndexer(feederPercent);
         },
         this::stop,
         this).withName("SpinUp");
@@ -255,17 +255,17 @@ public class FuelSubsystem extends SubsystemBase {
    *
    * @return a Command that runs the full launch routine
    */
-  // public Command launchCommand() {
-  //   return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-  //       () -> {
-  //         setIntakeLauncherRoller(
-  //             SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
-  //         setFeederRoller(SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT));
-  //       },
-  //       this::stop,
-  //       this).withName("Launch");
+  public Command launchCommand() {
+    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
+        () -> {
+          setIntakeLauncherDutyCycle(
+              SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
+          setIndexer(SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT));
+        },
+        this::stop,
+        this).withName("Launch");
 
-  // }
+  }
 
   /**
    * Convenience sequence that spins up the launcher for a configured timeout,
