@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends SubsystemBase {
     
-    private SparkMax m_motor_11; // feeder motor
+    //private SparkMax m_motor_11; // feeder motor
     private SparkMax m_motor_12; // shooter motor 1 (leader)
     private SparkMax m_motor_13; // shooter motor 2 (follower)
 
@@ -35,7 +35,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
 
         // initialize motor 11, 12, and 13 as a SparkMax motor
-        m_motor_11 = new SparkMax(11, MotorType.kBrushless); // feeder motor
+        //m_motor_11 = new SparkMax(11, MotorType.kBrushless); // feeder motor
         m_motor_12 = new SparkMax(12, MotorType.kBrushless); // shooter motor 1
         m_motor_13 = new SparkMax(13, MotorType.kBrushless); // shooter motor 2
 
@@ -44,7 +44,7 @@ public class Shooter extends SubsystemBase {
 
         // set up configs for SparkMax motors
         SparkMaxConfig global_config = new SparkMaxConfig();
-        SparkMaxConfig motor_11_config = new SparkMaxConfig();
+        //SparkMaxConfig motor_11_config = new SparkMaxConfig();
         SparkMaxConfig motor_12_config = new SparkMaxConfig();
         SparkMaxConfig motor_13_config = new SparkMaxConfig();
 
@@ -59,8 +59,8 @@ public class Shooter extends SubsystemBase {
             .velocityConversionFactor(1.0);  // 1 RPM = 1.0 units
 
         // apply global config to all motors
-        motor_11_config
-            .apply(global_config);
+        //motor_11_config
+        //    .apply(global_config);
         motor_12_config
             .apply(global_config);
         motor_13_config
@@ -71,7 +71,7 @@ public class Shooter extends SubsystemBase {
         // !!!! Comment out .follow() when testing !!!!
         motor_13_config.follow(12, true);  
 
-        m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        //m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_12.configure(motor_12_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_13.configure(motor_13_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -105,15 +105,15 @@ public class Shooter extends SubsystemBase {
     // ==================== FEEDER METHODS ====================
 
     // Set feeder motor speeds (change during testing)
-    private void forwardFeeder() {
-        m_motor_11.set(0.5);
-    }
-    private void reverseFeeder() {
-        m_motor_11.set(-0.5);
-    }
-    private void stopFeeder() {
-        m_motor_11.set(0);
-    }
+    // private void forwardFeeder() {
+    //     m_motor_11.set(0.5);
+    // }
+    // private void reverseFeeder() {
+    //     m_motor_11.set(-0.5);
+    // }
+    // private void stopFeeder() {
+    //     m_motor_11.set(0);
+    // }
 
     // ==================== TESTING COMMANDS (DELETE AFTER TESTING) ====================
  
@@ -144,15 +144,15 @@ public class Shooter extends SubsystemBase {
 
     // ==================== SHOOTER COMMANDS ====================
     
-    public Command smartFeederCommand() {
-    return new RunCommand(() -> {
-        if (isShooterReady()) {
-            forwardFeeder();  // Run feeder when shooter at speed
-        } else {
-            stopFeeder();     // Auto-pause when shooter slows down
-        }
-    }, this).withName("SmartFeeder");
-    }
+    // public Command smartFeederCommand() {
+    // return new RunCommand(() -> {
+    //     if (isShooterReady()) {
+    //         forwardFeeder();  // Run feeder when shooter at speed
+    //     } else {
+    //         stopFeeder();     // Auto-pause when shooter slows down
+    //     }
+    // }, this).withName("SmartFeeder");
+    // }
    
     // Basic forward shooter command (can be used for testing or manual control)
     public Command forwardShooterCommand(){
@@ -168,15 +168,15 @@ public class Shooter extends SubsystemBase {
 
     // ==================== FEEDER COMMANDS ====================
 
-    public Command forwardFeederCommand(){
-        return new RunCommand(this::forwardFeeder, this).withName("ForwardFeeder");
-    }
-    public Command reverseFeederCommand(){
-        return new RunCommand(this::reverseFeeder, this).withName("ReverseFeeder");
-    }
-    public Command stopFeederCommand(){
-        return new RunCommand(this::stopFeeder, this).withName("StopFeeder");
-    }
+    // public Command forwardFeederCommand(){
+    //     return new RunCommand(this::forwardFeeder, this).withName("ForwardFeeder");
+    // }
+    // public Command reverseFeederCommand(){
+    //     return new RunCommand(this::reverseFeeder, this).withName("ReverseFeeder");
+    // }
+    // public Command stopFeederCommand(){
+    //     return new RunCommand(this::stopFeeder, this).withName("StopFeeder");
+    // }
 
     @Override
     public void periodic() {
@@ -184,7 +184,7 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putNumber("Shooter/Current RPM", getShooterVelocityRPM());
         SmartDashboard.putNumber("Shooter/Target RPM", TARGET_SHOOTER_RPM);
         SmartDashboard.putBoolean("Shooter/Ready", isShooterReady());
-        SmartDashboard.putBoolean("Shooter/Feeder Running", m_motor_11.get() > 0.1); 
+        //SmartDashboard.putBoolean("Shooter/Feeder Running", m_motor_11.get() > 0.1); 
     }
 
 }
