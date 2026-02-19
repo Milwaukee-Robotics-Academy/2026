@@ -4,7 +4,9 @@ package frc.robot.subsystems;
 //import com.revrobotics.RelativeEncoder;
 
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 // import com.revrobotics.spark.config.ClosedLoopConfig;
@@ -25,8 +27,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase{
     
     
-    // ===private SparkMax m_motor_9; ===  // intake motor
-    // ===private SparkMax m_motor_10; === // arm motor
+    // private SparkFlex m_motor_9;  // intake motor
+    // private SparkMax m_motor_10;  // arm motor
 
     private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
     private SparkClosedLoopController m_armPID; //closed loop controller for arm position
@@ -38,39 +40,52 @@ public class Intake extends SubsystemBase{
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
     
-    public Intake() {
-        // //initialize motor 9 as a SparkMax motor
-        // m_motor_9 = new SparkMax(9, MotorType.kBrushless);
-        // m_motor_10 = new SparkMax(10, MotorType.kBrushless);
+    // public Intake() {
+    //     // initialize motor 9 as a SparkFlex motor and motor 10 as a SparkMax motor
+    //     m_motor_9 = new SparkFlex(9, MotorType.kBrushless);
+    //     m_motor_10 = new SparkMax(10, MotorType.kBrushless);
 
-        // //set up configs for SparkMax motors
-        // SparkMaxConfig global_config = new SparkMaxConfig();
-        // SparkMaxConfig motor_9_config = new SparkMaxConfig();
-        // SparkMaxConfig motor_10_config = new SparkMaxConfig();
+    //     // get absolute encoder and closed loop controller for arm motor
+    //     m_armEncoder = m_motor_10.getAbsoluteEncoder();
+    //     m_armPID = m_motor_10.getClosedLoopController();
 
-        // //configure motor settings
-        // global_config
-        //     .smartCurrentLimit(40) // only use 40 if NOT 550 motor
-        //     .idleMode(IdleMode.kBrake);
+    //     // set up configs for SparkFlex motor 9
+    //     SparkFlexConfig global_config_flex = new SparkFlexConfig();
+    //     SparkFlexConfig motor_9_config = new SparkFlexConfig();
 
-        // motor_9_config
-        //     .apply(global_config);
+    //     // set up configs for SparkMax motor 10
+    //     SparkMaxConfig global_config_max = new SparkMaxConfig();
+    //     SparkMaxConfig motor_10_config = new SparkMaxConfig();
 
-        //  motor_10_config
-        //     .apply(global_config);
+    //     // configure flex motor settings
+    //     global_config_flex
+    //         .smartCurrentLimit(60) // 60-80 for Vortex
+    //         .idleMode(IdleMode.kBrake);
 
-        // motor_10_config.absoluteEncoder
-        //      .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
-        //      .inverted(false);              // change to true if the encoder reads backwards
+    //     motor_9_config
+    //         .apply(global_config_flex);
 
-        // motor_10_config.closedLoop
-        //     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
-        //     .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
-        //     .outputRange(-0.5, 0.5);                   //limit speed to 50%
+    //     // configure max motor settings
+    //     global_config_max
+    //         .smartCurrentLimit(40) // 40-60 for NEO
+    //         .idleMode(IdleMode.kBrake);
 
-        // m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-        // m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-    }
+    //     motor_10_config
+    //         .apply(global_config_max);
+
+    //     motor_10_config.absoluteEncoder
+    //          .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
+    //          .inverted(false);              // change to true if the encoder reads backwards
+
+    //     motor_10_config.closedLoop
+    //         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
+    //         .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
+    //         .outputRange(-0.5, 0.5);                   //limit speed to 50%
+
+    //     // apply configs to motors
+    //     m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+    //     m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+    // }
 
     // ==================== SET INTAKE WHEEL SPEED ====================
 
@@ -138,6 +153,15 @@ public class Intake extends SubsystemBase{
     public void periodic() {
         // This method will be called once per scheduler run
         // You can use this to update SmartDashboard values or perform other periodic tasks
-        SmartDashboard.putNumber("Arm Position", getArmPosition());
+
+        // Arm monitoring
+        // SmartDashboard.putNumber("Arm/Position", getArmPosition());
+        // SmartDashboard.putNumber("Arm/Current (A)", m_motor_10.getOutputCurrent());
+        // SmartDashboard.putNumber("Arm/Temp (C)", m_motor_10.getMotorTemperature());
+        
+        // // Intake monitoring (NEO Vortex)
+        // SmartDashboard.putNumber("Intake/Current (A)", m_motor_9.getOutputCurrent());
+        // SmartDashboard.putNumber("Intake/Temp (C)", m_motor_9.getMotorTemperature());
+        // SmartDashboard.putNumber("Intake/Voltage (V)", m_motor_9.getBusVoltage());
     }
 }
