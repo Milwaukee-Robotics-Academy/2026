@@ -15,7 +15,6 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-//import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Shooter extends SubsystemBase {
     
@@ -36,40 +35,33 @@ public class Shooter extends SubsystemBase {
 
         // initialize motor 11, 12, and 13 as a SparkMax motor
         //m_motor_11 = new SparkMax(11, MotorType.kBrushless); // feeder motor
-        m_motor_12 = new SparkMax(12, MotorType.kBrushless); // shooter motor 1
-        m_motor_13 = new SparkMax(13, MotorType.kBrushless); // shooter motor 2
+        m_motor_12 = new SparkMax(12, MotorType.kBrushless); // shooter motor 1 (leader)
+        m_motor_13 = new SparkMax(13, MotorType.kBrushless); // shooter motor 2 (follower)
 
         // get encoders for leader shooter motor (motor 12)
         m_encoder_12 = m_motor_12.getEncoder();
 
-        // set up configs for SparkMax motors
-        SparkMaxConfig global_config = new SparkMaxConfig();
-        //SparkMaxConfig motor_11_config = new SparkMaxConfig();
-        SparkMaxConfig motor_12_config = new SparkMaxConfig();
-        SparkMaxConfig motor_13_config = new SparkMaxConfig();
-
-        // configure motor settings
-        global_config
-            .smartCurrentLimit(40) // only use 40 if NOT 550 motor
+        // FEEDER MOTOR CONFIG (motor 11)
+        SparkMaxConfig motor_11_config = new SparkMaxConfig();
+        motor_11_config
+            .smartCurrentLimit(40)
             .idleMode(IdleMode.kBrake);
-
-        // configure encoder settings
-        global_config.encoder
-            .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
-            .velocityConversionFactor(1.0);  // 1 RPM = 1.0 units
-
-        // apply global config to all motors
-        //motor_11_config
-        //    .apply(global_config);
-        motor_12_config
-            .apply(global_config);
-        motor_13_config
-            .apply(global_config);
         
-        // CRITICAL: Make motor 13 follow motor 12 (false = same direction, true = opposite direction if motors are mirrored)
-        // TEST THIS BEFORE DEPLOYING!!!!!!
-        // !!!! Comment out .follow() when testing !!!!
-        motor_13_config.follow(12, true);  
+        // LEADER MOTOR CONFIG (motor 12)
+        SparkMaxConfig motor_12_config = new SparkMaxConfig();
+        motor_12_config
+            .smartCurrentLimit(40)
+            .idleMode(IdleMode.kBrake);
+        motor_12_config.encoder
+            .positionConversionFactor(1.0)      // 1 rotation = 1.0 units
+            .velocityConversionFactor(1.0);     // 1 RPM = 1.0 units
+
+        // FOLLOWER MOTOR CONFIG (motor 13)
+        SparkMaxConfig motor_13_config = new SparkMaxConfig();
+        motor_13_config
+            .smartCurrentLimit(40)
+            .idleMode(IdleMode.kBrake);
+        motor_13_config.follow(12, true); // false = same direction, true = opposite direction if motors are mirrored (TEST THIS BEFORE DEPLOYING)
 
         //m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_12.configure(motor_12_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -101,7 +93,6 @@ public class Shooter extends SubsystemBase {
         return Math.abs(currentRPM - TARGET_SHOOTER_RPM) < SPEED_TOLERANCE_RPM;
     }
 
-
     // ==================== FEEDER METHODS ====================
 
     // Set feeder motor speeds (change during testing)
@@ -113,33 +104,6 @@ public class Shooter extends SubsystemBase {
     // }
     // private void stopFeeder() {
     //     m_motor_11.set(0);
-    // }
-
-    // ==================== TESTING COMMANDS (DELETE AFTER TESTING) ====================
- 
-    // INSTRUCTIONS FOR MOTOR DIRECTION TESTING:
-    // 1. Comment out motor_13_config.follow(12, true) in constructor
-    // 2. Deploy with ONLY testMotor12Forward uncommented (in shooter AND robot container)
-    // 3. Press button, note motor 12 direction
-    // 4. Stop robot
-    // 5. Comment testMotor12Forward, uncomment testMotor13Forward (in shooter AND robot container)
-    // 6. Deploy, press button, note motor 13 direction
-    // 7. Compare directions:
-    //    - Same direction → use follow(12, false)
-    //    - Opposite → use follow(12, true)
-    // 8. Update constructor, delete this entire section
-    //
-    // public Command testMotor12Forward() {
-    //     return runOnce(() -> m_motor_12.set(0.2));
-    // }
-    // public Command testMotor13Forward() {
-    //     return runOnce(() -> m_motor_13.set(0.2));  // POSITIVE 0.2, not negative!
-    // }
-    // public Command testStopAll() {
-    //     return runOnce(() -> {
-    //         m_motor_12.set(0);
-    //         m_motor_13.set(0);
-    //     });
     // }
 
     // ==================== SHOOTER COMMANDS ====================

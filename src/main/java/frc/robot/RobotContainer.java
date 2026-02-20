@@ -232,13 +232,13 @@ public class RobotContainer
 
       //shooter
       // Option 1: Right Trigger - Smart feeder (auto-pauses and resumes)
-      operatorXbox.rightTrigger().whileTrue(m_shooter.smartFeederCommand());
+      //operatorXbox.rightTrigger().whileTrue(m_shooter.smartFeederCommand());
 
       // Option 2: Right Bumper - Spin up shooter (tesing)
       operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
 
       // Option 3: Left Bumper - Force feeder (testing/override, no safety)
-      operatorXbox.leftBumper().whileTrue(m_shooter.forwardFeederCommand());
+      //operatorXbox.leftBumper().whileTrue(m_shooter.forwardFeederCommand());
     }
 
   }
