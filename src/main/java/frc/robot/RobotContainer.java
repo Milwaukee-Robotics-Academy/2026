@@ -199,12 +199,8 @@ public class RobotContainer
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
 
-      // test to determine shooter directions (make sure to comment out .follow() in Shooter constructor when testing directions)
-      // CRITICAL: Only test ONE motor at a time to determine direction, comment out the other command when testing
-      // operatorXbox.rightBumper().whileTrue(m_shooter.testMotor12Forward());
-      // operatorXbox.leftBumper().whileTrue(m_shooter.testMotor13Forward());
+      // test to determine shooter directions; motor 13 should automatically follow
       operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
-
 
     } else
     {
