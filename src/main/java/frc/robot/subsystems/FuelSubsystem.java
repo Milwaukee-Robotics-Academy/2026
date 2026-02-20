@@ -171,9 +171,6 @@ public class FuelSubsystem extends SubsystemBase {
   public Command sysId() {
     return intakeLauncherFlywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5));
   }
-
-
-
   /**
    * Set the output for the indexer / feeder roller.
    *
@@ -189,7 +186,7 @@ public class FuelSubsystem extends SubsystemBase {
    */
   public void stop() {
     indexerController.setDutyCycle(0);
-    intakeLauncherController.setVelocity(RPM.of(0));;
+    intakeLauncherController.setVelocity(RPM.of(0));
   }
 
   /**
