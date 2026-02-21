@@ -111,7 +111,7 @@ public class RobotContainer
    */
   public RobotContainer()
   {
-    //m_vision = new Vision(drivebase.getSwerveDrive());
+    //m_vision = new Vision(m_drivebase.getSwerveDrive());
     
     // Configure the trigger bindings
     configureBindings();
@@ -193,7 +193,7 @@ public class RobotContainer
       m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
       driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
-      //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+      //driverXbox.y().whileTrue(m_drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyro)));
       driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
       driverXbox.leftBumper().onTrue(Commands.none());
@@ -213,7 +213,7 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
-      //driverXbox.y().onTrue(m_drivebase.driveToDistanceCommandDefer(drivebase::getPose, 2, 14));
+      //driverXbox.y().onTrue(m_drivebase.driveToDistanceCommandDefer(m_drivebase::getPose, 2, 14));
       driverXbox.y().whileTrue(m_drivebase.driveForward());
 
       // ==================== OPERATOR COMMANDS ====================
