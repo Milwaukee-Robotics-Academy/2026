@@ -97,28 +97,32 @@ public class Shooter extends SubsystemBase {
 
     // ==================== FEEDER + MOTOR METHODS ====================
 
-    //TODO: change to be runboth() to fix command schceduling so shooter doesn't stop
-    // Set feeder motor speeds (change during testing)
-    // private void forwardFeeder() {
-    //     m_motor_12.set(.5);
-    //     m_motor_11.set(0.5);
-    // }
-    // private void reverseFeeder() {
-    //     m_motor_11.set(-0.5);
-    // }
-    // private void stopAll() {
-    //     m_motor_11.set(0);
-    // }
+    // Adjust speeds based on testing
+     private void forwardFeeder() {
+        m_motor_11.set(0.5);
+    }
+    private void forwardAll() {
+        m_motor_12.set(.5);
+        m_motor_11.set(0.5);
+    }
+    private void reverseAll() {
+        m_motor_12.set(-0.5);
+        m_motor_11.set(-0.5);
+    }
+    private void stopAll() {
+        m_motor_12.set(0);
+        m_motor_11.set(0);
+    }
 
     // ==================== SHOOTER COMMANDS ====================
     
     public Command smartFeederCommand() {
-    return new RunCommand(() -> {
-        if (isShooterReady()) {
-            forwardFeeder();  // Run feeder when shooter at speed
-        } else {
-            stopFeeder();     // Auto-pause when shooter slows down
-        }
+        return new RunCommand(() -> {
+            if (isShooterReady()) {
+                forwardAll();  // Run feeder when shooter at speed
+            } else {
+                stopAll();     // Auto-pause when shooter slows down
+            }
     }, this).withName("SmartFeeder");
     }
    
@@ -131,20 +135,20 @@ public class Shooter extends SubsystemBase {
     //     return new RunCommand(this::reverseShooter, this).withName("ReverseShooter");
     // }
     public Command stopShooterCommand(){
-        return new RunCommand(this::stopShooter, this).withName("StopShooter");
+        return new InstantCommand(this::stopShooter, this).withName("StopShooter");
     }
 
-    // ==================== FEEDER COMMANDS ====================
+    // ==================== FEEDER & MOTOR COMMANDS ====================
 
-    // public Command forwardFeederCommand(){
-    //     return new RunCommand(this::forwardFeeder, this).withName("ForwardFeeder");
-    // }
-    // public Command reverseFeederCommand(){
-    //     return new RunCommand(this::reverseFeeder, this).withName("ReverseFeeder");
-    // }
-    // public Command stopFeederCommand(){
-    //     return new RunCommand(this::stopFeeder, this).withName("StopFeeder");
-    // }
+    public Command forwardAllCommand(){
+        return new RunCommand(this::forwardAll, this).withName("ForwardAll");
+    }
+    public Command reverseAllCommand(){
+        return new RunCommand(this::reverseAll, this).withName("ReverseAll");
+    }
+    public Command stopAllCommand(){
+        return new InstantCommand(this::stopAll, this).withName("StopAll");
+    }
 
     @Override
     public void periodic() {
