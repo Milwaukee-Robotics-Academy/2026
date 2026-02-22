@@ -153,7 +153,7 @@ public class RobotContainer
    */
   private void configureBindings()
   {
-    // commands created as local variables
+    // commands created as local variables to setup drive orientation
     Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
     Command driveFieldOrientedDirectAngleKeyboard = m_drivebase.driveFieldOriented(driveDirectAngleKeyboard);
 
@@ -222,7 +222,6 @@ public class RobotContainer
 
     } else
     {
-      
       // ==================== DRIVER COMMANDS ====================
 
       driverXbox.a().onTrue((Commands.runOnce(m_drivebase::zeroGyro)));
