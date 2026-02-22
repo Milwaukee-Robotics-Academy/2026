@@ -28,7 +28,8 @@ public class Shooter extends SubsystemBase {
     private static final double TARGET_SHOOTER_RPM = 3000.0;  // Adjust this!
     private static final double SPEED_TOLERANCE_RPM = 100.0;  // Within 100 RPM = ready 
 
-    private static final double SHOOTER_SPEED = 0.5;
+    private static final double SHOOTER_SPEED_FORWARD = -0.75;       // forward is negative
+    private static final double SHOOTER_SPEED_REVERSE = 0.5;        // reverse is positive
 
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
@@ -44,10 +45,10 @@ public class Shooter extends SubsystemBase {
         m_encoder_12 = m_motor_12.getEncoder();
 
         // FEEDER MOTOR CONFIG (motor 11)
-        SparkMaxConfig motor_11_config = new SparkMaxConfig();
-        motor_11_config
-            .smartCurrentLimit(40)
-            .idleMode(IdleMode.kBrake);
+        // SparkMaxConfig motor_11_config = new SparkMaxConfig();
+        // motor_11_config
+        //     .smartCurrentLimit(40)
+        //     .idleMode(IdleMode.kBrake);
         
         // LEADER MOTOR CONFIG (motor 12)
         SparkMaxConfig motor_12_config = new SparkMaxConfig();
@@ -65,7 +66,7 @@ public class Shooter extends SubsystemBase {
             .idleMode(IdleMode.kBrake);
         motor_13_config.follow(12, true); // false = same direction, true = opposite direction if motors are mirrored (TEST THIS BEFORE DEPLOYING)
 
-        //m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        //m_motor_11.configure(motor_hyy11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_12.configure(motor_12_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_13.configure(motor_13_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -75,10 +76,10 @@ public class Shooter extends SubsystemBase {
 
     // Set shooter motor speeds (change during testing)
     private void forwardShooter() {
-        m_motor_12.set(0.5); // motor 13 will automatically follow
+        m_motor_12.set(SHOOTER_SPEED_FORWARD); // motor 13 will automatically follow
     }
     private void reverseShooter() {
-        m_motor_12.set(-0.5);      // motor 13 will automatically follow
+        m_motor_12.set(SHOOTER_SPEED_REVERSE);      // motor 13 will automatically follow
     }
     private void stopShooter() {
         m_motor_12.set(0);   // motor 13 will automatically follow
@@ -98,33 +99,33 @@ public class Shooter extends SubsystemBase {
     // ==================== FEEDER + MOTOR METHODS ====================
 
     // Adjust speeds based on testing
-     private void forwardFeeder() {
-        m_motor_11.set(0.5);
-    }
-    private void forwardAll() {
-        m_motor_12.set(.5);
-        m_motor_11.set(0.5);
-    }
-    private void reverseAll() {
-        m_motor_12.set(-0.5);
-        m_motor_11.set(-0.5);
-    }
-    private void stopAll() {
-        m_motor_12.set(0);
-        m_motor_11.set(0);
-    }
+    //  private void forwardFeeder() {
+    //     m_motor_11.set(0.5);
+    // }
+    // private void forwardAll() {
+    //     m_motor_12.set(.5);
+    //     m_motor_11.set(0.5);
+    // }
+    // private void reverseAll() {
+    //     m_motor_12.set(-0.5);
+    //     m_motor_11.set(-0.5);
+    // }
+    // private void stopAll() {
+    //     m_motor_12.set(0);
+    //     m_motor_11.set(0);
+    // }
 
     // ==================== SHOOTER COMMANDS ====================
     
-    public Command smartFeederCommand() {
-        return new RunCommand(() -> {
-            if (isShooterReady()) {
-                forwardAll();  // Run feeder when shooter at speed
-            } else {
-                stopAll();     // Auto-pause when shooter slows down
-            }
-    }, this).withName("SmartFeeder");
-    }
+    // public Command smartFeederCommand() {
+    //     return new RunCommand(() -> {
+    //         if (isShooterReady()) {
+    //             forwardAll();  // Run feeder when shooter at speed
+    //         } else {
+    //             stopAll();     // Auto-pause when shooter slows down
+    //         }
+    // }, this).withName("SmartFeeder");
+    // }
    
     // Basic forward shooter command (can be used for testing or manual control)
     public Command forwardShooterCommand(){
@@ -140,15 +141,15 @@ public class Shooter extends SubsystemBase {
 
     // ==================== FEEDER & MOTOR COMMANDS ====================
 
-    public Command forwardAllCommand(){
-        return new RunCommand(this::forwardAll, this).withName("ForwardAll");
-    }
-    public Command reverseAllCommand(){
-        return new RunCommand(this::reverseAll, this).withName("ReverseAll");
-    }
-    public Command stopAllCommand(){
-        return new InstantCommand(this::stopAll, this).withName("StopAll");
-    }
+    // public Command forwardAllCommand(){
+    //     return new RunCommand(this::forwardAll, this).withName("ForwardAll");
+    // }
+    // public Command reverseAllCommand(){
+    //     return new RunCommand(this::reverseAll, this).withName("ReverseAll");
+    // }
+    // public Command stopAllCommand(){
+    //     return new InstantCommand(this::stopAll, this).withName("StopAll");
+    // }
 
     @Override
     public void periodic() {
