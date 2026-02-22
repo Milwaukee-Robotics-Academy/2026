@@ -34,9 +34,9 @@ public class Intake extends SubsystemBase{
     private SparkClosedLoopController m_armPID; //closed loop controller for arm position
 
     //arm position setpoints (play with these values to find best fit for the positions)
-    private final double ARM_DOWN_POSITION = 0.2; 
-    private final double ARM_MIDDLE_POSITION = 0.125;   
-    private final double ARM_UP_POSITION = 0.0;   
+    private final double ARM_DOWN_POSITION = 0.16; 
+    private final double ARM_MIDDLE_POSITION = 0.05;   
+    private final double ARM_UP_POSITION = 0.87;   
 
     private static final double INTAKE_SPEED_FORWARD = 0.5; 
     private static final double INTAKE_SPEED_REVERSE = -0.5; 
