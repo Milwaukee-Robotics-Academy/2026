@@ -28,6 +28,8 @@ public class Shooter extends SubsystemBase {
     private static final double TARGET_SHOOTER_RPM = 3000.0;  // Adjust this!
     private static final double SPEED_TOLERANCE_RPM = 100.0;  // Within 100 RPM = ready 
 
+    private static final double SHOOTER_SPEED = 0.5;
+
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
 
@@ -93,30 +95,32 @@ public class Shooter extends SubsystemBase {
         return Math.abs(currentRPM - TARGET_SHOOTER_RPM) < SPEED_TOLERANCE_RPM;
     }
 
-    // ==================== FEEDER METHODS ====================
+    // ==================== FEEDER + MOTOR METHODS ====================
 
+    //TODO: change to be runboth() to fix command schceduling so shooter doesn't stop
     // Set feeder motor speeds (change during testing)
     // private void forwardFeeder() {
+    //     m_motor_12.set(.5);
     //     m_motor_11.set(0.5);
     // }
     // private void reverseFeeder() {
     //     m_motor_11.set(-0.5);
     // }
-    // private void stopFeeder() {
+    // private void stopAll() {
     //     m_motor_11.set(0);
     // }
 
     // ==================== SHOOTER COMMANDS ====================
     
-    // public Command smartFeederCommand() {
-    // return new RunCommand(() -> {
-    //     if (isShooterReady()) {
-    //         forwardFeeder();  // Run feeder when shooter at speed
-    //     } else {
-    //         stopFeeder();     // Auto-pause when shooter slows down
-    //     }
-    // }, this).withName("SmartFeeder");
-    // }
+    public Command smartFeederCommand() {
+    return new RunCommand(() -> {
+        if (isShooterReady()) {
+            forwardFeeder();  // Run feeder when shooter at speed
+        } else {
+            stopFeeder();     // Auto-pause when shooter slows down
+        }
+    }, this).withName("SmartFeeder");
+    }
    
     // Basic forward shooter command (can be used for testing or manual control)
     public Command forwardShooterCommand(){
