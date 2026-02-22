@@ -18,7 +18,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 
 import edu.wpi.first.wpilibj2.command.Command;
-//import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,8 +27,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase{
     
     
-    // private SparkFlex m_motor_9;  // intake motor
-    // private SparkMax m_motor_10;  // arm motor
+    private SparkFlex m_motor_9;  // intake motor
+    private SparkMax m_motor_10;  // arm motor
 
     private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
     private SparkClosedLoopController m_armPID; //closed loop controller for arm position
@@ -38,66 +38,69 @@ public class Intake extends SubsystemBase{
     private final double ARM_MIDDLE_POSITION = 0.125;   
     private final double ARM_UP_POSITION = 0.0;   
 
+    private static final double INTAKE_SPEED_FORWARD = 0.5; 
+    private static final double INTAKE_SPEED_REVERSE = -0.5; 
+
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
     
-    // public Intake() {
-    //     // initialize motor 9 as a SparkFlex motor and motor 10 as a SparkMax motor
-    //     m_motor_9 = new SparkFlex(9, MotorType.kBrushless);
-    //     m_motor_10 = new SparkMax(10, MotorType.kBrushless);
+    public Intake() {
+        // initialize motor 9 as a SparkFlex motor and motor 10 as a SparkMax motor
+        m_motor_9 = new SparkFlex(9, MotorType.kBrushless);
+        m_motor_10 = new SparkMax(10, MotorType.kBrushless);
 
-    //     // get absolute encoder and closed loop controller for arm motor
-    //     m_armEncoder = m_motor_10.getAbsoluteEncoder();
-    //     m_armPID = m_motor_10.getClosedLoopController();
+        // get absolute encoder and closed loop controller for arm motor
+        m_armEncoder = m_motor_10.getAbsoluteEncoder();
+        m_armPID = m_motor_10.getClosedLoopController();
 
-    //     // set up configs for SparkFlex motor 9
-    //     SparkFlexConfig global_config_flex = new SparkFlexConfig();
-    //     SparkFlexConfig motor_9_config = new SparkFlexConfig();
+        // set up configs for SparkFlex motor 9
+        SparkFlexConfig global_config_flex = new SparkFlexConfig();
+        SparkFlexConfig motor_9_config = new SparkFlexConfig();
 
-    //     // set up configs for SparkMax motor 10
-    //     SparkMaxConfig global_config_max = new SparkMaxConfig();
-    //     SparkMaxConfig motor_10_config = new SparkMaxConfig();
+        // set up configs for SparkMax motor 10
+        SparkMaxConfig global_config_max = new SparkMaxConfig();
+        SparkMaxConfig motor_10_config = new SparkMaxConfig();
 
-    //     // configure flex motor settings
-    //     global_config_flex
-    //         .smartCurrentLimit(60) // 60-80 for Vortex
-    //         .idleMode(IdleMode.kBrake);
+        // configure flex motor settings (intake)
+        global_config_flex
+            .smartCurrentLimit(40) // 60-80 for Vortex
+            .idleMode(IdleMode.kBrake);
 
-    //     motor_9_config
-    //         .apply(global_config_flex);
+        motor_9_config
+            .apply(global_config_flex);
 
-    //     // configure max motor settings
-    //     global_config_max
-    //         .smartCurrentLimit(40) // 40-60 for NEO
-    //         .idleMode(IdleMode.kBrake);
+        // configure max motor settings (arm)
+        global_config_max
+            .smartCurrentLimit(40) // 40-60 for NEO
+            .idleMode(IdleMode.kBrake);
 
-    //     motor_10_config
-    //         .apply(global_config_max);
+        motor_10_config
+            .apply(global_config_max);
 
-    //     motor_10_config.absoluteEncoder
-    //          .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
-    //          .inverted(false);              // change to true if the encoder reads backwards
+        motor_10_config.absoluteEncoder
+             .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
+             .inverted(false);              // change to true if the encoder reads backwards
 
-    //     motor_10_config.closedLoop
-    //         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
-    //         .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
-    //         .outputRange(-0.5, 0.5);                   //limit speed to 50%
+        motor_10_config.closedLoop
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
+            .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
+            .outputRange(-0.5, 0.5);                   //limit speed to 50%
 
-    //     // apply configs to motors
-    //     m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-    //     m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-    // }
+        // apply configs to motors
+        m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+        m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+    }
 
     // ==================== SET INTAKE WHEEL SPEED ====================
 
-    // private void forwardIntake() {
-    //     m_motor_9.set(0.5);
-    // }
-    // private void reverseIntake() {
-    //     m_motor_9.set(-0.5);
-    // }
-    // private void stopIntake() {
-    //     m_motor_9.set(0);
-    // }
+    private void forwardIntake() {
+        m_motor_9.set(INTAKE_SPEED_FORWARD);
+    }
+    private void reverseIntake() {
+        m_motor_9.set(INTAKE_SPEED_REVERSE);
+    }
+    private void stopIntake() {
+        m_motor_9.set(0);
+    }
 
     // ==================== SET ARM POSITION ====================
 
@@ -127,15 +130,15 @@ public class Intake extends SubsystemBase{
 
     // ==================== INTAKE WHEEL COMMANDS ====================
 
-    // public Command forwardIntakeCommand(){
-    //     return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
-    // }
-    // public Command reverseIntakeCommand(){
-    //     return new RunCommand(this::reverseIntake, this).withName("ReverseIntake");
-    // }
-    // public Command stopIntakeCommand(){
-    //     return new RunCommand(this::stopIntake, this).withName("StopIntake");
-    // }
+    public Command forwardIntakeCommand(){
+        return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
+    }
+    public Command reverseIntakeCommand(){
+        return new RunCommand(this::reverseIntake, this).withName("ReverseIntake");
+    }
+    public Command stopIntakeCommand(){
+        return new InstantCommand(this::stopIntake, this).withName("StopIntake");
+    }
 
     // ==================== ARM COMMANDS ====================
 
@@ -155,13 +158,13 @@ public class Intake extends SubsystemBase{
         // You can use this to update SmartDashboard values or perform other periodic tasks
 
         // Arm monitoring
-        // SmartDashboard.putNumber("Arm/Position", getArmPosition());
-        // SmartDashboard.putNumber("Arm/Current (A)", m_motor_10.getOutputCurrent());
-        // SmartDashboard.putNumber("Arm/Temp (C)", m_motor_10.getMotorTemperature());
+        SmartDashboard.putNumber("Arm/Position", getArmPosition());
+        SmartDashboard.putNumber("Arm/Current (A)", m_motor_10.getOutputCurrent());
+        SmartDashboard.putNumber("Arm/Temp (C)", m_motor_10.getMotorTemperature());
         
         // // Intake monitoring (NEO Vortex)
-        // SmartDashboard.putNumber("Intake/Current (A)", m_motor_9.getOutputCurrent());
-        // SmartDashboard.putNumber("Intake/Temp (C)", m_motor_9.getMotorTemperature());
-        // SmartDashboard.putNumber("Intake/Voltage (V)", m_motor_9.getBusVoltage());
+        SmartDashboard.putNumber("Intake/Current (A)", m_motor_9.getOutputCurrent());
+        SmartDashboard.putNumber("Intake/Temp (C)", m_motor_9.getMotorTemperature());
+        SmartDashboard.putNumber("Intake/Voltage (V)", m_motor_9.getBusVoltage());
     }
 }

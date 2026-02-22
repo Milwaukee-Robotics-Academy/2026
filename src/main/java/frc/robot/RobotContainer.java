@@ -168,8 +168,7 @@ public class RobotContainer
     m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     m_shooter.setDefaultCommand(m_shooter.stopShooterCommand());
     //m_shooter.setDefaultCommand(m_shooter.stopAllCommand());
-    //m_intake.setDefaultCommand(m_intake.stopIntakeCommand);
-    //m_intake.setDefaultCommand(m_intake.stopIntakeCommand());
+    m_intake.setDefaultCommand(m_intake.stopIntakeCommand());
 
     if (RobotBase.isSimulation()) {
     m_drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
@@ -235,8 +234,8 @@ public class RobotContainer
 
       // ==================== OPERATOR COMMANDS ====================
       //intake wheels 
-      // operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
-      // operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
+      operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
+      operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
 
       //arm 
       operatorXbox.povDown().onTrue(m_intake.armDownCommand());

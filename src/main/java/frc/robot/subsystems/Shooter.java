@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
     private static final double SPEED_TOLERANCE_RPM = 100.0;  // Within 100 RPM = ready 
 
     private static final double SHOOTER_SPEED_FORWARD = -0.75;       // forward is negative
-    private static final double SHOOTER_SPEED_REVERSE = 0.5;        // reverse is positive
+    private static final double SHOOTER_SPEED_REVERSE = 0.5;         // reverse is positive
 
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
@@ -159,5 +159,4 @@ public class Shooter extends SubsystemBase {
         SmartDashboard.putBoolean("Shooter/Ready", isShooterReady());
         //SmartDashboard.putBoolean("Shooter/Feeder Running", m_motor_11.get() > 0.1); 
     }
-
 }
