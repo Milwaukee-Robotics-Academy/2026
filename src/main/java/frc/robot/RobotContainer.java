@@ -55,6 +55,8 @@ public class RobotContainer
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
+
+   //TODO: check withControllerRotationAxis needs to be inverted
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
@@ -174,6 +176,7 @@ public class RobotContainer
     } else {
         m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
+
 
     if (Robot.isSimulation())
     {
