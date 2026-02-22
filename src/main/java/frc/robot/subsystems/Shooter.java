@@ -127,7 +127,7 @@ public class Shooter extends SubsystemBase {
     //     return new RunCommand(this::reverseShooter, this).withName("ReverseShooter");
     // }
     public Command stopShooterCommand(){
-        return new InstantCommand(this::stopShooter, this).withName("StopShooter");
+        return new RunCommand(this::stopShooter, this).withName("StopShooter");
     }
 
     // ==================== FEEDER COMMANDS ====================

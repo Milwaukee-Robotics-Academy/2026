@@ -38,7 +38,6 @@ import swervelib.SwerveInputStream;
  */
 public class RobotContainer
 {
-
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandXboxController operatorXbox = new CommandXboxController(1);
@@ -105,6 +104,16 @@ public class RobotContainer
                                                                                .translationHeadingOffset(true)
                                                                                .translationHeadingOffset(Rotation2d.fromDegrees(
                                                                                    0));
+  
+  SwerveInputStream driveAngularVelocitySim = SwerveInputStream.of(
+        m_drivebase.getSwerveDrive(),
+        () -> driverXbox.getLeftY(),       // Not inverted
+        () -> driverXbox.getLeftX()        // Not inverted
+    )
+    .withControllerRotationAxis(() -> driverXbox.getRightX())  // Not inverted
+    .deadband(OperatorConstants.DEADBAND)
+    .scaleTranslation(0.8)
+    .allianceRelativeControl(true);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -142,22 +151,28 @@ public class RobotContainer
    */
   private void configureBindings()
   {
-    Command driveFieldOrientedDirectAngle      = m_drivebase.driveFieldOriented(driveDirectAngle);
+    // commands created as local variables
     Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveRobotOrientedAngularVelocity  = m_drivebase.driveFieldOriented(driveRobotOriented);
-    Command driveSetpointGen = m_drivebase.driveWithSetpointGeneratorFieldRelative(
-        driveDirectAngle);
-    Command driveFieldOrientedDirectAngleKeyboard      = m_drivebase.driveFieldOriented(driveDirectAngleKeyboard);
-    Command driveFieldOrientedAnglularVelocityKeyboard = m_drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
-    Command driveSetpointGenKeyboard = m_drivebase.driveWithSetpointGeneratorFieldRelative(
-        driveDirectAngleKeyboard);
+    Command driveFieldOrientedDirectAngleKeyboard = m_drivebase.driveFieldOriented(driveDirectAngleKeyboard);
 
-    if (RobotBase.isSimulation())
-    {
-      m_drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
-    } else
-    {
-      m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    // commands to consider if we try a different mode for shooter
+    // Command driveFieldOrientedDirectAngle      = m_drivebase.driveFieldOriented(driveDirectAngle);
+    // Command driveRobotOrientedAngularVelocity  = m_drivebase.driveFieldOriented(driveRobotOriented);
+    // Command driveSetpointGen = m_drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngle);
+    // Command driveFieldOrientedAnglularVelocityKeyboard = m_drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
+    // Command driveSetpointGenKeyboard = m_drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
+
+   // set default commands
+    m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
+    m_shooter.setDefaultCommand(m_shooter.stopShooterCommand());
+    //m_shooter.setDefaultCommand(m_shooter.stopFeederCommand());
+    //m_intake.setDefaultCommand(m_intake.stopIntakeCommand);
+    //m_intake.setDefaultCommand(m_intake.stopIntakeCommand());
+
+    if (RobotBase.isSimulation()) {
+    m_drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+    } else {
+        m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     }
 
     if (Robot.isSimulation())
@@ -204,7 +219,7 @@ public class RobotContainer
 
     } else
     {
-
+      
       // ==================== DRIVER COMMANDS ====================
 
       driverXbox.a().onTrue((Commands.runOnce(m_drivebase::zeroGyro)));
