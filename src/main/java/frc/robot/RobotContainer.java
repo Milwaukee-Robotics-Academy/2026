@@ -194,13 +194,12 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(m_drivebase::zeroGyro)));
+ //     driverXbox.a().onTrue((Commands.runOnce(m_drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(m_drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
-      driverXbox.rightBumper().onTrue(Commands.none());
-      //driverXbox.y().onTrue(drivebase.driveToDistanceCommandDefer(drivebase::getPose, 2, 14));
+  //    driverXbox.leftBumper().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
+
       driverXbox.y().whileTrue(m_drivebase.driveForward());
     }
     // While the left bumper on operator controller is held, intake Fuel
