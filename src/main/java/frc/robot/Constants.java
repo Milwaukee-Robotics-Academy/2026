@@ -49,20 +49,20 @@ public static final class FuelConstants {
     public static final int LAUNCHER_MOTOR_CURRENT_LIMIT = 80;
 
     // All values likely need to be tuned based on your robot
-    public static final double INDEXER_INTAKING_PERCENT = -.8; 
-    public static final double INDEXER_LAUNCHING_PERCENT = 0.6;
+    public static final double INDEXER_INTAKING_PERCENT = -.5; //-.8 
+    public static final double INDEXER_LAUNCHING_PERCENT = 0.4;//.6;
     public static final double INDEXER_SPIN_UP_PRE_LAUNCH_PERCENT = -0.5;
 
-    public static final double INTAKE_INTAKING_PERCENT = 0.6;
-    public static final double LAUNCHING_LAUNCHER_PERCENT = .85;
-    public static final double INTAKE_EJECT_PERCENT = -0.8;
+    public static final double INTAKE_INTAKING_PERCENT = 0.6 ;//.6;
+    public static final double LAUNCHING_LAUNCHER_PERCENT = .85;// .85;
+    public static final double INTAKE_EJECT_PERCENT = -0.6;//-0.8;
 
     public static final double SPIN_UP_SECONDS = 0.75;
   }
 
   public static final class ClimbConstants {
     // Motor controller IDs for Climb motor
-    public static final int CLIMBER_MOTOR_ID = 7;
+    public static final int CLIMBER_MOTOR_ID = 12;
 
     // Current limit for climb motor
     public static final int CLIMBER_MOTOR_CURRENT_LIMIT = 40;

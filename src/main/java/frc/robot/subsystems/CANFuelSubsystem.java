@@ -46,6 +46,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     indexerConfig.smartCurrentLimit(INDEXER_MOTOR_CURRENT_LIMIT);
     indexerConfig.voltageCompensation(12);
     indexerConfig.idleMode(IdleMode.kCoast);
+    indexerConfig.inverted(true);
     Indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // create the configuration for the launcher roller, set a current limit, set
