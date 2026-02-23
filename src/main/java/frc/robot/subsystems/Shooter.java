@@ -22,27 +22,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Shooter extends SubsystemBase {
-  private SparkMax m_motor_12;
-  private SparkMax m_motor_13;
+  private SparkMax feeder;
+  private SparkMax bottomShooter;
+  private SparkMax topShooter;
   /** Creates a new EndEffector. */
   public Shooter() {
-    m_motor_12 =  new SparkMax(12, MotorType.kBrushless);
-    m_motor_13 =  new SparkMax(13, MotorType.kBrushless);
+    feeder =  new SparkMax(12, MotorType.kBrushless);
+    bottomShooter =  new SparkMax(13, MotorType.kBrushless);
     SparkMaxConfig global_config = new SparkMaxConfig();
-    SparkMaxConfig motor_12_config = new SparkMaxConfig();
-    SparkMaxConfig motor_13_config = new SparkMaxConfig();
+    SparkMaxConfig feederConfig = new SparkMaxConfig();
+    SparkMaxConfig bottomShooterConfig = new SparkMaxConfig();
+    SparkMaxConfig topShooterConfig = new SparkMaxConfig();
     global_config
       .smartCurrentLimit(50)
       .idleMode(IdleMode.kBrake);
-    motor_12_config
+    feederConfig
       .apply(global_config)      
       .inverted(true);
-    motor_13_config
+    bottomShooterConfig
       .apply(global_config)
       .inverted(false);
 
-    m_motor_12.configure(motor_12_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-    m_motor_13.configure(motor_13_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+    feeder.configure(feederConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+    bottomShooter.configure(bottomShooterConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+    topShooter.configure(topShooterConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     /**
     SmartDashboard.putNumber("Intake sensor", intakeSensor.getRange());
     SmartDashboard.putNumber("Acquired sensor", acquiredSensor.getRange());
@@ -53,25 +56,22 @@ public class Shooter extends SubsystemBase {
     */
   }
 private void loadUp(){
-  m_motor_12.set(0.5);
-  m_motor_13.set(0.5);
+  feeder.set(0.7);
 }
 private void stop(){
-  m_motor_12.set(0);
-  m_motor_13.set(0);
+  feeder.set(0);
+  bottomShooter.set(0);
+  topShooter.set(0);
 }
 private void shoot(){
-  m_motor_12.set(0.5);
-  m_motor_13.set(0.2);
+  bottomShooter.set(0.8);
+  topShooter.set(0.8);
 }
 
 private void spitBack(){
-  m_motor_12.set(-0.5);
-  m_motor_13.set(-0.5);
-}
-private void nudgeForward(){
-  m_motor_12.set(0.1);
-  m_motor_13.set(0.1);
+  feeder.set(-0.25);
+  bottomShooter.set(-0.25);
+  topShooter.set(-.25);
 }
 public Command loadUpCommand(){
   return new RunCommand(this::loadUp, this).withName("loadUp");
@@ -79,7 +79,7 @@ public Command loadUpCommand(){
 public Command spitbackCommand(){
   return new RunCommand(this::spitBack, this).withName("spitBack");
 }
-public Command outtakeCommand(){
+public Command shootCommand(){
   return new RunCommand(this::shoot, this).withName("shoot");
 }
 
@@ -90,9 +90,6 @@ public Command outtakeCommand(){
   .withName("OuttakeAndStop");
 }
 */
-public Command nudgeForwardCommand(){
-  return new RunCommand(this::nudgeForward, this).withName("nudge");
-}
 
 public Command stopCommand(){
  return new InstantCommand(this::stop, this).withName("Stopped");

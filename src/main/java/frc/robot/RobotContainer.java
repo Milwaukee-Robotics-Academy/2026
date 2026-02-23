@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 //import frc.robot.subsystems.QuestNavSubsystem;
@@ -48,6 +49,7 @@ public class RobotContainer
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
   private final Intake m_Intake = new Intake();
+  private final Shooter m_Shooter = new Shooter();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -55,7 +57,7 @@ public class RobotContainer
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(drivebase.getSwerveDrive(),
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(driverXbox::getRightX)
+                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() *-1)
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
@@ -146,55 +148,55 @@ public class RobotContainer
     Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(
         driveDirectAngleKeyboard);
 
-    if (RobotBase.isSimulation())
-    {
-      drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
-    } else
-    {
+    // if (RobotBase.isSimulation())
+    // {
+    //   drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
+    // } else
+    // {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    }
+//     }
 
-    if (Robot.isSimulation())
-    {
-      Pose2d target = new Pose2d(new Translation2d(1, 4),
-                                 Rotation2d.fromDegrees(90));
-      //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
-      driveDirectAngleKeyboard.driveToPose(() -> target,
-                                           new ProfiledPIDController(5,
-                                                                     0,
-                                                                     0,
-                                                                     new Constraints(5, 2)),
-                                           new ProfiledPIDController(5,
-                                                                     0,
-                                                                     0,
-                                                                     new Constraints(Units.degreesToRadians(360),
-                                                                                     Units.degreesToRadians(180))
-                                           ));
-      driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-      //driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
-      //driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
-      //                                               () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
+//     if (Robot.isSimulation())
+//     {
+//       Pose2d target = new Pose2d(new Translation2d(1, 4),
+//                                  Rotation2d.fromDegrees(90));
+//       //drivebase.getSwerveDrive().field.getObject("targetPose").setPose(target);
+//       driveDirectAngleKeyboard.driveToPose(() -> target,
+//                                            new ProfiledPIDController(5,
+//                                                                      0,
+//                                                                      0,
+//                                                                      new Constraints(5, 2)),
+//                                            new ProfiledPIDController(5,
+//                                                                      0,
+//                                                                      0,
+//                                                                      new Constraints(Units.degreesToRadians(360),
+//                                                                                      Units.degreesToRadians(180))
+//                                            ));
+//       driverXbox.start().onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+//       //driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
+//       //driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
+//       //                                               () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
       
 
-//      driverXbox.b().whileTrue(
-//          drivebase.driveToPose(
-//              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-//                              );
+// //      driverXbox.b().whileTrue(
+// //          drivebase.driveToPose(
+// //              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+// //                              );
 
-    }
-    if (DriverStation.isTest())
-    {
-      drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-    m_Intake.setDefaultCommand(m_Intake.stopCommand());
+//     }
+//     if (DriverStation.isTest())
+//     {
+//       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+//     m_Intake.setDefaultCommand(m_Intake.stopCommand());
 
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.back().whileTrue(drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
-    } else
-    {
+//       driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+//       //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+//       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
+//       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
+//       driverXbox.leftBumper().onTrue(Commands.none());
+//       driverXbox.rightBumper().onTrue(Commands.none());
+//     } else
+//     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
@@ -203,17 +205,18 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
       //driverXbox.y().onTrue(drivebase.driveToDistanceCommandDefer(drivebase::getPose, 2, 14));
       driverXbox.y().whileTrue(drivebase.driveForward());
-      operatorXbox.rightTrigger().onTrue(Commands.none());
-      operatorXbox.rightBumper().onTrue(m_Intake.intakeCommand());
-      operatorXbox.leftTrigger().whileTrue(Commands.none());
-      operatorXbox.leftBumper().onTrue(m_Intake.outtakeCommand());
+      operatorXbox.rightTrigger().whileTrue(m_Shooter.shootCommand());
+      operatorXbox.rightBumper().whileTrue(m_Intake.intakeCommand());
+      operatorXbox.leftTrigger().whileTrue(m_Shooter.loadUpCommand());
+      operatorXbox.leftBumper().whileTrue(m_Intake.outtakeCommand());
       operatorXbox.x().whileTrue(m_Intake.goUpFunctionCommand());
       operatorXbox.y().onTrue(Commands.none());
+      operatorXbox.a().onTrue(Commands.none());
       operatorXbox.b().whileTrue(m_Intake.goDownFunctionCommand());
       operatorXbox.povUp().whileTrue(Commands.none()); 
       operatorXbox.povDown().onTrue(Commands.none()); 
       operatorXbox.povLeft().onTrue(Commands.none());
-    }
+ //   }
 
   }
 
