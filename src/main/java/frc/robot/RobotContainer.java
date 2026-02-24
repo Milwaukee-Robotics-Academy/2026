@@ -167,8 +167,7 @@ public class RobotContainer
    // set default commands
     m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
     m_shooter.setDefaultCommand(m_shooter.stopAllCommand());
-    m_intake.setDefaultCommand(m_intake.stopIntakeCommand());
-    //m_intake.armSpeedDownCommand(m_intake.stopArmCommand());
+    m_intake.setDefaultCommand(m_intake.stopAllCommand());
 
     if (RobotBase.isSimulation()) {
     m_drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
@@ -243,18 +242,12 @@ public class RobotContainer
       // operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
 
       //arm with manual control (testing/override, no safety)
-      operatorXbox.povDown().onTrue(m_intake.armSpeedDownCommand());
-      operatorXbox.povUp().onTrue(m_intake.armSpeedUpCommand());
+      operatorXbox.rightTrigger().whileTrue(m_intake.armSpeedDownCommand());   // right trigger to move arm down
+      operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedUpCommand());      // left trigger to move arm up
 
       //shooter
-      // Option 1: Right Trigger - Smart feeder (auto-pauses and resumes)
-      //operatorXbox.rightTrigger().whileTrue(m_shooter.smartFeederCommand());
-
-      // Option 2: Right Bumper - Spin up shooter (tesing)
-      operatorXbox.rightBumper().whileTrue(m_shooter.forwardAllCommand());
-
-      // Option 3: Left Bumper - Force feeder (testing/override, no safety)
-      //operatorXbox.leftBumper().whileTrue(m_shooter.forwardFeederCommand());
+      operatorXbox.rightBumper().whileTrue(m_shooter.shootSequenceCommand());
+    
     }
 
   }

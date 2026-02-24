@@ -13,6 +13,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -170,6 +171,27 @@ public class Shooter extends SubsystemBase {
 
     public Command shootSequenceCommand() {
         return new RunCommand(this::shootSequence, this).withName("ShootSequence");
+    }
+
+    // Option for move advanced shooting
+    public Command smartShootCommand() {
+    return Commands.sequence(
+        // Step 1: Spin up shooter
+        new RunCommand(this::spinUpShooter, this)
+            .until(this::isShooterReady),
+        
+        // Step 2: Feed for 0.5 seconds
+        new RunCommand(() -> {
+            spinUpShooter();
+            forwardFeeder();
+        }, this).withTimeout(0.5),
+        
+        // Step 3: Stop feeder, keep shooter spinning
+        new RunCommand(() -> {
+            spinUpShooter();
+            stopFeeder();
+        }, this).withTimeout(0.2)
+    ).repeatedly();  // Repeat while button held
     }
 
     public Command stopAllCommand() {

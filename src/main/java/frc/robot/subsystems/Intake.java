@@ -178,6 +178,15 @@ public class Intake extends SubsystemBase{
         return new InstantCommand(this::stopArm, this).withName("StopArm");
     }
 
+    // ==================== ARM & INTAKE COMMANDS (NO ENCODER) ====================
+
+    public Command stopAllCommand() {
+    return new RunCommand(() -> {
+        stopIntake();
+        stopArm();
+    }, this).withName("StopAll");
+}
+
     // ==================== PRINT STATEMENTS ====================
 
     @Override 
