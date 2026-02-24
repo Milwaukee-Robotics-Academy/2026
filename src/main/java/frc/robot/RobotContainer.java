@@ -166,9 +166,9 @@ public class RobotContainer
 
    // set default commands
     m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    //m_shooter.setDefaultCommand(m_shooter.stopShooterCommand());
     m_shooter.setDefaultCommand(m_shooter.stopAllCommand());
     m_intake.setDefaultCommand(m_intake.stopIntakeCommand());
+    //m_intake.armSpeedDownCommand(m_intake.stopArmCommand());
 
     if (RobotBase.isSimulation()) {
     m_drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);

@@ -3,17 +3,17 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkClosedLoopController;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -23,19 +23,19 @@ public class Shooter extends SubsystemBase {
     private SparkMax m_motor_12; // shooter motor 1 (leader)
     private SparkMax m_motor_13; // shooter motor 2 (follower)
 
-    private RelativeEncoder m_encoder_12; // encoder motor 1 (only for leader motor, since follower will mirror it)
+    private RelativeEncoder m_encoder_12;                            // encoder motor 1 (only for leader motor, since follower will mirror it)
+    private SparkClosedLoopController m_PID_12;
+    private ClosedLoopSlot m_PID_slot_12 = ClosedLoopSlot.kSlot0;    // Use PID slot 0 for shooter control
 
     // Target shooter speed and tolerance (adjust as needed based on testing)
     private static final double TARGET_SHOOTER_RPM = 4000.0;  // Adjust this!
     private static final double SPEED_TOLERANCE_RPM = 100.0;  // Within 100 RPM = ready 
 
-    private static final double SHOOTER_SPEED_FORWARD = -0.75;       // forward is negative
-    private static final double SHOOTER_SPEED_REVERSE = 0.5;         // reverse is positive
+    private static final double SHOOTER_SPEED_FORWARD = -0.75;       // negative = forward
+    private static final double SHOOTER_SPEED_REVERSE = 0.5;         // positive = reverse
 
-    private static final double FEEDER_SPEED_FORWARD = -0.5;         // forward is negative
-    private static final double FEEDER_SPEED_REVERSE = 0.5;          // reverse is positive
-
-    private SparkClosedLoopController m_shooterPID;
+    private static final double FEEDER_SPEED_FORWARD = -0.5;         // negative = forward
+    private static final double FEEDER_SPEED_REVERSE = 0.5;          // positive = reverse
 
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase {
 
         // get encoder for leader shooter motor (motor 12)
         m_encoder_12 = m_motor_12.getEncoder();
-        m_shooterPID = m_motor_12.getClosedLoopController();
+        m_PID_12 = m_motor_12.getClosedLoopController();
 
         // FEEDER MOTOR CONFIG (motor 11)
         SparkMaxConfig motor_11_config = new SparkMaxConfig();
@@ -66,10 +66,8 @@ public class Shooter extends SubsystemBase {
             .positionConversionFactor(1.0)      // 1 rotation = 1.0 units
             .velocityConversionFactor(1.0);     // 1 RPM = 1.0 units
          motor_12_config.closedLoop
-            .feedbackSensor(SparkClosedLoopController.FeedbackSensor.kPrimaryEncoder)  // Use built-in encoder
-            .pid(0.0002, 0.0, 0.0, 0.0)     // Start with small P, tune later
-            .outputRange(-1.0, 1.0)         // Full power range
-            .velocityFF(0.00018);           // Feedforward (1/5676 for NEO)
+            .pid(0.0002, 0.0, 0.0, m_PID_slot_12)     // Start with small P, tune later
+            .outputRange(-1.0, 1.0);              // Full power range
 
         // FOLLOWER MOTOR CONFIG (motor 13)
         SparkMaxConfig motor_13_config = new SparkMaxConfig();
@@ -109,21 +107,39 @@ public class Shooter extends SubsystemBase {
 
     // ==================== FEEDER + MOTOR METHODS ====================
 
-    // Adjust speeds based on testing
-    // private void forwardFeeder() {
-    //     m_motor_11.set(0.5);
-    // }
-    private void forwardAll() {
-        m_motor_12.set(SHOOTER_SPEED_FORWARD); // motor 13 will automatically follow
+    // Set feeder motor speeds
+    private void forwardFeeder() {
         m_motor_11.set(FEEDER_SPEED_FORWARD);
     }
-    private void reverseAll() {
-        m_motor_12.set(FEEDER_SPEED_REVERSE);      // motor 13 will automatically follow
+    private void reverseFeeder() {
         m_motor_11.set(FEEDER_SPEED_REVERSE);
     }
-    private void stopAll() {
-        m_motor_12.set(0);
+    private void stopFeeder() {
         m_motor_11.set(0);
+    }
+
+    // Set shooter speed using closed-loop control to reach target RPM
+    private void spinUpShooter() {
+        m_PID_12.setSetpoint(TARGET_SHOOTER_RPM, ControlType.kVelocity);               
+    }
+    private void stopShooter() {
+        m_motor_12.set(0);
+    }
+
+    // Spin up shooter and run feeder only when shooter is at speed
+    private void shootSequence() {
+        spinUpShooter();
+        if (isShooterReady()) {
+            forwardFeeder();
+        } else {
+            stopFeeder();
+        }
+    }
+
+    // Turn off shooter and feeder
+    private void stopAll() {
+        stopShooter();
+        stopFeeder();
     }
 
     // ==================== SHOOTER ONLY COMMANDS ====================
@@ -152,14 +168,12 @@ public class Shooter extends SubsystemBase {
 
     // ==================== FEEDER & MOTOR COMMANDS ====================
 
-    public Command forwardAllCommand(){
-        return new RunCommand(this::forwardAll, this).withName("ForwardAll");
+    public Command shootSequenceCommand() {
+        return new RunCommand(this::shootSequence, this).withName("ShootSequence");
     }
-    // public Command reverseAllCommand(){
-    //     return new RunCommand(this::reverseAll, this).withName("ReverseAll");
-    // }
-    public Command stopAllCommand(){
-        return new InstantCommand(this::stopAll, this).withName("StopAll");
+
+    public Command stopAllCommand() {
+        return new RunCommand(this::stopAll, this).withName("StopAll");
     }
 
     @Override
