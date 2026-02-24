@@ -55,11 +55,11 @@ public class Intake extends SubsystemBase{
         m_armEncoder = m_motor_10.getAbsoluteEncoder();
         m_armPID = m_motor_10.getClosedLoopController();
 
-        // set up configs for SparkFlex motor 9
+        // set up configs for SparkFlex motor 9 (intake)
         SparkFlexConfig global_config_flex = new SparkFlexConfig();
         SparkFlexConfig motor_9_config = new SparkFlexConfig();
 
-        // set up configs for SparkMax motor 10
+        // set up configs for SparkMax motor 10 (arm)
         SparkMaxConfig global_config_max = new SparkMaxConfig();
         SparkMaxConfig motor_10_config = new SparkMaxConfig();
 
@@ -133,10 +133,10 @@ public class Intake extends SubsystemBase{
 
     // ==================== SET ARM POSITION (NO ENCODER) ====================
 
-    public void setArmSpeedMoveUp() {
+    public void armSpeedMoveUp() {
         m_motor_10.set(ARM_SPEED_MOVE_UP);
     }
-    public void setArmSpeedMoveDown() {
+    public void armSpeedMoveDown() {
         m_motor_10.set(ARM_SPEED_MOVE_DOWN);
     }
     public void stopArm() {
@@ -156,23 +156,23 @@ public class Intake extends SubsystemBase{
 
     // ==================== ARM COMMANDS (ENCODER) ====================
 
-    public Command armDownCommand(){
-        return new RunCommand(this::moveArmDown, this).withName("ArmDown");
-    }
-    public Command armMiddleCommand(){
-        return new RunCommand(this::moveArmMiddle, this).withName("ArmMiddle");
-    }
-    public Command armUpCommand(){
-        return new RunCommand(this::moveArmUp, this).withName("ArmUp");
-    }
+    // public Command armDownCommand(){
+    //     return new RunCommand(this::moveArmDown, this).withName("ArmDown");
+    // }
+    // public Command armMiddleCommand(){
+    //     return new RunCommand(this::moveArmMiddle, this).withName("ArmMiddle");
+    // }
+    // public Command armUpCommand(){
+    //     return new RunCommand(this::moveArmUp, this).withName("ArmUp");
+    // }
 
-    // ==================== ARM COMMANDS ====================
+    // ==================== ARM COMMANDS (NO ENCODER) ====================
 
     public Command armSpeedUpCommand(){
-        return new RunCommand((ARM_SPEED_MOVE_UP), this).withName("ArmSpeedUp");
+        return new RunCommand(this::armSpeedMoveUp, this).withName("ArmSpeedUp");
     }
     public Command armSpeedDownCommand(){
-        return new RunCommand(() -> setArmSpeedDown(ARM_SPEED_MOVE_DOWN), this).withName("ArmSpeedDown");
+        return new RunCommand(this::armSpeedMoveDown, this).withName("ArmSpeedDown");
     }
     public Command stopArmCommand(){
         return new InstantCommand(this::stopArm, this).withName("StopArm");

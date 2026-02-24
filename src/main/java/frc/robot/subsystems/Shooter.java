@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,6 +35,8 @@ public class Shooter extends SubsystemBase {
     private static final double FEEDER_SPEED_FORWARD = -0.5;         // forward is negative
     private static final double FEEDER_SPEED_REVERSE = 0.5;          // reverse is positive
 
+    private SparkClosedLoopController m_shooterPID;
+
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
 
@@ -44,8 +47,9 @@ public class Shooter extends SubsystemBase {
         m_motor_12 = new SparkMax(12, MotorType.kBrushless); // shooter motor 1 (leader)
         m_motor_13 = new SparkMax(13, MotorType.kBrushless); // shooter motor 2 (follower)
 
-        // get encoders for leader shooter motor (motor 12)
+        // get encoder for leader shooter motor (motor 12)
         m_encoder_12 = m_motor_12.getEncoder();
+        m_shooterPID = m_motor_12.getClosedLoopController();
 
         // FEEDER MOTOR CONFIG (motor 11)
         SparkMaxConfig motor_11_config = new SparkMaxConfig();
@@ -61,21 +65,25 @@ public class Shooter extends SubsystemBase {
         motor_12_config.encoder
             .positionConversionFactor(1.0)      // 1 rotation = 1.0 units
             .velocityConversionFactor(1.0);     // 1 RPM = 1.0 units
+         motor_12_config.closedLoop
+            .feedbackSensor(SparkClosedLoopController.FeedbackSensor.kPrimaryEncoder)  // Use built-in encoder
+            .pid(0.0002, 0.0, 0.0, 0.0)     // Start with small P, tune later
+            .outputRange(-1.0, 1.0)         // Full power range
+            .velocityFF(0.00018);           // Feedforward (1/5676 for NEO)
 
         // FOLLOWER MOTOR CONFIG (motor 13)
         SparkMaxConfig motor_13_config = new SparkMaxConfig();
         motor_13_config
             .smartCurrentLimit(40)
             .idleMode(IdleMode.kBrake);
-        motor_13_config.follow(12, true); // false = same direction, true = opposite direction if motors are mirrored (TEST THIS BEFORE DEPLOYING)
+        motor_13_config.follow(12, true);     // false = same direction, true = opposite direction if motors are mirrored
 
-        //m_motor_11.configure(motor_hyy11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_12.configure(motor_12_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_13.configure(motor_13_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
     }
 
-    // ==================== SHOOTER METHODS ====================
+    // ==================== SHOOTER ONLY METHODS ====================
 
     // Set shooter motor speeds (change during testing)
     // private void forwardShooter() {
@@ -118,7 +126,7 @@ public class Shooter extends SubsystemBase {
         m_motor_11.set(0);
     }
 
-    // ==================== SHOOTER COMMANDS ====================
+    // ==================== SHOOTER ONLY COMMANDS ====================
     
     // public Command smartFeederCommand() {
     //     return new RunCommand(() -> {
