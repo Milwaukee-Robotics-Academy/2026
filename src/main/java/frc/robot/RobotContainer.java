@@ -237,10 +237,14 @@ public class RobotContainer
       operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
       operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
 
-      //arm 
-      operatorXbox.povDown().onTrue(m_intake.armDownCommand());
-      operatorXbox.povUp().onTrue(m_intake.armUpCommand());
-      operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
+      //arm with encoder setpoints
+      // operatorXbox.povDown().onTrue(m_intake.armDownCommand());
+      // operatorXbox.povUp().onTrue(m_intake.armUpCommand());
+      // operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
+
+      //arm with manual control (testing/override, no safety)
+      operatorXbox.povDown().onTrue(m_intake.armSpeedDownCommand());
+      operatorXbox.povUp().onTrue(m_intake.armSpeedUpCommand());
 
       //shooter
       // Option 1: Right Trigger - Smart feeder (auto-pauses and resumes)

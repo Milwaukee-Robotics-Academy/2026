@@ -41,6 +41,9 @@ public class Intake extends SubsystemBase{
     private static final double INTAKE_SPEED_FORWARD = 0.5; 
     private static final double INTAKE_SPEED_REVERSE = -0.5; 
 
+    private static final double ARM_SPEED_MOVE_UP = -0.1;   //negative for up (since arm is inverted)
+    private static final double ARM_SPEED_MOVE_DOWN = 0.1;  //positive for down
+
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
     
     public Intake() {
@@ -102,7 +105,7 @@ public class Intake extends SubsystemBase{
         m_motor_9.set(0);
     }
 
-    // ==================== SET ARM POSITION ====================
+    // ==================== SET ARM POSITION (ENCODER) ====================
 
     private void setArmPosition(double position) {
         m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
@@ -128,6 +131,17 @@ public class Intake extends SubsystemBase{
         return Math.abs(getArmPosition() - targetPosition) < tolerance;
     }
 
+    // ==================== SET ARM POSITION (NO ENCODER) ====================
+
+    public void setArmSpeedMoveUp() {
+        m_motor_10.set(ARM_SPEED_MOVE_UP);
+    }
+    public void setArmSpeedMoveDown() {
+        m_motor_10.set(ARM_SPEED_MOVE_DOWN);
+    }
+    public void stopArm() {
+        m_motor_10.set(0);
+    }
     // ==================== INTAKE WHEEL COMMANDS ====================
 
     public Command forwardIntakeCommand(){
@@ -140,7 +154,7 @@ public class Intake extends SubsystemBase{
         return new InstantCommand(this::stopIntake, this).withName("StopIntake");
     }
 
-    // ==================== ARM COMMANDS ====================
+    // ==================== ARM COMMANDS (ENCODER) ====================
 
     public Command armDownCommand(){
         return new RunCommand(this::moveArmDown, this).withName("ArmDown");
@@ -151,6 +165,20 @@ public class Intake extends SubsystemBase{
     public Command armUpCommand(){
         return new RunCommand(this::moveArmUp, this).withName("ArmUp");
     }
+
+    // ==================== ARM COMMANDS ====================
+
+    public Command armSpeedUpCommand(){
+        return new RunCommand((ARM_SPEED_MOVE_UP), this).withName("ArmSpeedUp");
+    }
+    public Command armSpeedDownCommand(){
+        return new RunCommand(() -> setArmSpeedDown(ARM_SPEED_MOVE_DOWN), this).withName("ArmSpeedDown");
+    }
+    public Command stopArmCommand(){
+        return new InstantCommand(this::stopArm, this).withName("StopArm");
+    }
+
+    // ==================== PRINT STATEMENTS ====================
 
     @Override 
     public void periodic() {
