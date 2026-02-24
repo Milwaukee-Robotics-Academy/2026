@@ -166,8 +166,8 @@ public class RobotContainer
 
    // set default commands
     m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    m_shooter.setDefaultCommand(m_shooter.stopShooterCommand());
-    //m_shooter.setDefaultCommand(m_shooter.stopAllCommand());
+    //m_shooter.setDefaultCommand(m_shooter.stopShooterCommand());
+    m_shooter.setDefaultCommand(m_shooter.stopAllCommand());
     m_intake.setDefaultCommand(m_intake.stopIntakeCommand());
 
     if (RobotBase.isSimulation()) {
@@ -217,7 +217,7 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
 
       // test to determine shooter directions; motor 13 should automatically follow
-      operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
+      //operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
 
     } else
     {
@@ -247,7 +247,7 @@ public class RobotContainer
       //operatorXbox.rightTrigger().whileTrue(m_shooter.smartFeederCommand());
 
       // Option 2: Right Bumper - Spin up shooter (tesing)
-      operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
+      operatorXbox.rightBumper().whileTrue(m_shooter.forwardAllCommand());
 
       // Option 3: Left Bumper - Force feeder (testing/override, no safety)
       //operatorXbox.leftBumper().whileTrue(m_shooter.forwardFeederCommand());

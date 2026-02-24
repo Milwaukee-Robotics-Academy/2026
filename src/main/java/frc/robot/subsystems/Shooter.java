@@ -18,18 +18,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends SubsystemBase {
     
-    //private SparkMax m_motor_11; // feeder motor
+    private SparkMax m_motor_11; // feeder motor
     private SparkMax m_motor_12; // shooter motor 1 (leader)
     private SparkMax m_motor_13; // shooter motor 2 (follower)
 
     private RelativeEncoder m_encoder_12; // encoder motor 1 (only for leader motor, since follower will mirror it)
 
     // Target shooter speed and tolerance (adjust as needed based on testing)
-    private static final double TARGET_SHOOTER_RPM = 3000.0;  // Adjust this!
+    private static final double TARGET_SHOOTER_RPM = 4000.0;  // Adjust this!
     private static final double SPEED_TOLERANCE_RPM = 100.0;  // Within 100 RPM = ready 
 
     private static final double SHOOTER_SPEED_FORWARD = -0.75;       // forward is negative
     private static final double SHOOTER_SPEED_REVERSE = 0.5;         // reverse is positive
+
+    private static final double FEEDER_SPEED_FORWARD = -0.5;         // forward is negative
+    private static final double FEEDER_SPEED_REVERSE = 0.5;          // reverse is positive
 
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
@@ -37,7 +40,7 @@ public class Shooter extends SubsystemBase {
     public Shooter() {
 
         // initialize motor 11, 12, and 13 as a SparkMax motor
-        //m_motor_11 = new SparkMax(11, MotorType.kBrushless); // feeder motor
+        m_motor_11 = new SparkMax(11, MotorType.kBrushless); // feeder motor
         m_motor_12 = new SparkMax(12, MotorType.kBrushless); // shooter motor 1 (leader)
         m_motor_13 = new SparkMax(13, MotorType.kBrushless); // shooter motor 2 (follower)
 
@@ -45,10 +48,10 @@ public class Shooter extends SubsystemBase {
         m_encoder_12 = m_motor_12.getEncoder();
 
         // FEEDER MOTOR CONFIG (motor 11)
-        // SparkMaxConfig motor_11_config = new SparkMaxConfig();
-        // motor_11_config
-        //     .smartCurrentLimit(40)
-        //     .idleMode(IdleMode.kBrake);
+        SparkMaxConfig motor_11_config = new SparkMaxConfig();
+        motor_11_config
+            .smartCurrentLimit(40)
+            .idleMode(IdleMode.kBrake);
         
         // LEADER MOTOR CONFIG (motor 12)
         SparkMaxConfig motor_12_config = new SparkMaxConfig();
@@ -75,15 +78,15 @@ public class Shooter extends SubsystemBase {
     // ==================== SHOOTER METHODS ====================
 
     // Set shooter motor speeds (change during testing)
-    private void forwardShooter() {
-        m_motor_12.set(SHOOTER_SPEED_FORWARD); // motor 13 will automatically follow
-    }
-    private void reverseShooter() {
-        m_motor_12.set(SHOOTER_SPEED_REVERSE);      // motor 13 will automatically follow
-    }
-    private void stopShooter() {
-        m_motor_12.set(0);   // motor 13 will automatically follow
-    }
+    // private void forwardShooter() {
+    //     m_motor_12.set(SHOOTER_SPEED_FORWARD); // motor 13 will automatically follow
+    // }
+    // private void reverseShooter() {
+    //     m_motor_12.set(SHOOTER_SPEED_REVERSE);      // motor 13 will automatically follow
+    // }
+    // private void stopShooter() {
+    //     m_motor_12.set(0);   // motor 13 will automatically follow
+    // }
 
     // Get current shooter velocity in RPM
     public double getShooterVelocityRPM() {
@@ -99,21 +102,21 @@ public class Shooter extends SubsystemBase {
     // ==================== FEEDER + MOTOR METHODS ====================
 
     // Adjust speeds based on testing
-    //  private void forwardFeeder() {
+    // private void forwardFeeder() {
     //     m_motor_11.set(0.5);
     // }
-    // private void forwardAll() {
-    //     m_motor_12.set(.5);
-    //     m_motor_11.set(0.5);
-    // }
-    // private void reverseAll() {
-    //     m_motor_12.set(-0.5);
-    //     m_motor_11.set(-0.5);
-    // }
-    // private void stopAll() {
-    //     m_motor_12.set(0);
-    //     m_motor_11.set(0);
-    // }
+    private void forwardAll() {
+        m_motor_12.set(SHOOTER_SPEED_FORWARD); // motor 13 will automatically follow
+        m_motor_11.set(FEEDER_SPEED_FORWARD);
+    }
+    private void reverseAll() {
+        m_motor_12.set(FEEDER_SPEED_REVERSE);      // motor 13 will automatically follow
+        m_motor_11.set(FEEDER_SPEED_REVERSE);
+    }
+    private void stopAll() {
+        m_motor_12.set(0);
+        m_motor_11.set(0);
+    }
 
     // ==================== SHOOTER COMMANDS ====================
     
@@ -128,28 +131,28 @@ public class Shooter extends SubsystemBase {
     // }
    
     // Basic forward shooter command (can be used for testing or manual control)
-    public Command forwardShooterCommand(){
-        return new RunCommand(this::forwardShooter, this).withName("ForwardShooter");
-    }
+    // public Command forwardShooterCommand(){
+    //     return new RunCommand(this::forwardShooter, this).withName("ForwardShooter");
+    // }
 
     // public Command reverseShooterCommand(){
     //     return new RunCommand(this::reverseShooter, this).withName("ReverseShooter");
     // }
-    public Command stopShooterCommand(){
-        return new InstantCommand(this::stopShooter, this).withName("StopShooter");
-    }
+    // public Command stopShooterCommand(){
+    //     return new InstantCommand(this::stopShooter, this).withName("StopShooter");
+    // }
 
     // ==================== FEEDER & MOTOR COMMANDS ====================
 
-    // public Command forwardAllCommand(){
-    //     return new RunCommand(this::forwardAll, this).withName("ForwardAll");
-    // }
+    public Command forwardAllCommand(){
+        return new RunCommand(this::forwardAll, this).withName("ForwardAll");
+    }
     // public Command reverseAllCommand(){
     //     return new RunCommand(this::reverseAll, this).withName("ReverseAll");
     // }
-    // public Command stopAllCommand(){
-    //     return new InstantCommand(this::stopAll, this).withName("StopAll");
-    // }
+    public Command stopAllCommand(){
+        return new InstantCommand(this::stopAll, this).withName("StopAll");
+    }
 
     @Override
     public void periodic() {
