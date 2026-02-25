@@ -49,7 +49,6 @@ public class Shooter extends SubsystemBase {
         // LEADER MOTOR CONFIG (motor 12)
         SparkMaxConfig motor_12_config = new SparkMaxConfig();
         motor_12_config
-            .inverted(true)                    // Invert motor 12, so spins correct direction for shooting
             .smartCurrentLimit(40)
             .idleMode(IdleMode.kBrake);
         motor_12_config.encoder
