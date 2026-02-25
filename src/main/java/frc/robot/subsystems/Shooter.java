@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.ClosedLoopConfig;
+import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -16,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends SubsystemBase {
@@ -70,7 +72,12 @@ public class Shooter extends SubsystemBase {
          motor_12_config.closedLoop
             .pid(0.0002, 0.0, 0.0, m_PID_slot_12)     // Start with small P, tune later
             .outputRange(-1.0, 1.0);              // Full power range
-
+        
+        motor_12_config.closedLoop.maxMotion
+            .cruiseVelocity(TARGET_SHOOTER_RPM)             // Set cruise velocity to target RPM
+            .maxAcceleration(MAX_ACCELERATION);             // Set max acceleration (adjust as needed)
+            .allowedProfileError(ALLOWED_ERROR);            // Allow some error for profile completion
+                    
         // FOLLOWER MOTOR CONFIG (motor 13)
         SparkMaxConfig motor_13_config = new SparkMaxConfig();
         motor_13_config
@@ -193,7 +200,7 @@ public class Shooter extends SubsystemBase {
             stopFeeder();
         }, this).withTimeout(0.2)
     ).repeatedly();  // Repeat while button held
-    }
+}
 
     public Command stopAllCommand() {
         return new RunCommand(this::stopAll, this).withName("StopAll");
