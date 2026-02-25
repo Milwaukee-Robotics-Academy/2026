@@ -34,7 +34,7 @@ public class Shooter extends SubsystemBase {
 
     // Target shooter speed and tolerance (adjust as needed based on testing)
     private static final double TARGET_SHOOTER_RPM = 4000.0;  // Adjust this!
-    private static final double SPEED_TOLERANCE_RPM = 100.0;  // Within 100 RPM = ready 
+    private static final double SPEED_TOLERANCE_RPM = 150.0;  // Within 100 RPM = ready 
 
     private static final double SHOOTER_SPEED_FORWARD = -0.75;       // negative = forward
     private static final double SHOOTER_SPEED_REVERSE = 0.5;         // positive = reverse
@@ -74,7 +74,7 @@ public class Shooter extends SubsystemBase {
          motor_12_config.closedLoop
             .pid(0.0002, 0.0, 0.0, m_PID_slot0_12)     // Start with small P, tune later
             .outputRange(-1.0, 1.0)                // Full power range
-            .feedForward.kV(0.00025, m_PID_slot0_12);     // kV = 1 / max RPM (1 represents full power)
+            .feedForward.kV(0.00225, m_PID_slot0_12);     // kV = 1 / max RPM (1 represents full power)
 
         // FOLLOWER MOTOR CONFIG (motor 13)
         SparkMaxConfig motor_13_config = new SparkMaxConfig();
