@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.units.measure.Velocity;
+import com.revrobotics.REVLibError;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends SubsystemBase {
@@ -28,7 +29,8 @@ public class Shooter extends SubsystemBase {
 
     private RelativeEncoder m_encoder_12;                            // encoder motor 1 (only for leader motor, since follower will mirror it)
     private SparkClosedLoopController m_PID_12;
-    private ClosedLoopSlot m_PID_slot_12 = ClosedLoopSlot.kSlot0;    // Use PID slot 0 for shooter control
+    private ClosedLoopSlot m_PID_slot0_12 = ClosedLoopSlot.kSlot0;   // PID slot 0 for position control
+    //private ClosedLoopSlot m_PID_vel_12 = ClosedLoopSlot.kSlot1;   // PID slot 1 for velocity control
 
     // Target shooter speed and tolerance (adjust as needed based on testing)
     private static final double TARGET_SHOOTER_RPM = 4000.0;  // Adjust this!
@@ -63,21 +65,17 @@ public class Shooter extends SubsystemBase {
         // LEADER MOTOR CONFIG (motor 12)
         SparkMaxConfig motor_12_config = new SparkMaxConfig();
         motor_12_config
-            .inverted(true)                     // Invert motor 12
+            .inverted(true)                    // Invert motor 12, so spins correct direction for shooting
             .smartCurrentLimit(40)
             .idleMode(IdleMode.kBrake);
         motor_12_config.encoder
             .positionConversionFactor(1.0)      // 1 rotation = 1.0 units
             .velocityConversionFactor(1.0);     // 1 RPM = 1.0 units
          motor_12_config.closedLoop
-            .pid(0.0002, 0.0, 0.0, m_PID_slot_12)     // Start with small P, tune later
-            .outputRange(-1.0, 1.0);              // Full power range
-        
-        motor_12_config.closedLoop.maxMotion
-            .cruiseVelocity(TARGET_SHOOTER_RPM)             // Set cruise velocity to target RPM
-            .maxAcceleration(MAX_ACCELERATION);             // Set max acceleration (adjust as needed)
-            .allowedProfileError(ALLOWED_ERROR);            // Allow some error for profile completion
-                    
+            .pid(0.0002, 0.0, 0.0, m_PID_slot0_12)     // Start with small P, tune later
+            .outputRange(-1.0, 1.0)                // Full power range
+            .feedForward.kV(0.00025, m_PID_slot0_12);     // kV = 1 / max RPM (1 represents full power)
+
         // FOLLOWER MOTOR CONFIG (motor 13)
         SparkMaxConfig motor_13_config = new SparkMaxConfig();
         motor_13_config
