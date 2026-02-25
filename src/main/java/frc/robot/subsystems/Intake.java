@@ -41,7 +41,7 @@ public class Intake extends SubsystemBase{
     private static final double INTAKE_SPEED_FORWARD = 0.5; 
     private static final double INTAKE_SPEED_REVERSE = -0.5; 
 
-    private static final double ARM_SPEED_MOVE_UP = -0.3;   //up = negative (arm is inverted)
+    private static final double ARM_SPEED_MOVE_UP = -0.2;   //up = negative (arm is inverted)
     private static final double ARM_SPEED_MOVE_DOWN = 0.1;  //down = positive
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
