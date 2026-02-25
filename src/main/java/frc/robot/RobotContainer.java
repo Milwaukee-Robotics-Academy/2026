@@ -6,6 +6,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
 
@@ -47,6 +48,7 @@ public class RobotContainer
                                                                                 "swerve/maxSwerve"));
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
+  private final Feeder m_feeder = new Feeder();
   //private final Vision m_vision;
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
@@ -166,7 +168,8 @@ public class RobotContainer
 
    // set default commands
     m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    m_shooter.setDefaultCommand(m_shooter.stopAllCommand());
+    m_shooter.setDefaultCommand(m_shooter.stopShooterCommand());
+    m_feeder.setDefaultCommand(m_feeder.stopFeederCommand());
     m_intake.setDefaultCommand(m_intake.stopAllCommand());
 
     if (RobotBase.isSimulation()) {
@@ -215,9 +218,6 @@ public class RobotContainer
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
 
-      // test to determine shooter directions; motor 13 should automatically follow
-      //operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
-
     } else
     {
       // ==================== DRIVER COMMANDS ====================
@@ -236,18 +236,15 @@ public class RobotContainer
       operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
       operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
 
-      //arm with encoder setpoints
-      // operatorXbox.povDown().onTrue(m_intake.armDownCommand());
-      // operatorXbox.povUp().onTrue(m_intake.armUpCommand());
-      // operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
-
       //arm with manual control (testing/override, no safety)
       operatorXbox.rightTrigger().whileTrue(m_intake.armSpeedDownCommand());   // right trigger to move arm down
       operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedUpCommand());      // left trigger to move arm up
 
       //shooter
-      operatorXbox.rightBumper().whileTrue(m_shooter.shootSequenceCommand());
-    
+      operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
+      
+      //feeder
+      operatorXbox.leftBumper().whileTrue(m_feeder.forwardFeederCommand());
     }
 
   }
