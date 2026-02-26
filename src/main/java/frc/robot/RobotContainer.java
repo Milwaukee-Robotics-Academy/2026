@@ -44,7 +44,7 @@ public class RobotContainer
   private final SwerveSubsystem       m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
   private final CANFuelSubsystem m_fuelSubsystem = new CANFuelSubsystem();
-  private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
+ // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -212,13 +212,13 @@ public class RobotContainer
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
    // While the down arrow on the directional pad is held it will unclimb the robot
-    driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
+  //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
-    driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
+   // driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
 
     m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.run(() -> m_fuelSubsystem.stop()));
 
-    m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
+ //   m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
 
   }
 
