@@ -30,13 +30,13 @@ public class Intake extends SubsystemBase{
     private SparkFlex m_motor_9;  // intake motor
     private SparkMax m_motor_10;  // arm motor
 
-    private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
-    private SparkClosedLoopController m_armPID; //closed loop controller for arm position
+    // private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
+    // private SparkClosedLoopController m_armPID; //closed loop controller for arm position
 
     //arm position setpoints (play with these values to find best fit for the positions)
-    private final double ARM_DOWN_POSITION = 0.16; 
-    private final double ARM_MIDDLE_POSITION = 0.05;   
-    private final double ARM_UP_POSITION = 0.87;   
+    // private final double ARM_DOWN_POSITION = 0.16; 
+    // private final double ARM_MIDDLE_POSITION = 0.05;   
+    // private final double ARM_UP_POSITION = 0.87;   
 
     private static final double INTAKE_SPEED_FORWARD = 0.3; 
     private static final double INTAKE_SPEED_REVERSE = -0.7; 
@@ -52,8 +52,8 @@ public class Intake extends SubsystemBase{
         m_motor_10 = new SparkMax(10, MotorType.kBrushless);
 
         // get absolute encoder and closed loop controller for arm motor
-        m_armEncoder = m_motor_10.getAbsoluteEncoder();
-        m_armPID = m_motor_10.getClosedLoopController();
+        //m_armEncoder = m_motor_10.getAbsoluteEncoder();
+        //m_armPID = m_motor_10.getClosedLoopController();
 
         // set up configs for SparkFlex motor 9 (intake)
         SparkFlexConfig global_config_flex = new SparkFlexConfig();
@@ -79,14 +79,14 @@ public class Intake extends SubsystemBase{
         motor_10_config
             .apply(global_config_max);
 
-        motor_10_config.absoluteEncoder
-             .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
-             .inverted(false);              // change to true if the encoder reads backwards
+        // motor_10_config.absoluteEncoder
+        //      .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
+        //      .inverted(false);              // change to true if the encoder reads backwards
 
-        motor_10_config.closedLoop
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
-            .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
-            .outputRange(-0.5, 0.5);                   //limit speed to 50%
+        // motor_10_config.closedLoop
+        //     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
+        //     .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
+        //     .outputRange(-0.5, 0.5);                   //limit speed to 50%
 
         // apply configs to motors
         m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
@@ -107,29 +107,29 @@ public class Intake extends SubsystemBase{
 
     // ==================== SET ARM POSITION (ENCODER) ====================
 
-    private void setArmPosition(double position) {
-        m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
-    }
+    // private void setArmPosition(double position) {
+    //     m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
+    // }
 
-    public void moveArmDown() {
-        setArmPosition(ARM_DOWN_POSITION);
-    }
-    public void moveArmMiddle() {
-        setArmPosition(ARM_MIDDLE_POSITION);
-    }
-    public void moveArmUp() {
-        setArmPosition(ARM_UP_POSITION);
-    }   
+    // public void moveArmDown() {
+    //     setArmPosition(ARM_DOWN_POSITION);
+    // }
+    // public void moveArmMiddle() {
+    //     setArmPosition(ARM_MIDDLE_POSITION);
+    // }
+    // public void moveArmUp() {
+    //     setArmPosition(ARM_UP_POSITION);
+    // }   
 
-    public double getArmPosition() {
-        return m_armEncoder.getPosition();
-    }
+    // public double getArmPosition() {
+    //     return m_armEncoder.getPosition();
+    // }
 
     // check if arm is at target position within a certain tolerance
-    public boolean armAtTarget(double targetPosition) {
-        double tolerance = 0.02; //within 0.02 rotations  
-        return Math.abs(getArmPosition() - targetPosition) < tolerance;
-    }
+    // public boolean armAtTarget(double targetPosition) {
+    //     double tolerance = 0.02; //within 0.02 rotations  
+    //     return Math.abs(getArmPosition() - targetPosition) < tolerance;
+    // }
 
     // ==================== SET ARM POSITION (NO ENCODER) ====================
 
@@ -195,7 +195,7 @@ public class Intake extends SubsystemBase{
         // You can use this to update SmartDashboard values or perform other periodic tasks
 
         // Arm monitoring
-        SmartDashboard.putNumber("Arm/Position", getArmPosition());
+        //SmartDashboard.putNumber("Arm/Position", getArmPosition());
         SmartDashboard.putNumber("Arm/Current (A)", m_motor_10.getOutputCurrent());
         SmartDashboard.putNumber("Arm/Temp (C)", m_motor_10.getMotorTemperature());
         
