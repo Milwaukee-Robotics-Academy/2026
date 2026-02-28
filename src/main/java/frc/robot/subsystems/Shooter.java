@@ -207,9 +207,6 @@ public class Shooter extends SubsystemBase {
     @Override
     public void periodic() {
         // Log shooter speed to dashboard for monitoring
-        SmartDashboard.putNumber("Shooter/Current RPM", getShooterVelocityRPM());
-        SmartDashboard.putNumber("Shooter/Target RPM", TARGET_SHOOTER_RPM);
-        SmartDashboard.putBoolean("Shooter/Ready", isShooterReady());
         //SmartDashboard.putBoolean("Shooter/Feeder Running", m_motor_11.get() > 0.1); 
     }
 }

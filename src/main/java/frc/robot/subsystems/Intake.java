@@ -193,15 +193,5 @@ public class Intake extends SubsystemBase{
     public void periodic() {
         // This method will be called once per scheduler run
         // You can use this to update SmartDashboard values or perform other periodic tasks
-
-        // Arm monitoring
-        //SmartDashboard.putNumber("Arm/Position", getArmPosition());
-        SmartDashboard.putNumber("Arm/Current (A)", m_motor_10.getOutputCurrent());
-        SmartDashboard.putNumber("Arm/Temp (C)", m_motor_10.getMotorTemperature());
-        
-        // // Intake monitoring (NEO Vortex)
-        SmartDashboard.putNumber("Intake/Current (A)", m_motor_9.getOutputCurrent());
-        SmartDashboard.putNumber("Intake/Temp (C)", m_motor_9.getMotorTemperature());
-        SmartDashboard.putNumber("Intake/Voltage (V)", m_motor_9.getBusVoltage());
     }
 }
