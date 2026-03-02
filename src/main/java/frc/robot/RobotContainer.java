@@ -196,7 +196,7 @@ public class RobotContainer
     {
       driverXbox.a().onTrue((Commands.runOnce(m_drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(m_drivebase::addFakeVisionReading));
-      driverXbox.start().whileTrue(Commands.none());
+      driverXbox.start().whileTrue(Commands.runOnce(m_drivebase::zeroGyro));
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
