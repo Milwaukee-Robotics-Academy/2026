@@ -25,7 +25,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   /** Right launcher motor controller (brushless) */
   private final SparkMax rightIntakeLauncher;
   /** Indexer / indexer motor controller (brushless) */
-  private final SparkMax Indexer;
+  private final SparkMax indexer;
 
   /**
    * Construct the CANFuelSubsystem.
@@ -38,7 +38,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     // create brushed motors for each of the motors on the launcher mechanism
     leftIntakeLauncher = new SparkMax(LEFT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
     rightIntakeLauncher = new SparkMax(RIGHT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
-    Indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
+    indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
 
     // create the configuration for the indexer roller, set a current limit and apply
     // the config to the controller
@@ -47,7 +47,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     indexerConfig.voltageCompensation(12);
     indexerConfig.idleMode(IdleMode.kCoast);
     indexerConfig.inverted(true);
-    Indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // create the configuration for the launcher roller, set a current limit, set
     // the motor to inverted so that positive values are used for both intaking and
@@ -71,6 +71,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT);
     SmartDashboard.putNumber("Shooter/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Shooter/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Shooter/Indexer-Velocity", indexer.getEncoder().getVelocity());
     // SmartDashboard.putNumber("Spin-up indexer roller value",
     // SPIN_UP_INDEXER_VOLTAGE);
   }
@@ -93,14 +94,14 @@ public class CANFuelSubsystem extends SubsystemBase {
    *              -1.0..1.0)
    */
   public void setIndexerRoller(double power) {
-    Indexer.set(power); // positive for shooting
+    indexer.set(power); // positive for shooting
   }
 
   /**
    * Stop all rollers immediately.
    */
   public void stop() {
-    Indexer.set(0);
+    indexer.set(0);
     leftIntakeLauncher.set(0);
     rightIntakeLauncher.set(0);
   }
@@ -198,7 +199,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Shooter/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Shooter/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
-
+    SmartDashboard.putNumber("Shooter/Indexer-Velocity", indexer.getEncoder().getVelocity());
     // This method will be called once per scheduler run
   }
 }
