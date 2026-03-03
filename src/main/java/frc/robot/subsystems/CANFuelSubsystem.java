@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,25 +41,32 @@ public class CANFuelSubsystem extends SubsystemBase {
     RightIntakeLauncher = new SparkMax(RIGHT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
     Indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
 
+
     // create the configuration for the indexer roller, set a current limit and apply
     // the config to the controller
     SparkMaxConfig indexerConfig = new SparkMaxConfig();
     indexerConfig.smartCurrentLimit(INDEXER_MOTOR_CURRENT_LIMIT);
     indexerConfig.voltageCompensation(12);
     indexerConfig.idleMode(IdleMode.kCoast);
+    indexerConfig.inverted(true); // invert the indexer so that positive values are used for both intaking and
+                                  // launching
     Indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // create the configuration for the launcher roller, set a current limit, set
     // the motor to inverted so that positive values are used for both intaking and
     // launching, and apply the config to the controller
     SparkMaxConfig launcherConfig = new SparkMaxConfig();
-
-    launcherConfig.smartCurrentLimit(LAUNCHER_MOTOR_CURRENT_LIMIT);
-    launcherConfig.voltageCompensation(12);
-    launcherConfig.idleMode(IdleMode.kCoast);
+    SparkMaxConfig launcherLeaderConfig = new SparkMaxConfig();
+    SparkMaxConfig launcherFollowerConfig = new SparkMaxConfig();
+    launcherConfig.smartCurrentLimit(LAUNCHER_MOTOR_CURRENT_LIMIT)
+    .voltageCompensation(12)
+    .idleMode(IdleMode.kCoast);
+    launcherLeaderConfig.apply(launcherConfig)
+    .inverted(false);
     RightIntakeLauncher.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    launcherConfig.inverted(true);
-    LeftIntakeLauncher.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    launcherFollowerConfig.apply(launcherConfig)
+        .inverted(true); // invert the follower to match the leader
+    LeftIntakeLauncher.configure(launcherFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // put default values for various fuel operations onto the dashboard
     // all commands using this subsystem pull values from the dashbaord to allow
