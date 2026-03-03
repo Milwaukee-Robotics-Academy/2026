@@ -76,6 +76,8 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
     SmartDashboard.putNumber("Launching indexer roller value", INDEXER_LAUNCHING_PERCENT);
     SmartDashboard.putNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT);
+    SmartDashboard.putNumber("Shooter/Left-Velocity", LeftIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Shooter/Right-Velocity", RightIntakeLauncher.getEncoder().getVelocity());
     // SmartDashboard.putNumber("Spin-up indexer roller value",
     // SPIN_UP_INDEXER_VOLTAGE);
   }
@@ -202,5 +204,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Shooter/Left-Velocity", LeftIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Shooter/Right-Velocity", RightIntakeLauncher.getEncoder().getVelocity());
   }
 }
