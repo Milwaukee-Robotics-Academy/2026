@@ -34,7 +34,7 @@ public class Shooter extends SubsystemBase {
 
     // Target shooter speed and tolerance (adjust as needed based on testing)
     private static final double TARGET_SHOOTER_RPM = 4000.0;  // Adjust this!
-    private static final double SPEED_TOLERANCE_RPM = 150.0;  // Within 100 RPM = ready 
+    private static final double SPEED_TOLERANCE_RPM = 150.0;  // Within 150 RPM = ready 
 
     private static final double SHOOTER_SPEED_FORWARD = -0.75;       // negative = forward
     private static final double SHOOTER_SPEED_REVERSE = 0.5;         // positive = reverse

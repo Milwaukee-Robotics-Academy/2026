@@ -242,8 +242,9 @@ public class RobotContainer
       // operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
 
       //arm with manual control (testing/override, no safety)
-      operatorXbox.rightTrigger().whileTrue(m_intake.armSpeedDownCommand());   // right trigger to move arm down
-      operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedUpCommand());      // left trigger to move arm up
+      operatorXbox.rightTrigger().whileTrue(m_intake.armDownCommand());   // right trigger to move arm down
+      operatorXbox.leftTrigger().whileTrue(m_intake.armUpCommand());      // left trigger to move arm up
+      operatorXbox.leftBumper().whileTrue(m_intake.armMiddleCommand());  
 
       //shooter
       operatorXbox.rightBumper().whileTrue(m_shooter.shootSequenceCommand());

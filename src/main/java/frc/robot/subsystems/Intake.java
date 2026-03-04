@@ -30,19 +30,19 @@ public class Intake extends SubsystemBase{
     private SparkFlex m_motor_9;  // intake motor
     private SparkMax m_motor_10;  // arm motor
 
-    // private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
-    // private SparkClosedLoopController m_armPID; //closed loop controller for arm position
+    private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
+    private SparkClosedLoopController m_armPID; //closed loop controller for arm position
 
     //arm position setpoints (play with these values to find best fit for the positions)
-    // private final double ARM_DOWN_POSITION = 0.16; 
-    // private final double ARM_MIDDLE_POSITION = 0.05;   
-    // private final double ARM_UP_POSITION = 0.87;   
+    private final double ARM_DOWN_POSITION = 0.16; 
+    private final double ARM_MIDDLE_POSITION = 0.05;   
+    private final double ARM_UP_POSITION = 0.87;   
 
     private static final double INTAKE_SPEED_FORWARD = 0.3; 
     private static final double INTAKE_SPEED_REVERSE = -0.7; 
 
-    private static final double ARM_SPEED_MOVE_UP = -0.3;   //up = negative (arm is inverted)
-    private static final double ARM_SPEED_MOVE_DOWN = 0.1;  //down = positive
+    //private static final double ARM_SPEED_MOVE_UP = -0.3;   //up = negative (arm is inverted)
+    //private static final double ARM_SPEED_MOVE_DOWN = 0.1;  //down = positive
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
     
@@ -107,38 +107,38 @@ public class Intake extends SubsystemBase{
 
     // ==================== SET ARM POSITION (ENCODER) ====================
 
-    // private void setArmPosition(double position) {
-    //     m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
-    // }
+    private void setArmPosition(double position) {
+        m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
+    }
 
-    // public void moveArmDown() {
-    //     setArmPosition(ARM_DOWN_POSITION);
-    // }
-    // public void moveArmMiddle() {
-    //     setArmPosition(ARM_MIDDLE_POSITION);
-    // }
-    // public void moveArmUp() {
-    //     setArmPosition(ARM_UP_POSITION);
-    // }   
+    public void moveArmDown() {
+        setArmPosition(ARM_DOWN_POSITION);
+    }
+    public void moveArmMiddle() {
+        setArmPosition(ARM_MIDDLE_POSITION);
+    }
+    public void moveArmUp() {
+        setArmPosition(ARM_UP_POSITION);
+    }   
 
-    // public double getArmPosition() {
-    //     return m_armEncoder.getPosition();
-    // }
+    public double getArmPosition() {
+        return m_armEncoder.getPosition();
+    }
 
-    // check if arm is at target position within a certain tolerance
-    // public boolean armAtTarget(double targetPosition) {
-    //     double tolerance = 0.02; //within 0.02 rotations  
-    //     return Math.abs(getArmPosition() - targetPosition) < tolerance;
-    // }
+    //check if arm is at target position within a certain tolerance
+    public boolean armAtTarget(double targetPosition) {
+        double tolerance = 0.02; //within 0.02 rotations  
+        return Math.abs(getArmPosition() - targetPosition) < tolerance;
+    }
 
     // ==================== SET ARM POSITION (NO ENCODER) ====================
 
-    public void armSpeedMoveUp() {
-        m_motor_10.set(ARM_SPEED_MOVE_UP);
-    }
-    public void armSpeedMoveDown() {
-        m_motor_10.set(ARM_SPEED_MOVE_DOWN);
-    }
+    // public void armSpeedMoveUp() {
+    //     m_motor_10.set(ARM_SPEED_MOVE_UP);
+    // }
+    // public void armSpeedMoveDown() {
+    //     m_motor_10.set(ARM_SPEED_MOVE_DOWN);
+    // }
     public void stopArm() {
         m_motor_10.set(0);
     }
@@ -156,24 +156,24 @@ public class Intake extends SubsystemBase{
 
     // ==================== ARM COMMANDS (ENCODER) ====================
 
-    // public Command armDownCommand(){
-    //     return new RunCommand(this::moveArmDown, this).withName("ArmDown");
-    // }
-    // public Command armMiddleCommand(){
-    //     return new RunCommand(this::moveArmMiddle, this).withName("ArmMiddle");
-    // }
-    // public Command armUpCommand(){
-    //     return new RunCommand(this::moveArmUp, this).withName("ArmUp");
-    // }
+    public Command armDownCommand(){
+        return new RunCommand(this::moveArmDown, this).withName("ArmDown");
+    }
+    public Command armMiddleCommand(){
+        return new RunCommand(this::moveArmMiddle, this).withName("ArmMiddle");
+    }
+    public Command armUpCommand(){
+        return new RunCommand(this::moveArmUp, this).withName("ArmUp");
+    }
 
     // ==================== ARM COMMANDS (NO ENCODER) ====================
 
-    public Command armSpeedUpCommand(){
-        return new RunCommand(this::armSpeedMoveUp, this).withName("ArmSpeedUp");
-    }
-    public Command armSpeedDownCommand(){
-        return new RunCommand(this::armSpeedMoveDown, this).withName("ArmSpeedDown");
-    }
+    // public Command armSpeedUpCommand(){
+    //     return new RunCommand(this::armSpeedMoveUp, this).withName("ArmSpeedUp");
+    // }
+    // public Command armSpeedDownCommand(){
+    //     return new RunCommand(this::armSpeedMoveDown, this).withName("ArmSpeedDown");
+    // }
     public Command stopArmCommand(){
         return new InstantCommand(this::stopArm, this).withName("StopArm");
     }
