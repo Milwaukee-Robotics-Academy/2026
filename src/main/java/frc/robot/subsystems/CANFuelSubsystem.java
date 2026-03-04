@@ -15,6 +15,7 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.FuelConstants;
 
 import static frc.robot.Constants.FuelConstants.*;
@@ -152,15 +153,14 @@ public class CANFuelSubsystem extends SubsystemBase {
    * @return a Command that spins up the launcher until interrupted
    */
   public Command spinUpCommand() {
-    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
+    return new edu.wpi.first.wpilibj2.command.RunCommand(
         () -> {
           double launcherPercent = SmartDashboard.getNumber("Launching launcher roller value",
               LAUNCHING_LAUNCHER_PERCENT);
           double indexerPercent = SmartDashboard.getNumber("Launching indexer roller value", INDEXER_LAUNCHING_PERCENT);
           setIntakeLauncherRoller(launcherPercent);
-          setIndexerRoller(indexerPercent);
+        //  setIndexerRoller(indexerPercent);
         },
-        this::stop,
         this).withName("SpinUp");
   }
 
@@ -170,13 +170,12 @@ public class CANFuelSubsystem extends SubsystemBase {
    * @return a Command that runs the full launch routine
    */
   public Command launchCommand() {
-    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
+    return new edu.wpi.first.wpilibj2.command.RunCommand(
         () -> {
           setIntakeLauncherRoller(
               SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
           setIndexerRoller(SmartDashboard.getNumber("Launching indexer roller value", INDEXER_LAUNCHING_PERCENT));
         },
-        this::stop,
         this).withName("Launch");
 
   }
@@ -192,6 +191,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     // interrupted
     return new edu.wpi.first.wpilibj2.command.SequentialCommandGroup(
         spinUpCommand().withTimeout(FuelConstants.SPIN_UP_SECONDS),
+        new WaitCommand(SPIN_UP_SECONDS),
         launchCommand());
   }
 
