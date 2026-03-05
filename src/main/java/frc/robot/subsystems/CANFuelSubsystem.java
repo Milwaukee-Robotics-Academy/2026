@@ -66,14 +66,14 @@ public class CANFuelSubsystem extends SubsystemBase {
     // all commands using this subsystem pull values from the dashbaord to allow
     // you to tune the values easily, and then replace the values in Constants.java
     // with your new values. For more information, see the Software Guide.
-    SmartDashboard.putNumber("Intaking indexer roller value", INDEXER_INTAKING_PERCENT);
-    SmartDashboard.putNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
-    SmartDashboard.putNumber("Launching indexer roller value", INDEXER_LAUNCHING_PERCENT);
-    SmartDashboard.putNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT);
+    SmartDashboard.putNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
+    SmartDashboard.putNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
+    SmartDashboard.putNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT);
+    SmartDashboard.putNumber("Launching/launcher", LAUNCHING_LAUNCHER_PERCENT);
     SmartDashboard.putNumber("Shooter/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Shooter/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Shooter/Indexer-Velocity", indexer.getEncoder().getVelocity());
-    // SmartDashboard.putNumber("Spin-up indexer roller value",
+    // SmartDashboard.putNumber("Spin-up indexer",
     // SPIN_UP_INDEXER_VOLTAGE);
   }
 
@@ -118,8 +118,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command intakeCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
         () -> {
-          double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
-          double indexerPercent = SmartDashboard.getNumber("Intaking indexer roller value", INDEXER_INTAKING_PERCENT);
+          double intakePercent = SmartDashboard.getNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
+          double indexerPercent = SmartDashboard.getNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
           setIntakeLauncherRoller(intakePercent);
           setIndexerRoller(indexerPercent);
         },
@@ -135,8 +135,8 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command ejectCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
         () -> {
-          double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
-          double indexerPercent = SmartDashboard.getNumber("Intaking indexer roller value", INDEXER_INTAKING_PERCENT);
+          double intakePercent = SmartDashboard.getNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
+          double indexerPercent = SmartDashboard.getNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
           // reverse the intake and indexer to eject
           setIntakeLauncherRoller(-intakePercent);
           setIndexerRoller(-indexerPercent);
@@ -155,9 +155,9 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command spinUpCommand() {
     return new edu.wpi.first.wpilibj2.command.RunCommand(
         () -> {
-          double launcherPercent = SmartDashboard.getNumber("Launching launcher roller value",
+          double launcherPercent = SmartDashboard.getNumber("Launching/launcher",
               LAUNCHING_LAUNCHER_PERCENT);
-          double indexerPercent = SmartDashboard.getNumber("Launching indexer roller value", INDEXER_LAUNCHING_PERCENT);
+          double indexerPercent = SmartDashboard.getNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT);
           setIntakeLauncherRoller(launcherPercent);
         //  setIndexerRoller(indexerPercent);
         },
@@ -173,8 +173,8 @@ public class CANFuelSubsystem extends SubsystemBase {
     return new edu.wpi.first.wpilibj2.command.RunCommand(
         () -> {
           setIntakeLauncherRoller(
-              SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
-          setIndexerRoller(SmartDashboard.getNumber("Launching indexer roller value", INDEXER_LAUNCHING_PERCENT));
+              SmartDashboard.getNumber("Launching/launcher", LAUNCHING_LAUNCHER_PERCENT));
+          setIndexerRoller(SmartDashboard.getNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT));
         },
         this).withName("Launch");
 
