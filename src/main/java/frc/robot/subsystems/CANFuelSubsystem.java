@@ -12,6 +12,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,6 +41,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     leftIntakeLauncher = new SparkMax(LEFT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
     rightIntakeLauncher = new SparkMax(RIGHT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
     indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
+
 
     // create the configuration for the indexer roller, set a current limit and apply
     // the config to the controller
@@ -201,5 +203,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Shooter/Left-Velocity", LeftIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Shooter/Right-Velocity", RightIntakeLauncher.getEncoder().getVelocity());
   }
 }
