@@ -203,7 +203,5 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
     // This method will be called once per scheduler run
-    SmartDashboard.putNumber("Shooter/Left-Velocity", LeftIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Shooter/Right-Velocity", RightIntakeLauncher.getEncoder().getVelocity());
   }
 }
