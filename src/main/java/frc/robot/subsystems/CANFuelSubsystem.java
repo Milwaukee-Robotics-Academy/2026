@@ -70,9 +70,9 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
     SmartDashboard.putNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT);
     SmartDashboard.putNumber("Launching/launcher", LAUNCHING_LAUNCHER_PERCENT);
-    SmartDashboard.putNumber("Shooter/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Shooter/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Shooter/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
     // SmartDashboard.putNumber("Spin-up indexer",
     // SPIN_UP_INDEXER_VOLTAGE);
   }
@@ -197,9 +197,9 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Shooter/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Shooter/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Shooter/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
     // This method will be called once per scheduler run
   }
 }
