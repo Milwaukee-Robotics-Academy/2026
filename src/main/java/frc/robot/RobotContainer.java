@@ -107,11 +107,9 @@ public class RobotContainer
       //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
       driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
 
     // While the left bumper on operator controller is held, intake Fuel
-    driverXbox.leftBumper().whileTrue(m_fuelSubsystem.intakeCommand());
+    driverXbox.leftBumper().onTrue(m_fuelSubsystem.toggleIntakeCommand());
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     driverXbox.rightBumper().whileTrue(m_fuelSubsystem.launchSequenceCommand());
@@ -123,7 +121,7 @@ public class RobotContainer
     // While the up arrow on the directional pad is held it will cimb the robot
    // driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
 
-    m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.run(() -> m_fuelSubsystem.stop()));
+    m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
  //   m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
 

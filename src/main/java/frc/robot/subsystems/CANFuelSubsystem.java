@@ -8,13 +8,13 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.FuelConstants;
@@ -109,6 +109,26 @@ public class CANFuelSubsystem extends SubsystemBase {
     rightIntakeLauncher.set(0);
   }
 
+  public boolean isLauncherAtSpeed() {
+    double targetVelocity = 4500;
+    double leftVelocity = leftIntakeLauncher.getEncoder().getVelocity();
+    double rightVelocity = rightIntakeLauncher.getEncoder().getVelocity();
+    double tolerance = 100;
+    return Math.abs(leftVelocity - targetVelocity) < tolerance
+        && Math.abs(rightVelocity - targetVelocity) < tolerance;
+  }
+
+  public boolean isIntaking() {
+    return leftIntakeLauncher.getEncoder().getVelocity() > 0; // Adjust threshold as needed
+  }
+
+  public Command stopCommand() {
+    return new RunCommand(() -> stop(), this);
+  }
+
+  public Command toggleIntakeCommand() {
+    return new ConditionalCommand(stopCommand(), intakeCommand(), this::isIntaking);
+  }
   /**
    * Returns a command that runs the intake sequence while held.
    *
@@ -201,4 +221,6 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
   }
+
+
 }
