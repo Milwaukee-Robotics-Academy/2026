@@ -159,9 +159,7 @@ public class CANFuelSubsystem extends SubsystemBase {
         () -> {
           double launcherPercent = SmartDashboard.getNumber("Launching/launcher",
               LAUNCHING_LAUNCHER_PERCENT);
-          double indexerPercent = SmartDashboard.getNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT);
           setIntakeLauncherRoller(launcherPercent);
-        //  setIndexerRoller(indexerPercent);
         },
         this).withName("SpinUp");
   }
