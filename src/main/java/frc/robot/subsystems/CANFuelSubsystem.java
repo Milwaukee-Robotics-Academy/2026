@@ -75,6 +75,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putBoolean("Intaking/IsIntaking?", isIntaking());
     // SmartDashboard.putNumber("Spin-up indexer",
     // SPIN_UP_INDEXER_VOLTAGE);
   }
@@ -123,7 +124,10 @@ public class CANFuelSubsystem extends SubsystemBase {
   }
 
   public Command stopCommand() {
-    return new RunCommand(() -> stop(), this);
+    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
+        this::stop,
+        this::stop,
+        this).withName("Stop");
   }
 
   public Command toggleIntakeCommand() {
@@ -220,6 +224,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putBoolean("Intaking/IsIntaking?", isIntaking());
   }
 
 
