@@ -109,7 +109,7 @@ public class RobotContainer
       driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
 
     // While the left bumper on operator controller is held, intake Fuel
-    driverXbox.leftBumper().onTrue(m_fuelSubsystem.toggleIntakeCommand());
+    driverXbox.leftBumper().whileTrue(m_fuelSubsystem.intakeCommand());
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     driverXbox.rightBumper().whileTrue(m_fuelSubsystem.launchSequenceCommand());
