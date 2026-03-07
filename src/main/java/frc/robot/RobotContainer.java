@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -109,7 +110,7 @@ public class RobotContainer
       driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
 
     // While the left bumper on operator controller is held, intake Fuel
-    driverXbox.leftBumper().onTrue(m_fuelSubsystem.toggleIntakeCommand());
+    driverXbox.leftBumper().onTrue( new ConditionalCommand(m_fuelSubsystem.stopCommand(), m_fuelSubsystem.intakeCommand(), m_fuelSubsystem::isIntaking));
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     driverXbox.rightBumper().whileTrue(m_fuelSubsystem.launchSequenceCommand());
