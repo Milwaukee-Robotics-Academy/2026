@@ -53,6 +53,7 @@ public class Intake extends SubsystemBase{
 
         // get absolute encoder and closed loop controller for arm motor
         //m_armEncoder = m_motor_10.getAbsoluteEncoder();
+//TODO: figure out how to set up absolute encoder for SparkMax arm motor (motor 10) and use it for closed loop control to set arm position
         //m_armPID = m_motor_10.getClosedLoopController();
 
         // set up configs for SparkFlex motor 9 (intake)
@@ -61,6 +62,7 @@ public class Intake extends SubsystemBase{
 
         // set up configs for SparkMax motor 10 (arm)
         SparkMaxConfig global_config_max = new SparkMaxConfig();
+//TODO: figure out how to set up absolute encoder for SparkMax arm motor (motor 10) and use it for closed loop control to set arm position
         SparkMaxConfig motor_10_config = new SparkMaxConfig();
 
         // configure flex motor settings (intake)
@@ -108,7 +110,7 @@ public class Intake extends SubsystemBase{
     // ==================== SET ARM POSITION (ENCODER) ====================
 
     private void setArmPosition(double position) {
-        m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
+      //  m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
     }
 
     public void moveArmDown() {
