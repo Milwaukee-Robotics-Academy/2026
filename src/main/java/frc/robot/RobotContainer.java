@@ -115,6 +115,8 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("shootCommand", m_Shooter.shootCommand());
+    NamedCommands.registerCommand("intakeCommand", m_Intake.intakeCommand());
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -186,8 +188,9 @@ public class RobotContainer
 //     }
 //     if (DriverStation.isTest())
 //     {
-//       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-//     m_Intake.setDefaultCommand(m_Intake.stopCommand());
+       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+     m_Intake.setDefaultCommand(m_Intake.stopCommand());
+     m_Shooter.setDefaultCommand(m_Shooter.stopCommand());
 
 //       driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 //       //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
@@ -210,12 +213,12 @@ public class RobotContainer
       operatorXbox.leftTrigger().whileTrue(m_Shooter.loadUpCommand());
       operatorXbox.leftBumper().whileTrue(m_Intake.outtakeCommand());
       operatorXbox.x().whileTrue(m_Intake.goUpFunctionCommand());
-      operatorXbox.y().onTrue(Commands.none());
-      operatorXbox.a().onTrue(Commands.none());
+      operatorXbox.y().whileTrue(m_Shooter.spitbackCommand());
+      operatorXbox.a().whileTrue(m_Shooter.oppositeAgitateCommand());
       operatorXbox.b().whileTrue(m_Intake.goDownFunctionCommand());
-      operatorXbox.povUp().whileTrue(Commands.none()); 
+      operatorXbox.povUp().whileTrue(m_Shooter.oppositeAgitateCommand()); 
       operatorXbox.povDown().onTrue(Commands.none()); 
-      operatorXbox.povLeft().onTrue(Commands.none());
+      operatorXbox.povLeft().whileTrue(m_Shooter.hyperShotCommand());
  //   }
 
   }

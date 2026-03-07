@@ -20,30 +20,37 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
   private SparkMax m_motor_9;
   private SparkMax m_motor_10;
-  private SparkMax m_motor_11;
+  private SparkMax m_motor_12;
   private RelativeEncoder m_encoder_9;
   private RelativeEncoder m_encoder_10;
-  private RelativeEncoder m_encoder_11;
+  private RelativeEncoder m_encoder_12;
 
     
 
   public Intake(){
-    m_motor_9 =  new SparkMax(11, MotorType.kBrushless);
-    m_motor_10 =  new SparkMax(12, MotorType.kBrushless);
+    m_motor_9 =  new SparkMax(9, MotorType.kBrushless);
+    m_motor_10 =  new SparkMax(10, MotorType.kBrushless);
+    m_motor_12 =  new SparkMax(12, MotorType.kBrushless);
     m_encoder_9 = m_motor_9.getEncoder();
     m_encoder_10 = m_motor_10.getEncoder();
+    m_encoder_12 = m_motor_12.getEncoder();
 
     //Setup Configuration of SparkMax Motors
     SparkMaxConfig global_config = new SparkMaxConfig();
     SparkMaxConfig motor_9_config = new SparkMaxConfig();
     SparkMaxConfig motor_10_config = new SparkMaxConfig();
+    SparkMaxConfig motor_12_config = new SparkMaxConfig();
     global_config
       .smartCurrentLimit(0)
       .idleMode(IdleMode.kBrake);
     motor_9_config
       .apply(global_config);    
     motor_10_config
-      .apply(global_config);
+      .apply(global_config)
+      .inverted(true);
+    motor_12_config
+      .apply(global_config)
+      .inverted(true);
     //Apply motor configuration to SparkMaxes
     m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
@@ -52,20 +59,22 @@ public class Intake extends SubsystemBase {
 
 
   private void intake(){
-    m_motor_11.set(0.5);
+    m_motor_12.set(0.7);
   }
 
   private void stopIntake(){
-    m_motor_11.set(0);
+    m_motor_12.set(0);
+    m_motor_9.set(0);
+    m_motor_10.set(0);
   }
 
   private void outtake(){
-    m_motor_11.set(-0.5);
+    m_motor_12.set(-0.5);
   }
 
   private void raiseArm(){
-    m_motor_9.set(0.25);
-    m_motor_10.set(0.25);
+    m_motor_9.set(0.12);
+    m_motor_10.set(0.12);
   }
 
   private void stopArm(){
@@ -74,8 +83,12 @@ public class Intake extends SubsystemBase {
   }
 
   private void lowerArm(){
-    m_motor_9.set(-0.25);
-    m_motor_10.set(-0.25);
+    m_motor_9.set(-0.07);
+    m_motor_10.set(-0.07);
+  }
+  private void armDown(){
+    m_encoder_9.setPosition(2);
+    m_encoder_10.setPosition(2);
   }
 
   public Command intakeCommand(){
@@ -104,7 +117,7 @@ public class Intake extends SubsystemBase {
       // This method will be called once per scheduler run
       SmartDashboard.putNumber("Arm Lifter Left", m_encoder_9.getPosition());
       SmartDashboard.putNumber("Arm Lifter Right", m_encoder_10.getPosition());
-      SmartDashboard.putNumber("Intake", m_encoder_11.getPosition());
+      SmartDashboard.putNumber("Intake", m_encoder_12.getPosition());
     
     }
 }

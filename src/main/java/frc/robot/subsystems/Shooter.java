@@ -10,6 +10,9 @@ package frc.robot.subsystems;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import org.opencv.features2d.AgastFeatureDetector;
+
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -25,10 +28,13 @@ public class Shooter extends SubsystemBase {
   private SparkMax feeder;
   private SparkMax bottomShooter;
   private SparkMax topShooter;
+  private SparkMax agitator;
   /** Creates a new EndEffector. */
   public Shooter() {
-    feeder =  new SparkMax(12, MotorType.kBrushless);
+    feeder =  new SparkMax(15, MotorType.kBrushless);
+    agitator = new SparkMax(11, MotorType.kBrushless);
     bottomShooter =  new SparkMax(13, MotorType.kBrushless);
+    topShooter =  new SparkMax(14, MotorType.kBrushless);
     SparkMaxConfig global_config = new SparkMaxConfig();
     SparkMaxConfig feederConfig = new SparkMaxConfig();
     SparkMaxConfig bottomShooterConfig = new SparkMaxConfig();
@@ -42,6 +48,9 @@ public class Shooter extends SubsystemBase {
     bottomShooterConfig
       .apply(global_config)
       .inverted(false);
+    topShooterConfig
+      .apply(global_config)
+      .inverted(true);
 
     feeder.configure(feederConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     bottomShooter.configure(bottomShooterConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
@@ -57,24 +66,37 @@ public class Shooter extends SubsystemBase {
   }
 private void loadUp(){
   feeder.set(0.7);
+  agitator.set(.1);
 }
 private void stop(){
   feeder.set(0);
   bottomShooter.set(0);
   topShooter.set(0);
+  agitator.set(0);
+}
+
+private void oppositeAgitate(){
+  agitator.set(-0.1);
 }
 private void shoot(){
-  bottomShooter.set(0.8);
-  topShooter.set(0.8);
+  bottomShooter.set(0.58);
+  topShooter.set(0.18);
+}
+private void hyperShot(){
+  bottomShooter.set(1);
+  topShooter.set(0.5);
 }
 
 private void spitBack(){
   feeder.set(-0.25);
   bottomShooter.set(-0.25);
-  topShooter.set(-.25);
+  topShooter.set(-0.25);
 }
 public Command loadUpCommand(){
   return new RunCommand(this::loadUp, this).withName("loadUp");
+}
+public Command hyperShotCommand(){
+  return new RunCommand(this::hyperShot, this).withName("hyperShot");
 }
 public Command spitbackCommand(){
   return new RunCommand(this::spitBack, this).withName("spitBack");
@@ -94,7 +116,9 @@ public Command shootCommand(){
 public Command stopCommand(){
  return new InstantCommand(this::stop, this).withName("Stopped");
 }
-
+public Command oppositeAgitateCommand(){
+ return new RunCommand(this::oppositeAgitate, this).withName("oppositeAgitate");
+}
 /**public Command intakeWithSensorsCommand(){
   return this.intakeCommand()
   .until(()-> this.atInSensor())
