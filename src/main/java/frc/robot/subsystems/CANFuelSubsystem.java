@@ -75,6 +75,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putBoolean("Intaking/IsIntaking?",this.isIntaking());
     // SmartDashboard.putNumber("Spin-up indexer",
     // SPIN_UP_INDEXER_VOLTAGE);
   }
@@ -119,7 +120,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   }
 
   public boolean isIntaking() {
-    return leftIntakeLauncher.getEncoder().getVelocity() > 0; // Adjust threshold as needed
+    return leftIntakeLauncher.getEncoder().getVelocity() > 0.001; // Adjust threshold as needed
   }
 
   public Command stopCommand() {
@@ -138,14 +139,13 @@ public class CANFuelSubsystem extends SubsystemBase {
    *         finished/interrupted
    */
   public Command intakeCommand() {
-    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
+    return new RunCommand(
         () -> {
           double intakePercent = SmartDashboard.getNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
           double indexerPercent = SmartDashboard.getNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
-          setIntakeLauncherRoller(intakePercent);
-          setIndexerRoller(indexerPercent);
+            setIntakeLauncherRoller(intakePercent);
+            setIndexerRoller(indexerPercent);
         },
-        this::stop,
         this).withName("Intake");
   }
 
@@ -220,6 +220,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putBoolean("Intaking/IsIntaking?",this.isIntaking());
   }
 
 
