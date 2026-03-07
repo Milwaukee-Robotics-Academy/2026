@@ -41,7 +41,9 @@ public class RobotContainer
 {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController operatorXbox = new CommandXboxController(1);
+ 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
@@ -110,14 +112,19 @@ public class RobotContainer
       driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
       driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
 
+
     // While the left bumper on operator controller is held, intake Fuel
     driverXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
+    operatorXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
+    
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
+    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
+    operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
    // While the down arrow on the directional pad is held it will unclimb the robot
   //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
