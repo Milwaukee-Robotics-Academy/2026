@@ -215,8 +215,6 @@ public class RobotContainer
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
 
-      // test to determine shooter directions; motor 13 should automatically follow
-      //operatorXbox.rightBumper().whileTrue(m_shooter.forwardShooterCommand());
 
     } else
     {
@@ -237,17 +235,18 @@ public class RobotContainer
       operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
 
       //arm with encoder setpoints
-      // operatorXbox.povDown().onTrue(m_intake.armDownCommand());
-      // operatorXbox.povUp().onTrue(m_intake.armUpCommand());
-      // operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
+      operatorXbox.povDown().onTrue(m_intake.armDownCommand());
+      operatorXbox.povUp().onTrue(m_intake.armUpCommand());
+      operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
 
       //arm with manual control (testing/override, no safety)
-      operatorXbox.rightTrigger().whileTrue(m_intake.armDownCommand());   // right trigger to move arm down
-      operatorXbox.leftTrigger().whileTrue(m_intake.armUpCommand());      // left trigger to move arm up
-      operatorXbox.leftBumper().whileTrue(m_intake.armMiddleCommand());  
+      // operatorXbox.rightTrigger().whileTrue(m_intake.armDownCommand());   // right trigger to move arm down
+      // operatorXbox.leftTrigger().whileTrue(m_intake.armUpCommand());      // left trigger to move arm up
+      // operatorXbox.leftBumper().whileTrue(m_intake.armMiddleCommand());  
 
       //shooter
-      operatorXbox.rightBumper().whileTrue(m_shooter.shootSequenceCommand());
+      operatorXbox.rightBumper().whileTrue(m_shooter.shootFarSequenceCommand());    // left bumper to shoot FAR
+      operatorXbox.leftBumper().whileTrue(m_shooter.shootCloseSequenceCommand());   // right bumper to shoot CLOSE
     
     }
 

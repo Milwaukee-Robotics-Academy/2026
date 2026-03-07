@@ -9,7 +9,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-// import com.revrobotics.spark.config.ClosedLoopConfig;
+//import com.revrobotics.spark.config.ClosedLoopConfig;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -52,9 +52,8 @@ public class Intake extends SubsystemBase{
         m_motor_10 = new SparkMax(10, MotorType.kBrushless);
 
         // get absolute encoder and closed loop controller for arm motor
-        //m_armEncoder = m_motor_10.getAbsoluteEncoder();
-//TODO: figure out how to set up absolute encoder for SparkMax arm motor (motor 10) and use it for closed loop control to set arm position
-        //m_armPID = m_motor_10.getClosedLoopController();
+        m_armEncoder = m_motor_10.getAbsoluteEncoder();
+        m_armPID = m_motor_10.getClosedLoopController();
 
         // set up configs for SparkFlex motor 9 (intake)
         SparkFlexConfig global_config_flex = new SparkFlexConfig();
@@ -62,7 +61,6 @@ public class Intake extends SubsystemBase{
 
         // set up configs for SparkMax motor 10 (arm)
         SparkMaxConfig global_config_max = new SparkMaxConfig();
-//TODO: figure out how to set up absolute encoder for SparkMax arm motor (motor 10) and use it for closed loop control to set arm position
         SparkMaxConfig motor_10_config = new SparkMaxConfig();
 
         // configure flex motor settings (intake)
@@ -81,14 +79,16 @@ public class Intake extends SubsystemBase{
         motor_10_config
             .apply(global_config_max);
 
-        // motor_10_config.absoluteEncoder
-        //      .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
-        //      .inverted(false);              // change to true if the encoder reads backwards
+        motor_10_config.absoluteEncoder
+             .positionConversionFactor(1.0)   // 1 rotation = 1.0 units
+             .inverted(false);              // change to true if the encoder reads backwards
 
-        // motor_10_config.closedLoop
-        //     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
-        //     .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
-        //     .outputRange(-0.5, 0.5);                   //limit speed to 50%
+        // documentation for closed loop config: https://docs.revrobotics.com/revlib/spark/closed-loop/closed-loop-control-getting-started
+        motor_10_config.closedLoop
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)     //use absolute encoder for closed loop control
+            .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
+            .outputRange(-0.5, 0.5);                   //limit speed to 50%
+            //.feedForward.kCos(0);                              // kCos is a cosine gravity feedforward, for an arm
 
         // apply configs to motors
         m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
@@ -110,7 +110,7 @@ public class Intake extends SubsystemBase{
     // ==================== SET ARM POSITION (ENCODER) ====================
 
     private void setArmPosition(double position) {
-      //  m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
+        m_armPID.setSetpoint(position, SparkMax.ControlType.kPosition);
     }
 
     public void moveArmDown() {
@@ -195,5 +195,8 @@ public class Intake extends SubsystemBase{
     public void periodic() {
         // This method will be called once per scheduler run
         // You can use this to update SmartDashboard values or perform other periodic tasks
+
+        // Print arm encoder position to SmartDashboard for monitoring
+        SmartDashboard.putNumber("Arm/Position", getArmPosition());
     }
 }
