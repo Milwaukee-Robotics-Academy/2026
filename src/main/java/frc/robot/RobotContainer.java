@@ -245,8 +245,8 @@ public class RobotContainer
       // operatorXbox.leftBumper().whileTrue(m_intake.armMiddleCommand());  
 
       //shooter
-      operatorXbox.rightBumper().whileTrue(m_shooter.shootFarSequenceCommand());    // left bumper to shoot FAR
-      operatorXbox.leftBumper().whileTrue(m_shooter.shootCloseSequenceCommand());   // right bumper to shoot CLOSE
+      operatorXbox.rightBumper().whileTrue(m_shooter.shootFarSequenceCommand());    // right bumper to shoot FAR
+      operatorXbox.leftBumper().whileTrue(m_shooter.shootCloseSequenceCommand());   // left bumper to shoot CLOSE
     
     }
 
