@@ -6,28 +6,27 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ClimbDown;
-import frc.robot.commands.ClimbUp;
 import frc.robot.subsystems.CANFuelSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+
+
+import org.photonvision.PhotonUtils;
+
 import swervelib.SwerveInputStream;
 
 /**
@@ -39,7 +38,9 @@ public class RobotContainer
 {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController operatorXbox = new CommandXboxController(1);
+ 
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
@@ -55,12 +56,16 @@ public class RobotContainer
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(() -> driverXbox.getRightX()*-1)
+                                                            .withControllerRotationAxis(()-> turnSupplier())
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(Constants.SCALE_TRANSLATION)
                                                             .allianceRelativeControl(true)
                                                             .scaleRotation(Constants.SCALE_ROTATION);
 
+
+    // Inside your Teleop command or RobotContainer
+  // 1. Set up a PID controller for steering
+  PIDController turnPID = new PIDController(0.09, 0.0, 0.0); // Tune these values!
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -85,9 +90,23 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
+    turnPID.enableContinuousInput(-180, 180);
   }
 
-  /**
+  Double turnSupplier() {
+  Pose2d hub = new Pose2d(12,4,new Rotation2d());
+    // 1. Get the translation between the two points
+    if (driverXbox.b().getAsBoolean()) {
+ 
+        return turnPID.calculate((PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getRadians(), 0.0);
+    } else {
+        // No target, maintain normal driver control
+        return -driverXbox.getRightX();
+    }
+  }
+  
+
+/**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the
    * named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
@@ -100,30 +119,32 @@ public class RobotContainer
     Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
 
 
-
       m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
       driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
       //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
       driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
-      driverXbox.leftBumper().onTrue(Commands.none());
-      driverXbox.rightBumper().onTrue(Commands.none());
+
 
     // While the left bumper on operator controller is held, intake Fuel
-    driverXbox.leftBumper().whileTrue(m_fuelSubsystem.intakeCommand());
+    driverXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
+    operatorXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
+    
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
-    driverXbox.rightBumper().whileTrue(m_fuelSubsystem.launchSequenceCommand());
+    driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
+    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
+    operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
    // While the down arrow on the directional pad is held it will unclimb the robot
   //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
    // driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
 
-    m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.run(() -> m_fuelSubsystem.stop()));
+    m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
  //   m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
 
@@ -144,4 +165,11 @@ public class RobotContainer
   {
     m_drivebase.setMotorBrake(brake);
   }
+
+public void periodic() {
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putData(m_fuelSubsystem);
+
+}
 }

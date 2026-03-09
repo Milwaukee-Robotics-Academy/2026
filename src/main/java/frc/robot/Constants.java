@@ -26,6 +26,8 @@ public final class Constants
   public static final double SCALE_ROTATION = 0.6; // Multiplier for rotation input to reduce sensitivity
   public static final double SCALE_TRANSLATION = 0.8; // Multiplier for translation input to reduce sensitivity
   // Maximum speed of the robot in meters per second, used to limit acceleration.
+  public static final double SCALE_ROTATION = 0.6; // Multiplier for rotation input to reduce sensitivity
+  public static final double SCALE_TRANSLATION = 0.8; // Multiplier for translation input to reduce sensitivity
 
 //  public static final class AutonConstants
 //  {
@@ -40,6 +42,7 @@ public final class Constants
     // Hold time on motor brakes when disabled
     public static final double WHEEL_LOCK_TIME = 10; // seconds
   }
+
 public static final class FuelConstants {
     // Motor controller IDs for Fuel Mechanism motors
     public static final int LEFT_INTAKE_LAUNCHER_MOTOR_ID = 9;
@@ -56,7 +59,7 @@ public static final class FuelConstants {
     public static final double INDEXER_SPIN_UP_PRE_LAUNCH_PERCENT = -0.5;
 
     public static final double INTAKE_INTAKING_PERCENT = 0.6;
-    public static final double LAUNCHING_LAUNCHER_PERCENT = 0.85;
+    public static final double LAUNCHING_LAUNCHER_PERCENT = 0.93;
     public static final double INTAKE_EJECT_PERCENT = -0.8;
 
     public static final double SPIN_UP_SECONDS = 0.65;

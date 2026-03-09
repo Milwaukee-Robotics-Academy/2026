@@ -161,9 +161,7 @@ public class FuelSubsystem extends SubsystemBase {
   public Command intakeCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
         () -> {
-          double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
           double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
-       //   setIntakeLauncherRoller(intakePercent);
           setFeederRoller(feederPercent);
         },
         this::stop,
@@ -178,10 +176,8 @@ public class FuelSubsystem extends SubsystemBase {
   public Command ejectCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
         () -> {
-          double intakePercent = SmartDashboard.getNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
           double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
           // reverse the intake and feeder to eject
-   // TODO       setIntakeLauncherRoller(-intakePercent);
           setFeederRoller(-feederPercent);
         },
         this::stop,
@@ -198,11 +194,8 @@ public class FuelSubsystem extends SubsystemBase {
   public Command spinUpCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
         () -> {
-          double launcherPercent = SmartDashboard.getNumber("Launching launcher roller value",
-              LAUNCHING_LAUNCHER_PERCENT);
-          double feederPercent = SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
-    // TODO           setIntakeLauncherRoller(launcherPercent);
-          setFeederRoller(feederPercent);
+      double feederPercent = SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
+      setFeederRoller(feederPercent);
         },
         this::stop,
         this).withName("SpinUp");
@@ -236,7 +229,21 @@ public class FuelSubsystem extends SubsystemBase {
     // interrupted
     return new edu.wpi.first.wpilibj2.command.SequentialCommandGroup(
         spinUpCommand().withTimeout(FuelConstants.SPIN_UP_SECONDS),
-        launchSequenceCommand());
+        launchCommand());
+  }
+
+  /**
+   * Launch command: runs launcher + feeder until interrupted.
+   * Extracted from previous commented code so launchSequenceCommand can call it.
+   */
+  public Command launchCommand() {
+    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
+        () -> {
+          double feederPercent = SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
+          setFeederRoller(feederPercent);
+        },
+        this::stop,
+        this).withName("Launch");
   }
 
   @Override
