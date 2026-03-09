@@ -52,7 +52,7 @@ public class Vision {
    * April Tag Field Layout of the year.
    */
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
-      AprilTagFields.k2025ReefscapeAndyMark);
+      AprilTagFields.k2026RebuiltAndymark);
   /**
    * Ambiguity defined as a value between (0,1). Used in
    * {@link Vision#filterPose}.
@@ -313,21 +313,21 @@ public class Vision {
     /**
      * Left Camera
      */
-    LEFT_CAM("Arducam_OV9281_USB_Camera (1)",
-        new Rotation3d(0, 0, Math.toRadians(15)),
-        new Translation3d(Units.inchesToMeters(11.5),
-            Units.inchesToMeters(12.5),
+    LEFT_CAM("Arducam_OV9281_USB_Camera",
+        new Rotation3d(0, 0, Math.toRadians(-12)),
+        new Translation3d(Units.inchesToMeters(12.5),
+            Units.inchesToMeters(11.5),
             Units.inchesToMeters(8)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)), //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
+        VecBuilder.fill(8, 8, 12), VecBuilder.fill(5, 5, 10)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
     /**
      * Right Camera
      */
-    RIGHT_CAM("Arducam_OV9281_USB_Camera",
-        new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-172)),
-        new Translation3d(Units.inchesToMeters(-11.5),
-            Units.inchesToMeters(-12.5),
-            Units.inchesToMeters(8)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
+    // RIGHT_CAM("Arducam_OV9281_USB_Camera (1)",
+    //     new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-172)),
+    //     new Translation3d(Units.inchesToMeters(-11.5),
+    //         Units.inchesToMeters(-12.5),
+    //         Units.inchesToMeters(8)),
+    //     VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
 
 
     /**
