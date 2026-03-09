@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import java.awt.Desktop;
 import java.util.ArrayList;
@@ -144,6 +145,10 @@ public class Vision {
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
             pose.timestampSeconds,
             camera.curStdDevs);
+        SmartDashboard.putNumber(camera.name() + "/x", pose.estimatedPose.getTranslation().getX());
+        SmartDashboard.putNumber(camera.name() + "/y", pose.estimatedPose.getTranslation().getY());
+        SmartDashboard.putNumber(camera.name() + "/angle", pose.estimatedPose.toPose2d().getRotation().getDegrees());
+        SmartDashboard.putNumber(camera.name() + "/posetimestamp", pose.timestampSeconds);
       }
     }
 
