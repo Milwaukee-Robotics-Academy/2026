@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import java.awt.Desktop;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class Vision {
    * April Tag Field Layout of the year.
    */
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
-      AprilTagFields.k2025ReefscapeAndyMark);
+      AprilTagFields.k2026RebuiltAndymark);
   /**
    * Ambiguity defined as a value between (0,1). Used in
    * {@link Vision#filterPose}.
@@ -144,6 +145,10 @@ public class Vision {
         swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
             pose.timestampSeconds,
             camera.curStdDevs);
+        SmartDashboard.putNumber(camera.name() + "/x", pose.estimatedPose.getTranslation().getX());
+        SmartDashboard.putNumber(camera.name() + "/y", pose.estimatedPose.getTranslation().getY());
+        SmartDashboard.putNumber(camera.name() + "/angle", pose.estimatedPose.toPose2d().getRotation().getDegrees());
+        SmartDashboard.putNumber(camera.name() + "/posetimestamp", pose.timestampSeconds);
       }
     }
 
@@ -183,6 +188,7 @@ public class Vision {
    * @param pose Estimated robot pose.
    * @return Could be empty if there isn't a good reading.
    */
+  @SuppressWarnings("unused")
   @Deprecated(since = "2024", forRemoval = true)
   private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose) {
     if (pose.isPresent()) {
@@ -308,30 +314,22 @@ public class Vision {
     /**
      * Left Camera
      */
-    LEFT_CAM("left",
-        new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(30)),
-        new Translation3d(Units.inchesToMeters(12.056),
-            Units.inchesToMeters(10.981),
-            Units.inchesToMeters(8.44)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+    LEFT_CAM("Arducam_OV9281_USB_Camera",
+        new Rotation3d(0, 0, Math.toRadians(-12)),
+        new Translation3d(Units.inchesToMeters(12.5),
+            Units.inchesToMeters(11.5),
+            Units.inchesToMeters(8)),
+        VecBuilder.fill(8, 8, 12), VecBuilder.fill(5, 5, 10)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
     /**
      * Right Camera
      */
-    RIGHT_CAM("right",
-        new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-30)),
-        new Translation3d(Units.inchesToMeters(12.056),
-            Units.inchesToMeters(-10.981),
-            Units.inchesToMeters(8.44)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
-    /**
-     * Center Camera
-     */
-    CENTER_CAM("center",
-        new Rotation3d(0, Units.degreesToRadians(18), 0),
-        new Translation3d(Units.inchesToMeters(-4.628),
-            Units.inchesToMeters(-10.687),
-            Units.inchesToMeters(16.129)),
-        VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+    // RIGHT_CAM("Arducam_OV9281_USB_Camera (1)",
+    //     new Rotation3d(0, Math.toRadians(-24.094), Math.toRadians(-172)),
+    //     new Translation3d(Units.inchesToMeters(-11.5),
+    //         Units.inchesToMeters(-12.5),
+    //         Units.inchesToMeters(8)),
+    //     VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
+
 
     /**
      * Latency alert to use when high latency is detected.
@@ -379,7 +377,8 @@ public class Vision {
     /**
      * Last read from the camera timestamp to prevent lag due to slow data fetches.
      */
-    private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+  @SuppressWarnings("unused")
+  private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
 
     /**
      * Construct a Photon Camera class with help. Standard deviations are fake

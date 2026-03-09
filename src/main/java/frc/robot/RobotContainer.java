@@ -6,30 +6,27 @@ package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.ClimbDown;
-import frc.robot.commands.ClimbUp;
 import frc.robot.subsystems.CANFuelSubsystem;
-import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+
+
+import org.photonvision.PhotonUtils;
+
 import swervelib.SwerveInputStream;
 
 /**
@@ -59,12 +56,16 @@ public class RobotContainer
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(() -> driverXbox.getRightX()*-1)
+                                                            .withControllerRotationAxis(()-> turnSupplier())
                                                             .deadband(OperatorConstants.DEADBAND)
                                                             .scaleTranslation(Constants.SCALE_TRANSLATION)
                                                             .allianceRelativeControl(true)
                                                             .scaleRotation(Constants.SCALE_ROTATION);
 
+
+    // Inside your Teleop command or RobotContainer
+  // 1. Set up a PID controller for steering
+  PIDController turnPID = new PIDController(0.09, 0.0, 0.0); // Tune these values!
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -89,9 +90,23 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
+    turnPID.enableContinuousInput(-180, 180);
   }
 
-  /**
+  Double turnSupplier() {
+  Pose2d hub = new Pose2d(12,4,new Rotation2d());
+    // 1. Get the translation between the two points
+    if (driverXbox.b().getAsBoolean()) {
+ 
+        return turnPID.calculate((PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getRadians(), 0.0);
+    } else {
+        // No target, maintain normal driver control
+        return -driverXbox.getRightX();
+    }
+  }
+  
+
+/**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary predicate, or via the
    * named factories in {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
@@ -102,7 +117,6 @@ public class RobotContainer
   {
 
     Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
-
 
 
       m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
