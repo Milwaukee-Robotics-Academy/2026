@@ -188,6 +188,7 @@ public class Vision {
    * @param pose Estimated robot pose.
    * @return Could be empty if there isn't a good reading.
    */
+  @SuppressWarnings("unused")
   @Deprecated(since = "2024", forRemoval = true)
   private Optional<EstimatedRobotPose> filterPose(Optional<EstimatedRobotPose> pose) {
     if (pose.isPresent()) {
@@ -376,7 +377,8 @@ public class Vision {
     /**
      * Last read from the camera timestamp to prevent lag due to slow data fetches.
      */
-    private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
+  @SuppressWarnings("unused")
+  private double lastReadTimestamp = Microseconds.of(NetworkTablesJNI.now()).in(Seconds);
 
     /**
      * Construct a Photon Camera class with help. Standard deviations are fake
