@@ -71,7 +71,7 @@ public class Shooter extends SubsystemBase {
             .velocityConversionFactor(1.0);     // 1 RPM = 1.0 units
         
         
-        // Documentation for closed loop config: https://docs.revrobotics.com/spark-max/operating-modes/closed-loop-control 
+        // Documentation for closed loop config: https://docs.revrobotics.com/revlib/spark/closed-loop/feed-forward-control
         // Configure for FAR shooting (slot 0)
         motor_12_config.closedLoop
             .pid(0.0002, 0.0, 0.0, m_PID_far)       // PID for far shooting, start with small P and tune later
