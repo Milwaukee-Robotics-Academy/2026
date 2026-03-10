@@ -54,14 +54,17 @@ public class RobotContainer
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * -1,
-                                                                () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(()-> turnSupplier())
-                                                            .deadband(OperatorConstants.DEADBAND)
-                                                            .scaleTranslation(Constants.SCALE_TRANSLATION)
-                                                            .allianceRelativeControl(true)
-                                                            .scaleRotation(Constants.SCALE_ROTATION);
-
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
+      .withControllerRotationAxis(() -> turnSupplier())
+      .deadband(OperatorConstants.DEADBAND)
+      .scaleTranslation(Constants.SCALE_TRANSLATION)
+      .allianceRelativeControl(true)
+      .scaleRotation(Constants.SCALE_ROTATION)
+      .aim(new Pose2d(4.6, 4, new Rotation2d()))
+      .aimHeadingOffset(true)
+      .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
+      .aimWhile(driverXbox.b());;
 
     // Inside your Teleop command or RobotContainer
   // 1. Set up a PID controller for steering
