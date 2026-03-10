@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.FuelConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -56,11 +57,9 @@ public class RobotContainer
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(()-> turnSupplier())
-                                                            .deadband(OperatorConstants.DEADBAND)
-                                                            .scaleTranslation(Constants.SCALE_TRANSLATION)
-                                                            .allianceRelativeControl(true)
-                                                            .scaleRotation(Constants.SCALE_ROTATION);
+                                                                .aim(getHubPose())
+                                                                .aimHeadingOffset(Rotation2d.k180deg)
+                                                                .aimWhile(driverXbox.b());
 
 
     // Inside your Teleop command or RobotContainer
@@ -93,16 +92,8 @@ public class RobotContainer
     turnPID.enableContinuousInput(-180, 180);
   }
 
-  Double turnSupplier() {
-  Pose2d hub = new Pose2d(12,4,new Rotation2d());
-    // 1. Get the translation between the two points
-    if (driverXbox.b().getAsBoolean()) {
- 
-        return turnPID.calculate((PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getRadians(), 0.0);
-    } else {
-        // No target, maintain normal driver control
-        return -driverXbox.getRightX();
-    }
+  Pose2d getHubPose() {
+    return new Pose2d(12, 4, new Rotation2d());
   }
   
 
