@@ -55,16 +55,16 @@ public class RobotContainer
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * -1,
-                                                                () -> driverXbox.getLeftX() * -1)
-                                                                .aim(getHubPose())
-                                                                .aimHeadingOffset(Rotation2d.k180deg)
-                                                                .aimWhile(driverXbox.b());
-
-
-    // Inside your Teleop command or RobotContainer
-  // 1. Set up a PID controller for steering
-  PIDController turnPID = new PIDController(0.09, 0.0, 0.0); // Tune these values!
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
+      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+      .deadband(OperatorConstants.DEADBAND)
+      .scaleTranslation(Constants.SCALE_TRANSLATION)
+      .allianceRelativeControl(true)
+      .scaleRotation(Constants.SCALE_ROTATION)
+      .aim(getHubPose())
+      .aimHeadingOffset(Rotation2d.k180deg)
+      .aimWhile(driverXbox.b());
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -89,7 +89,6 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    turnPID.enableContinuousInput(-180, 180);
   }
 
   Pose2d getHubPose() {
