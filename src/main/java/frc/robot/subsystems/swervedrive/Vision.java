@@ -321,7 +321,7 @@ public class Vision {
         new Translation3d(Units.inchesToMeters(12.5),
             Units.inchesToMeters(11.5),
             Units.inchesToMeters(8)),
-        VecBuilder.fill(8, 8, 12), VecBuilder.fill(5, 5, 10)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
+        VecBuilder.fill(4, 4, 8), VecBuilder.fill(5, 5, 10)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
     /**
      * Right Camera
      */

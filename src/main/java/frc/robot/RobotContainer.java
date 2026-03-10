@@ -65,13 +65,19 @@ public class RobotContainer
 
     // Inside your Teleop command or RobotContainer
   // 1. Set up a PID controller for steering
-  PIDController turnPID = new PIDController(0.09, 0.0, 0.0); // Tune these values!
-
+  PIDController turnPID;
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer()
   {
+    SmartDashboard.putNumber("Hub/P", 0.04);
+    SmartDashboard.putNumber("Hub/I", 0.00);
+    SmartDashboard.putNumber("Hub/D", 0.00);
+
+    turnPID = new PIDController(SmartDashboard.getNumber("Hub/P", 0.04), SmartDashboard.getNumber("Hub/I", 0.00), SmartDashboard.getNumber("Hub/D", 0.00));
+    turnPID.enableContinuousInput(180, -180);
+    turnPID.setTolerance(0.03); // Set an appropriate tolerance for your robot's needs
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -90,17 +96,38 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    turnPID.enableContinuousInput(-180, 180);
+
+
   }
 
   Double turnSupplier() {
-  Pose2d hub = new Pose2d(12,4,new Rotation2d());
+  // Determine the hub pose. If needed, these can be adjusted per-alliance.
+  // Previously there were empty alliance branches and a stray character causing
+  // a compile error. Consolidate to ensure a value is chosen for `hub`.
+  Pose2d hub;
+  if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+    // Set to red hub
+    hub = new Pose2d(12, 4, new Rotation2d());
+  } else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+    // Set to blue hub
+    hub = new Pose2d(4.6, 4, new Rotation2d());
+  } else {
+    // do nothing
+    hub = new Pose2d(); // Default value to avoid compile error; adjust as needed
+  }
     // 1. Get the translation between the two points
-    if (driverXbox.b().getAsBoolean()) {
- 
-        return turnPID.calculate((PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getRadians(), 0.0);
+    if (driverXbox.b().getAsBoolean() ) {
+      turnPID.setP(SmartDashboard.getNumber("Hub/P", 0.08));
+      turnPID.setI(SmartDashboard.getNumber("Hub/I", 0.0));
+      turnPID.setD(SmartDashboard.getNumber("Hub/D", 0.0));
+      SmartDashboard.putNumber("Hub/Yaw", (PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getDegrees());
+      SmartDashboard.putNumber("Hub/Error",turnPID.calculate((PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getDegrees(), 0));
+      SmartDashboard.putBoolean("At Setpoint", turnPID.atSetpoint());
+      return turnPID.calculate((PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getDegrees(),0);
     } else {
-        // No target, maintain normal driver control
+      SmartDashboard.putNumber("Hub/Yaw", (PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getDegrees());
+      SmartDashboard.putBoolean("At Setpoint", turnPID.atSetpoint());
+            // No target, maintain normal driver control
         return -driverXbox.getRightX();
     }
   }
