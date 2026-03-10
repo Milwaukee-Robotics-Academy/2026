@@ -61,7 +61,11 @@ public class RobotContainer
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(Constants.SCALE_TRANSLATION)
       .allianceRelativeControl(true)
-      .scaleRotation(Constants.SCALE_ROTATION);
+      .scaleRotation(Constants.SCALE_ROTATION)
+      .aim(new Pose2d(4.6, 4, new Rotation2d())) 
+      .aimHeadingOffset(true)
+      .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
+      .aimWhile(driverXbox.b());
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -112,10 +116,7 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity.copy()
-      .aim(new Pose2d(4.6, 4, new Rotation2d())) 
-      .aimHeadingOffset(Rotation2d.fromDegrees(180)) // Rotate the hub pose by 180 degrees to aim at the back of the hub
-      .aimWhile(driverXbox.b()));
+    Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
 
 
       m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
