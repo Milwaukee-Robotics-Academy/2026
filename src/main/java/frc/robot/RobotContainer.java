@@ -220,7 +220,7 @@ public class RobotContainer
     {
       // ==================== DRIVER COMMANDS ====================
 
-      driverXbox.a().onTrue((Commands.runOnce(m_drivebase::zeroGyro)));
+      driverXbox.a().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
       driverXbox.x().onTrue(Commands.runOnce(m_drivebase::addFakeVisionReading));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
