@@ -62,8 +62,7 @@ public class RobotContainer
       .scaleTranslation(Constants.SCALE_TRANSLATION)
       .allianceRelativeControl(true)
       .scaleRotation(Constants.SCALE_ROTATION)
-      .aim(getHubPose())
-      .aimHeadingOffset(Rotation2d.k180deg)
+      .aim(getHubPose()) // Rotate the hub pose by 180 degrees to aim at the back of the hub
       .aimWhile(driverXbox.b());
 
   /**
@@ -92,7 +91,16 @@ public class RobotContainer
   }
 
   Pose2d getHubPose() {
-    return new Pose2d(12, 4, new Rotation2d());
+     if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+    // Set to red hub
+    return new Pose2d(12, 4, new Rotation2d()).rotateBy(Rotation2d.fromDegrees(180));
+  } else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+    // Set to blue hub
+    return new Pose2d(4.6, 4, new Rotation2d()).rotateBy(Rotation2d.fromDegrees(180));
+  } else {
+    // do nothing
+   return new Pose2d(); // Default value to avoid compile error; adjust as needed
+  }
   }
   
 
