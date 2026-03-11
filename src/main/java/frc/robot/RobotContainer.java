@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.FuelConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
@@ -54,18 +55,17 @@ public class RobotContainer
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * -1,
-                                                                () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(()-> turnSupplier())
-                                                            .deadband(OperatorConstants.DEADBAND)
-                                                            .scaleTranslation(Constants.SCALE_TRANSLATION)
-                                                            .allianceRelativeControl(true)
-                                                            .scaleRotation(Constants.SCALE_ROTATION);
-
-
-    // Inside your Teleop command or RobotContainer
-  // 1. Set up a PID controller for steering
-  PIDController turnPID = new PIDController(0.09, 0.0, 0.0); // Tune these values!
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
+      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
+      .deadband(OperatorConstants.DEADBAND)
+      .scaleTranslation(Constants.SCALE_TRANSLATION)
+      .allianceRelativeControl(true)
+      .scaleRotation(Constants.SCALE_ROTATION)
+      .aim(new Pose2d(4.6, 4, new Rotation2d())) 
+      .aimHeadingOffset(true)
+      .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
+      .aimWhile(driverXbox.b());
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -90,19 +90,19 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
-    turnPID.enableContinuousInput(-180, 180);
   }
 
-  Double turnSupplier() {
-  Pose2d hub = new Pose2d(12,4,new Rotation2d());
-    // 1. Get the translation between the two points
-    if (driverXbox.b().getAsBoolean()) {
- 
-        return turnPID.calculate((PhotonUtils.getYawToPose(m_drivebase.getPose(),hub)).getRadians(), 0.0);
-    } else {
-        // No target, maintain normal driver control
-        return -driverXbox.getRightX();
-    }
+  Pose2d getHubPose() {
+     if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+    // Set to red hub
+    return new Pose2d(12, 4, new Rotation2d()).rotateBy(Rotation2d.fromDegrees(180));
+  } else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+    // Set to blue hub
+    return new Pose2d(4.6, 4, new Rotation2d()).rotateBy(Rotation2d.fromDegrees(180));
+  } else {
+    // do nothing
+   return new Pose2d(); // Default value to avoid compile error; adjust as needed
+  }
   }
   
 

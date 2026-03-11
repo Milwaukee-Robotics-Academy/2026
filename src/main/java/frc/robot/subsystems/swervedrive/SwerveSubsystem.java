@@ -240,7 +240,23 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
-  
+  /**
+   * Get the robot relative speeds to aim at a target.
+   *
+   * @param translationX     Translation in the X direction. Cubed for smoother
+   *                         controls.
+   * @param translationY     Translation in the Y direction. Cubed for smoother
+   *                         controls.
+   * @param angularRotationX Angular velocity of the robot to set. Cubed for
+   *                         smoother controls.
+   * @return Robot relative chassis speeds to aim at a target.
+   */
+public Rotation2d getAngleToTarget(Translation2d target) {
+  Translation2d robotPos = swerveDrive.getPose().getTranslation();
+  // Returns the angle from the robot to the target coordinate
+  return target.minus(robotPos).getAngle();
+}
+
   /**
    * Get the path follower with events.
    *
