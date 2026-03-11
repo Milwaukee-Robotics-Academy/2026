@@ -62,7 +62,7 @@ public class RobotContainer
       .scaleTranslation(Constants.SCALE_TRANSLATION)
       .allianceRelativeControl(true)
       .scaleRotation(Constants.SCALE_ROTATION)
-      .aim(new Pose2d(4.6, 4, new Rotation2d())) 
+      .aim(this.getHubPose())
       .aimHeadingOffset(true)
       .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
       .aimWhile(driverXbox.b());
