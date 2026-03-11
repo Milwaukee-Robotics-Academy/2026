@@ -26,8 +26,7 @@ public final class Constants
   public static final double SCALE_ROTATION = 0.6; // Multiplier for rotation input to reduce sensitivity
   public static final double SCALE_TRANSLATION = 0.8; // Multiplier for translation input to reduce sensitivity
   // Maximum speed of the robot in meters per second, used to limit acceleration.
-  public static final double SCALE_ROTATION = 0.6; // Multiplier for rotation input to reduce sensitivity
-  public static final double SCALE_TRANSLATION = 0.8; // Multiplier for translation input to reduce sensitivity
+
 
 //  public static final class AutonConstants
 //  {
