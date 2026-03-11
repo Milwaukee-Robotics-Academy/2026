@@ -5,14 +5,21 @@
 package frc.robot.subsystems;
 
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants;
 import frc.robot.Constants.FuelConstants;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -46,7 +53,7 @@ public class FuelSubsystem extends SubsystemBase {
       MotorType.kBrushless);
   private final SmartMotorControllerConfig leftIntakeLauncherConfig = new SmartMotorControllerConfig(this)
       .withClosedLoopController(0.00016541, 0, 0, RPM.of(5000), RotationsPerSecondPerSecond.of(2500))
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
+      .withGearing(new MechanismGearing(GearBox.fromTeeth(40,60)))
       .withIdleMode(MotorMode.COAST)
       .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
       .withStatorCurrentLimit(Amps.of(40))
@@ -67,21 +74,8 @@ public class FuelSubsystem extends SubsystemBase {
       .withSpeedometerSimulation(RPM.of(750));
   private final FlyWheel intakeLauncherFlywheel = new FlyWheel(shooterConfig);
 
-  private final SparkMax indexer = new SparkMax(FuelConstants.RIGHT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
-  private final SmartMotorControllerConfig indexerConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(0.00016541, 0, 0, RPM.of(5000), RotationsPerSecondPerSecond.of(2500))
-      .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
-      .withIdleMode(MotorMode.COAST)
-      .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
-      .withStatorCurrentLimit(Amps.of(40))
-      .withMotorInverted(false)
-      .withClosedLoopRampRate(Seconds.of(0.25))
-      .withOpenLoopRampRate(Seconds.of(0.25))
-      .withFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
-      .withSimFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
-      .withControlMode(ControlMode.CLOSED_LOOP);
-  private final SmartMotorController indexerController = new SparkWrapper(indexer, DCMotor.getNEO(1),
-      indexerConfig);
+  private final SparkMax indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
+  private final SparkMaxConfig indexerConfig = new SparkMaxConfig();
 
 
   /**
@@ -93,7 +87,11 @@ public class FuelSubsystem extends SubsystemBase {
    */
   public FuelSubsystem() {
 
-
+     indexerConfig.smartCurrentLimit(INDEXER_MOTOR_CURRENT_LIMIT)
+  .voltageCompensation(12)
+    .idleMode(IdleMode.kCoast)
+    .inverted(true);
+    indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // put default values for various fuel operations onto the dashboard
     // all commands using this subsystem pull values from the dashbaord to allow
     // you to tune the values easily, and then replace the values in Constants.java
@@ -106,26 +104,24 @@ public class FuelSubsystem extends SubsystemBase {
     // SPIN_UP_FEEDER_VOLTAGE);
   }
 
-  public AngularVelocity getVelocity() {
-    return intakeLauncherFlywheel.getSpeed();
+  private void intake() {
+    intakeLauncherFlywheel.setMechanismVelocitySetpoint(RPM.of(Constants.FuelConstants.INTAKE_INTAKING_SETPOINT_RPM));
+    indexer.set(Constants.FuelConstants.INTAKE_INTAKING_PERCENT);
   }
 
-  public Command setVelocity(AngularVelocity speed) {
-    return intakeLauncherFlywheel.setSpeed(speed);
+  private void spinUp() {
+    intakeLauncherFlywheel.setMechanismVelocitySetpoint(RPM.of(Constants.FuelConstants.LAUNCHING_LAUNCHER_SETPOINT_RPM));
   }
 
-  public Command setDutyCycle(double dutyCycle) {
-    return intakeLauncherFlywheel.set(dutyCycle);
+  private void launch() {
+    intakeLauncherFlywheel.setMechanismVelocitySetpoint(RPM.of(Constants.FuelConstants.LAUNCHING_LAUNCHER_SETPOINT_RPM));
+    indexer.set(Constants.FuelConstants.INDEXER_LAUNCHING_PERCENT);
   }
 
-  public Command setVelocity(Supplier<AngularVelocity> speed) {
-    return intakeLauncherFlywheel.setSpeed(speed);
+  private void eject() {
+    intakeLauncherFlywheel.setMechanismVelocitySetpoint(RPM.of(Constants.FuelConstants.EJECT_LAUNCHING_SETPOINT_RPM));
+    indexer.set(-Constants.FuelConstants.INDEXER_INTAKING_PERCENT);
   }
-
-  public Command setDutyCycle(Supplier<Double> dutyCycle) {
-    return intakeLauncherFlywheel.set(dutyCycle);
-  }
-
   public Command sysId() {
     return intakeLauncherFlywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5));
   }
@@ -133,20 +129,10 @@ public class FuelSubsystem extends SubsystemBase {
 
 
   /**
-   * Set the output for the indexer / feeder roller.
-   *
-   * @param power Motor output in the range supported by SparkMax (typically
-   *              -1.0..1.0)
-   */
-  public void setFeederRoller(double power) {
-    indexerController.setDutyCycle(power); // positive for shooting
-  }
-
-  /**
    * Stop all rollers immediately.
    */
   public void stop() {
-    indexerController.setDutyCycle(0);
+    indexer.set(0);
     intakeLauncherController.setVelocity(RPM.of(0));;
   }
 
@@ -159,12 +145,8 @@ public class FuelSubsystem extends SubsystemBase {
    *         finished/interrupted
    */
   public Command intakeCommand() {
-    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-        () -> {
-          double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
-          setFeederRoller(feederPercent);
-        },
-        this::stop,
+    return new RunCommand(
+      this::intake,
         this).withName("Intake");
   }
 
@@ -174,14 +156,7 @@ public class FuelSubsystem extends SubsystemBase {
    * @return a Command that runs the eject routine until interrupted
    */
   public Command ejectCommand() {
-    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-        () -> {
-          double feederPercent = SmartDashboard.getNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
-          // reverse the intake and feeder to eject
-          setFeederRoller(-feederPercent);
-        },
-        this::stop,
-        this).withName("Eject");
+    return new RunCommand(this::eject,this).withName("Eject");
   }
 
   /**
@@ -192,13 +167,7 @@ public class FuelSubsystem extends SubsystemBase {
    * @return a Command that spins up the launcher until interrupted
    */
   public Command spinUpCommand() {
-    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-        () -> {
-      double feederPercent = SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
-      setFeederRoller(feederPercent);
-        },
-        this::stop,
-        this).withName("SpinUp");
+    return new RunCommand(this::spinUp,this).withName("SpinUp");
   }
 
   /**
@@ -229,6 +198,7 @@ public class FuelSubsystem extends SubsystemBase {
     // interrupted
     return new edu.wpi.first.wpilibj2.command.SequentialCommandGroup(
         spinUpCommand().withTimeout(FuelConstants.SPIN_UP_SECONDS),
+         new WaitCommand(SPIN_UP_SECONDS),
         launchCommand());
   }
 
@@ -237,17 +207,15 @@ public class FuelSubsystem extends SubsystemBase {
    * Extracted from previous commented code so launchSequenceCommand can call it.
    */
   public Command launchCommand() {
-    return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-        () -> {
-          double feederPercent = SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
-          setFeederRoller(feederPercent);
-        },
-        this::stop,
-        this).withName("Launch");
+    return new RunCommand(this::launch,this).withName("Launch");
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public Command stopCommand() {
+    return new RunCommand(this::stop, this).withName("Stop");
   }
 }

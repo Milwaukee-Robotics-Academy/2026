@@ -61,6 +61,9 @@ public static final class FuelConstants {
     public static final double INTAKE_EJECT_PERCENT = -0.8;
 
     public static final double SPIN_UP_SECONDS = 0.65;
+    public static final double INTAKE_INTAKING_SETPOINT_RPM = 3000;
+    public static final double LAUNCHING_LAUNCHER_SETPOINT_RPM = 5000;
+    public static final double EJECT_LAUNCHING_SETPOINT_RPM = -3000;
   }
 
   public static final class ClimbConstants {
