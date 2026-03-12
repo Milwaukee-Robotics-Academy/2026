@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -54,20 +55,27 @@ public class RobotContainer
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
+  SwerveInputStream driveStream = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
       .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(Constants.SCALE_TRANSLATION)
       .allianceRelativeControl(true)
-      .scaleRotation(Constants.SCALE_ROTATION)
+      .scaleRotation(Constants.SCALE_ROTATION);
+
+  SwerveInputStream defaultDriveStream = driveStream.copy()
       .aim(this.getHubPose())
       .aimHeadingOffset(true)
       .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
       .aimWhile(driverXbox.b());
-    SwerveInputStream driveRotatingTowardsTravel = driveAngularVelocity.copy()
-      .withControllerRotationAxis(() -> {return Math.atan2(driverXbox.getLeftY() * -1, driverXbox.getLeftX() * -1);});
+
+    SwerveInputStream driveRotatingTowardsTravel = driveStream.copy().aim(this.getHubPose())
+      .aim(this.getDrivingDirection())
+      .aimHeadingOffset(true)
+      .aimHeadingOffset(Rotation2d.k180deg); // Rotate the hub pose by 180 degrees to aim at the back of the hub
+;
+  //    .withControllerRotationAxis(() -> {return Math.atan2(driverXbox.getLeftY() * -1, driverXbox.getLeftX() * -1);});
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -92,7 +100,11 @@ public class RobotContainer
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
-
+  Pose2d getDrivingDirection() {
+    m_drivebase.getPose().plus(new Transform2d(driverXbox.getLeftX() * -1, driverXbox.getLeftY() * -1, new Rotation2d()));
+   return new Pose2d(); 
+  }
+  
   Pose2d getHubPose() {
      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
     // Set to red hub
@@ -117,11 +129,11 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
-    Command driveFieldOrientedRotatingTowardsTravel = m_drivebase.driveFieldOriented(driveRotatingTowardsTravel);
+    Command defaultDriveStreamCommand = m_drivebase.driveFieldOriented(defaultDriveStream);
+    Command driveRotatingTowardsTravelCommand = m_drivebase.driveFieldOriented(driveRotatingTowardsTravel);
 
 
-      m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+      m_drivebase.setDefaultCommand(defaultDriveStreamCommand); // Overrides drive command above!
 
       driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
       //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
@@ -142,8 +154,8 @@ public class RobotContainer
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
     operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
 
-    driverXbox.x().toggleOnTrue(driveFieldOrientedRotatingTowardsTravel);
-    driverXbox.b().whileTrue(driveFieldOrientedAnglularVelocity);
+    driverXbox.x().toggleOnTrue(driveRotatingTowardsTravelCommand);
+    driverXbox.b().whileTrue(defaultDriveStreamCommand);
    // While the down arrow on the directional pad is held it will unclimb the robot
   //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
