@@ -73,7 +73,8 @@ public class RobotContainer
     SwerveInputStream driveRotatingTowardsTravel = driveStream.copy()
       .aim(this.getDrivingDirection())
       .aimHeadingOffset(true)
-      .aimHeadingOffset(Rotation2d.k180deg); // Rotate the hub pose by 180 degrees to aim at the back of the hub
+      .aimHeadingOffset(Rotation2d.k180deg)
+      .aimWhile(true); // Rotate the hub pose by 180 degrees to aim at the back of the hub
   //    .withControllerRotationAxis(() -> {return Math.atan2(driverXbox.getLeftY() * -1, driverXbox.getLeftX() * -1);});
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -100,8 +101,8 @@ public class RobotContainer
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
   Pose2d getDrivingDirection() {
-    m_drivebase.getPose().plus(new Transform2d(driverXbox.getLeftX() * -1, driverXbox.getLeftY() * -1, new Rotation2d()));
-   return new Pose2d(); 
+    return m_drivebase.getPose().plus(new Transform2d(driverXbox.getLeftX() * -10, driverXbox.getLeftY() * -10, m_drivebase.getPose().getRotation()));
+
   }
   
   Pose2d getHubPose() {
@@ -186,6 +187,10 @@ public void periodic() {
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(m_drivebase);
     SmartDashboard.putData(m_fuelSubsystem);
+    SmartDashboard.putNumber("DrivingDirection/x", this.getDrivingDirection().getX());
+    SmartDashboard.putNumber("DrivingDirection/y", this.getDrivingDirection().getY());
+    SmartDashboard.putNumber("CurrentPose/x", m_drivebase.getPose().getX());
+    SmartDashboard.putNumber("CurrentPose/y", m_drivebase.getPose().getY());
 
 }
 }
