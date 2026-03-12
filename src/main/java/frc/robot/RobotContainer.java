@@ -66,7 +66,8 @@ public class RobotContainer
       .aimHeadingOffset(true)
       .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
       .aimWhile(driverXbox.b());
-
+    SwerveInputStream driveRotatingTowardsTravel = driveAngularVelocity.copy()
+      .withControllerRotationAxis(() -> {return Math.atan2(driverXbox.getLeftX() * -1, driverXbox.getLeftY() * -1);});
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -117,6 +118,7 @@ public class RobotContainer
   {
 
     Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedRotatingTowardsTravel = m_drivebase.driveFieldOriented(driveRotatingTowardsTravel);
 
 
       m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
@@ -139,6 +141,9 @@ public class RobotContainer
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
     operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
+
+    driverXbox.x().toggleOnTrue(driveFieldOrientedRotatingTowardsTravel);
+    driverXbox.b().whileTrue(driveFieldOrientedAnglularVelocity);
    // While the down arrow on the directional pad is held it will unclimb the robot
   //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
