@@ -95,10 +95,10 @@ public class RobotContainer
   Pose2d getHubPose() {
      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
     // Set to red hub
-    return new Pose2d(12, 4, new Rotation2d()).rotateBy(Rotation2d.fromDegrees(180));
+    return new Pose2d(12, 4, new Rotation2d());
   } else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
     // Set to blue hub
-    return new Pose2d(4.6, 4, new Rotation2d()).rotateBy(Rotation2d.fromDegrees(180));
+    return new Pose2d(4.6, 4, new Rotation2d());
   } else {
     // do nothing
    return new Pose2d(); // Default value to avoid compile error; adjust as needed
