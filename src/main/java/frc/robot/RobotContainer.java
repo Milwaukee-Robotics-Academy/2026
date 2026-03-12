@@ -67,7 +67,7 @@ public class RobotContainer
       .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
       .aimWhile(driverXbox.b());
     SwerveInputStream driveRotatingTowardsTravel = driveAngularVelocity.copy()
-      .withControllerRotationAxis(() -> {return Math.atan2(driverXbox.getLeftX() * -1, driverXbox.getLeftY() * -1);});
+      .withControllerRotationAxis(() -> {return Math.atan2(driverXbox.getLeftY() * -1, driverXbox.getLeftX() * -1);});
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
