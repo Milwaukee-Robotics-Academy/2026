@@ -95,6 +95,14 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    // Register persistent Sendable items once (moved out of periodic)
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putData(m_fuelSubsystem);
+    SmartDashboard.putData(pdh);
+    SmartDashboard.putNumber("Clock/Match Time", 0.0);
+    SmartDashboard.putBoolean("Clock/Shift 1 Active", false);
   }
   Pose2d getDrivingDirection() {
     return m_drivebase.getPose().plus(new Transform2d(driverXbox.getLeftX() * -10, driverXbox.getLeftY() * -10, m_drivebase.getPose().getRotation()));
@@ -176,22 +184,35 @@ public class RobotContainer
   }
 
 public void periodic() {
-    SmartDashboard.putData(CommandScheduler.getInstance());
-    SmartDashboard.putData(m_drivebase);
-    SmartDashboard.putData(m_fuelSubsystem);
-    SmartDashboard.putData(pdh);
     double matchTime = DriverStation.getMatchTime();
     SmartDashboard.putNumber("Clock/Match Time", matchTime);
+    updateShiftStates(matchTime);
+}
 
-        // Example 2026 Shift Logic based on match time [1]
-        boolean shift1Active = false;
-        if (matchTime > 105) {
-            shift1Active = true;
-        } else if (matchTime > 80) {
-            shift1Active = false;
-        }
-        // Add more shift logic as needed...
+/**
+ * Update SmartDashboard booleans (Shift 1..n) in one place.
+ * Keeps the mapping and ranges consolidated.
+ */
+private void updateShiftStates(double matchTime) {
+    // If matchTime < 0, treat all shifts as inactive (or choose different behavior above)
+    boolean shift1Active = isBetween(matchTime, 30, 55);
+    boolean shift2Active = isBetween(matchTime, 55, 80);
+    boolean shift3Active = isBetween(matchTime, 80, 105);
+    boolean shift4Active = isBetween(matchTime, 105, 120);
+    boolean endgameShiftActive = isBetween(matchTime, 120, 150);
+    boolean autoShiftActive = isBetween(matchTime, 0, 20);
+    boolean transitionShiftActive = isBetween(matchTime, 20, 30);
 
-        SmartDashboard.putBoolean("Clock/Shift 1 Active", shift1Active);
+    SmartDashboard.putBoolean("Clock/Auto Active", autoShiftActive);
+    SmartDashboard.putBoolean("Clock/Transition Active", transitionShiftActive);
+    SmartDashboard.putBoolean("Clock/Shift 1 Active", shift1Active);
+    SmartDashboard.putBoolean("Clock/Shift 2 Active", shift2Active);
+    SmartDashboard.putBoolean("Clock/Shift 3 Active", shift3Active);
+    SmartDashboard.putBoolean("Clock/Shift 4 Active", shift4Active);
+    SmartDashboard.putBoolean("Clock/Endgame Active", endgameShiftActive);
+}
+
+private static boolean isBetween(double t, double startInclusive, double endExclusive) {
+    return t >= startInclusive && t < endExclusive;
 }
 }
