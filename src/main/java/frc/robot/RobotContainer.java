@@ -58,24 +58,22 @@ public class RobotContainer
   SwerveInputStream driveStream = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(Constants.SCALE_TRANSLATION)
       .allianceRelativeControl(true)
       .scaleRotation(Constants.SCALE_ROTATION);
 
   SwerveInputStream defaultDriveStream = driveStream.copy()
+      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .aim(this.getHubPose())
       .aimHeadingOffset(true)
       .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
       .aimWhile(driverXbox.b());
 
     SwerveInputStream driveRotatingTowardsTravel = driveStream.copy()
-      .aim(this.getDrivingDirection())
-      .aimHeadingOffset(true)
-      .aimHeadingOffset(Rotation2d.k180deg)
-      .aimWhile(true); // Rotate the hub pose by 180 degrees to aim at the back of the hub
-  //    .withControllerRotationAxis(() -> {return Math.atan2(driverXbox.getLeftY() * -1, driverXbox.getLeftX() * -1);});
+      .withControllerHeadingAxis(
+        ()-> driverXbox.getLeftX() * -1, 
+        ()-> driverXbox.getLeftY() * -1);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -156,10 +154,6 @@ public class RobotContainer
 
     driverXbox.x().toggleOnTrue(driveRotatingTowardsTravelCommand);
     driverXbox.b().whileTrue(defaultDriveStreamCommand);
-   // While the down arrow on the directional pad is held it will unclimb the robot
-  //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
-    // While the up arrow on the directional pad is held it will cimb the robot
-   // driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
 
     m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
