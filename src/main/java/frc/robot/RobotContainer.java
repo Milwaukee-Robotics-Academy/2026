@@ -7,7 +7,6 @@ package frc.robot;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,15 +18,12 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.FuelConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.FuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 
-
-import org.photonvision.PhotonUtils;
 
 import swervelib.SwerveInputStream;
 
@@ -96,10 +92,10 @@ public class RobotContainer
   Pose2d getHubPose() {
      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
     // Set to red hub
-    return new Pose2d(12, 4, new Rotation2d()).rotateBy(Rotation2d.fromDegrees(180));
+    return new Pose2d(12, 4, new Rotation2d());
   } else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
     // Set to blue hub
-    return new Pose2d(4.6, 4, new Rotation2d()).rotateBy(Rotation2d.fromDegrees(180));
+    return new Pose2d(4.6, 4, new Rotation2d());
   } else {
     // do nothing
    return new Pose2d(); // Default value to avoid compile error; adjust as needed
