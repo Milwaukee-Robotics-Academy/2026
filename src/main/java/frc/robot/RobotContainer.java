@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,6 +39,7 @@ public class RobotContainer
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandXboxController operatorXbox = new CommandXboxController(1);
+  final PowerDistribution pdh = new PowerDistribution();
  
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -177,5 +179,19 @@ public void periodic() {
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(m_drivebase);
     SmartDashboard.putData(m_fuelSubsystem);
+    SmartDashboard.putData(pdh);
+    double matchTime = DriverStation.getMatchTime();
+    SmartDashboard.putNumber("Clock/Match Time", matchTime);
+
+        // Example 2026 Shift Logic based on match time [1]
+        boolean shift1Active = false;
+        if (matchTime > 105) {
+            shift1Active = true;
+        } else if (matchTime > 80) {
+            shift1Active = false;
+        }
+        // Add more shift logic as needed...
+
+        SmartDashboard.putBoolean("Clock/Shift 1 Active", shift1Active);
 }
 }
