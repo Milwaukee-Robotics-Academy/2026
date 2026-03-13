@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -50,19 +51,25 @@ public class RobotContainer
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
+  SwerveInputStream driveStream = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
-      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(Constants.SCALE_TRANSLATION)
       .allianceRelativeControl(true)
-      .scaleRotation(Constants.SCALE_ROTATION)
+      .scaleRotation(Constants.SCALE_ROTATION);
+
+  SwerveInputStream defaultDriveStream = driveStream.copy()
+      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .aim(this.getHubPose())
       .aimHeadingOffset(true)
       .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
       .aimWhile(driverXbox.b());
 
+    SwerveInputStream driveRotatingTowardsTravel = driveStream.copy()
+      .withControllerHeadingAxis(
+        ()-> driverXbox.getLeftX() * -1, 
+        ()-> driverXbox.getLeftY() * -1);
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -87,7 +94,11 @@ public class RobotContainer
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
   }
+  Pose2d getDrivingDirection() {
+    return m_drivebase.getPose().plus(new Transform2d(driverXbox.getLeftX() * -10, driverXbox.getLeftY() * -10, m_drivebase.getPose().getRotation()));
 
+  }
+  
   Pose2d getHubPose() {
      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
     // Set to red hub
@@ -112,10 +123,11 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
+    Command defaultDriveStreamCommand = m_drivebase.driveFieldOriented(defaultDriveStream);
+    Command driveRotatingTowardsTravelCommand = m_drivebase.driveFieldOriented(driveRotatingTowardsTravel);
 
 
-      m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+      m_drivebase.setDefaultCommand(defaultDriveStreamCommand); // Overrides drive command above!
 
       driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
       //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
@@ -135,10 +147,9 @@ public class RobotContainer
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
     operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
-   // While the down arrow on the directional pad is held it will unclimb the robot
-  //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
-    // While the up arrow on the directional pad is held it will cimb the robot
-   // driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
+
+    driverXbox.x().toggleOnTrue(driveRotatingTowardsTravelCommand);
+    driverXbox.b().whileTrue(defaultDriveStreamCommand);
 
     m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
@@ -166,6 +177,10 @@ public void periodic() {
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(m_drivebase);
     SmartDashboard.putData(m_fuelSubsystem);
+    SmartDashboard.putNumber("DrivingDirection/x", this.getDrivingDirection().getX());
+    SmartDashboard.putNumber("DrivingDirection/y", this.getDrivingDirection().getY());
+    SmartDashboard.putNumber("CurrentPose/x", m_drivebase.getPose().getX());
+    SmartDashboard.putNumber("CurrentPose/y", m_drivebase.getPose().getY());
 
 }
 }
