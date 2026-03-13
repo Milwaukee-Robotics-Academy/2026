@@ -70,12 +70,13 @@ public class CANFuelSubsystem extends SubsystemBase {
     // with your new values. For more information, see the Software Guide.
     SmartDashboard.putNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
     SmartDashboard.putNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
+    SmartDashboard.putBoolean("Intaking/IsIntaking?", isIntaking());
     SmartDashboard.putNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT);
     SmartDashboard.putNumber("Launching/launcher", LAUNCHING_LAUNCHER_PERCENT);
-    SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
-    SmartDashboard.putBoolean("Intaking/IsIntaking?", isIntaking());
+    SmartDashboard.putNumber("Launching/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launching/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launching/Indexer-Velocity", indexer.getEncoder().getVelocity());
+
     // SmartDashboard.putNumber("Spin-up indexer",
     // SPIN_UP_INDEXER_VOLTAGE);
   }
@@ -220,9 +221,9 @@ public class CANFuelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launching/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launching/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launching/Indexer-Velocity", indexer.getEncoder().getVelocity());
     SmartDashboard.putBoolean("Intaking/IsIntaking?", isIntaking());
   }
 

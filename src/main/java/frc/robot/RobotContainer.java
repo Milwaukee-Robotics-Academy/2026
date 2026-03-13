@@ -177,10 +177,5 @@ public void periodic() {
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(m_drivebase);
     SmartDashboard.putData(m_fuelSubsystem);
-    SmartDashboard.putNumber("DrivingDirection/x", this.getDrivingDirection().getX());
-    SmartDashboard.putNumber("DrivingDirection/y", this.getDrivingDirection().getY());
-    SmartDashboard.putNumber("CurrentPose/x", m_drivebase.getPose().getX());
-    SmartDashboard.putNumber("CurrentPose/y", m_drivebase.getPose().getY());
-
 }
 }
