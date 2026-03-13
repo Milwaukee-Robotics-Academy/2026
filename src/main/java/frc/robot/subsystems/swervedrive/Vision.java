@@ -149,6 +149,8 @@ public class Vision {
         SmartDashboard.putNumber(camera.name() + "/y", pose.estimatedPose.getTranslation().getY());
         SmartDashboard.putNumber(camera.name() + "/angle", pose.estimatedPose.toPose2d().getRotation().getDegrees());
         SmartDashboard.putNumber(camera.name() + "/posetimestamp", pose.timestampSeconds);
+      } else {
+        SmartDashboard.putString(camera.name() + "/pose", "No Pose Estimation");
       }
     }
 
