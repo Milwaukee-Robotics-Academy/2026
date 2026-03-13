@@ -76,6 +76,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launching/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launching/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launching/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putBoolean("Launching/LauncherAtSpeed", this.isLauncherAtSpeed());
 
     // SmartDashboard.putNumber("Spin-up indexer",
     // SPIN_UP_INDEXER_VOLTAGE);
@@ -116,12 +117,12 @@ public class CANFuelSubsystem extends SubsystemBase {
     double leftVelocity = leftIntakeLauncher.getEncoder().getVelocity();
     double rightVelocity = rightIntakeLauncher.getEncoder().getVelocity();
     double tolerance = 100;
-    return Math.abs(leftVelocity - targetVelocity) < tolerance
-        && Math.abs(rightVelocity - targetVelocity) < tolerance;
+    return leftVelocity - targetVelocity > tolerance
+        && rightVelocity - targetVelocity > tolerance;
   }
 
   public boolean isIntaking() {
-    return leftIntakeLauncher.getEncoder().getVelocity() > 0.001; // Adjust threshold as needed
+    return leftIntakeLauncher.getEncoder().getVelocity() > 0.1; // Adjust threshold as needed
   }
 
   public Command stopCommand() {
@@ -225,6 +226,10 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Launching/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launching/Indexer-Velocity", indexer.getEncoder().getVelocity());
     SmartDashboard.putBoolean("Intaking/IsIntaking?", isIntaking());
+    SmartDashboard.putNumber("Launching/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launching/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launching/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putBoolean("Launching/LauncherAtSpeed", this.isLauncherAtSpeed());
   }
 
 

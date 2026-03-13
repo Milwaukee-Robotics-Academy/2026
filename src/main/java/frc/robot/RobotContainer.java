@@ -57,13 +57,13 @@ public class RobotContainer
   SwerveInputStream driveStream = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
+      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(Constants.SCALE_TRANSLATION)
       .allianceRelativeControl(true)
       .scaleRotation(Constants.SCALE_ROTATION);
 
   SwerveInputStream defaultDriveStream = driveStream.copy()
-      .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .aim(this.getHubPose())
       .aimHeadingOffset(true)
       .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
