@@ -236,7 +236,7 @@ public class RobotContainer
       operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
       operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
 
-      //arm with manual control (testing/override, no safety)
+      //arm with limit switches
       operatorXbox.rightTrigger().whileTrue(m_intake.armSpeedDownCommand());   // right trigger to move arm down
       operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedUpCommand());      // left trigger to move arm up
 
