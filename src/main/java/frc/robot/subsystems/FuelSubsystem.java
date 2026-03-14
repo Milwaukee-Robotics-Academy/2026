@@ -4,10 +4,12 @@
 
 package frc.robot.subsystems;
 
-
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import frc.robot.Constants.FuelConstants;
 import static edu.wpi.first.units.Units.Amps;
@@ -30,26 +33,30 @@ import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.function.Supplier;
 import static frc.robot.Constants.FuelConstants.*;
 
-
-
 public class FuelSubsystem extends SubsystemBase {
 
-  private SparkMax leftShooter;
-  private SparkMaxConfig leftShooterConfig;
-  private SparkClosedLoopController leftShooterController;
+  private SparkMax shooterFollower;
+  private SparkMaxConfig shooterFollowerConfig;
 
-  private SparkMax rightShooter;
-  private SparkMaxConfig rightShooterConfig;
-  private SparkClosedLoopController rightShooterController;
+  private SparkMax shooter;
+  private SparkMaxConfig shooterConfig;
+  private SparkClosedLoopController shooterController;
 
   private SparkMax indexer;
   private SparkMaxConfig indexerConfig;
   private SparkClosedLoopController indexerController;
+
+  // Member variables for subsystem state management
+  private double shooterTargetVelocity = 0.0;
+  private RelativeEncoder shooterEncoder = shooter.getEncoder();
+
   /**
    * Construct the CANFuelSubsystem.
    *
@@ -59,56 +66,112 @@ public class FuelSubsystem extends SubsystemBase {
    */
   public FuelSubsystem() {
 
-    leftShooter = new SparkMax(LEFT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
-    leftShooterConfig = new SparkMaxConfig();
-    leftShooterConfig
-        .smartCurrentLimit(SHOOTER_MOTOR_CURRENT_LIMIT)
-        .voltageCompensation(12)
-        .idleMode(IdleMode.kCoast);
-    leftShooterController = leftShooter.getClosedLoopController();
-    
-    rightShooter = new SparkMax(RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
-    rightShooterConfig = new SparkMaxConfig();
-    rightShooterController = rightShooter.getClosedLoopController();
+    shooter = new SparkMax(RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    shooterConfig = new SparkMaxConfig();
+    shooterConfig
+        .inverted(false)
+        .idleMode(IdleMode.kCoast)
+        .closedLoopRampRate(1.0)
+        .openLoopRampRate(1.0)
+        .smartCurrentLimit(80);
+    shooterConfig.closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        // Set PID values for position control
+        .p(0.0002)
+        .outputRange(-1, 1);
+    shooterConfig.closedLoop.maxMotion
+        // Set MAXMotion parameters for MAXMotion Velocity control
+        .cruiseVelocity(5000)
+        .maxAcceleration(10000)
+        .allowedProfileError(1);
+    // Nominal voltage is 12V, free speed of a Neo is 5600 rpm, so kV is 12V / 5600 rpm. Since feedforward.kV is in V/rpm,  
+    // sort we take
+    // the reciprocol.
+    shooterConfig.closedLoop
+            .feedForward.kV(12 / 5600 / 12.0); // 5600 rpm is the free speed of a Neo at 12V, so this gives us volts per rpm.
+    shooter.configure(shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    shooterController = shooter.getClosedLoopController();
+
+    shooterFollower = new SparkMax(LEFT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    shooterFollowerConfig = new SparkMaxConfig();
+    shooterFollowerConfig.apply(shooterConfig)
+        .follow(RIGHT_SHOOTER_MOTOR_ID, true);
+    shooterFollower.configure(shooterFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
     indexerConfig = new SparkMaxConfig();
-    indexerController = indexer.getClosedLoopController();
+    indexerConfig
+        .inverted(true)
+        .idleMode(IdleMode.kCoast)
+        .closedLoopRampRate(0.5)
+        .openLoopRampRate(0.5)
+        .smartCurrentLimit(80);
+    indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // put default values for various fuel operations onto the dashboard
     // all commands using this subsystem pull values from the dashbaord to allow
     // you to tune the values easily, and then replace the values in Constants.java
     // with your new values. For more information, see the Software Guide.
-    SmartDashboard.putNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
-    SmartDashboard.putNumber("Intaking intake roller value", SHOOTER_INTAKING_PERCENT);
-    SmartDashboard.putNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
-    SmartDashboard.putNumber("Launching launcher roller value", SHOOTER_LAUNCHING_PERCENT);
+    SmartDashboard.putNumber("Indexer roller value", INDEXER_INTAKING_PERCENT);
+    SmartDashboard.putNumber("Shooter intaking roller value", SHOOTER_INTAKING_VELOCITY);
+    SmartDashboard.putNumber("Indexer shooting roller value", INDEXER_LAUNCHING_PERCENT);
+    SmartDashboard.putNumber("Shooter shooting roller value", SHOOTER_SHOOTING_VELOCITY);
     // SmartDashboard.putNumber("Spin-up feeder roller value",
     // SPIN_UP_FEEDER_VOLTAGE);
   }
 
+  /**
+   * Drive the flywheels to their set velocity. This will use MAXMotion
+   * velocity control which will allow for a smooth acceleration and deceleration
+   * to the mechanism's
+   * setpoint.
+   */
+  private void setShooterVelocity(double velocity) {
+    shooterController.setSetpoint(velocity, ControlType.kMAXMotionVelocityControl);
+    shooterTargetVelocity = velocity;
+  }
+
+  private void setIndexerPower(double power) {
+    indexer.set(power);
+  }
+
   private void intake() {
-    indexer.set(Constants.FuelConstants.SHOOTER_INTAKING_PERCENT);
+    indexer.set(Constants.FuelConstants.SHOOTER_INTAKING_VELOCITY);
   }
 
-  private void spinUp() {
-  }
-
-  private void launch() {
-    indexer.set(Constants.FuelConstants.INDEXER_LAUNCHING_PERCENT);
+  /**
+   * Meta-command to operate the shooter. The Flywheel starts spinning up and when
+   * it reaches
+   * the desired speed it starts the Feeder.
+   */
+  public Command runShooterCommand() {
+    return this.startEnd(
+        () -> this.setShooterVelocity(SHOOTER_SHOOTING_VELOCITY),
+        () -> shooter.stopMotor()).until(isShooterSpinning).andThen(
+            this.startEnd(
+                () -> {
+                  this.setShooterVelocity(SHOOTER_SHOOTING_VELOCITY);
+                  this.setIndexerPower(INDEXER_LAUNCHING_PERCENT);
+                }, () -> {
+                  shooter.stopMotor();
+                  indexer.stopMotor();
+                }))
+        .withName("Shooting");
   }
 
   private void eject() {
-    indexer.set(-Constants.FuelConstants.INDEXER_INTAKING_PERCENT);
+    setShooterVelocity(SHOOTER_EJECT_VELOCITY);
+    setIndexerPower(-INDEXER_INTAKING_PERCENT);
   }
-
 
   /**
    * Stop all rollers immediately.
    */
   public void stop() {
-    indexer.set(0);
-    }
+    shooter.stopMotor();
+    indexer.stopMotor();
+  }
 
   /**
    * Returns a command that runs the intake sequence while held.
@@ -120,7 +183,7 @@ public class FuelSubsystem extends SubsystemBase {
    */
   public Command intakeCommand() {
     return new RunCommand(
-      this::intake,
+        this::intake,
         this).withName("Intake");
   }
 
@@ -130,59 +193,9 @@ public class FuelSubsystem extends SubsystemBase {
    * @return a Command that runs the eject routine until interrupted
    */
   public Command ejectCommand() {
-    return new RunCommand(this::eject,this).withName("Eject");
+    return new RunCommand(this::eject, this).withName("Eject");
   }
 
-  /**
-   * Returns a command to spin up the launcher wheels to a shooting setpoint.
-   *
-   * Launcher and feeder values are read from SmartDashboard.
-   *
-   * @return a Command that spins up the launcher until interrupted
-   */
-  public Command spinUpCommand() {
-    return new RunCommand(this::spinUp,this).withName("SpinUp");
-  }
-
-  /**
-   * Returns a command that runs launcher+feeder for launching until interrupted.
-   *
-   * @return a Command that runs the full launch routine
-   */
-  // public Command launchCommand() {
-  //   return new edu.wpi.first.wpilibj2.command.StartEndCommand(
-  //       () -> {
-  //         setIntakeLauncherRoller(
-  //             SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
-  //         setFeederRoller(SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT));
-  //       },
-  //       this::stop,
-  //       this).withName("Launch");
-
-  // }
-
-  /**
-   * Convenience sequence that spins up the launcher for a configured timeout,
-   * then runs the full launch command.
-   *
-   * @return a SequentialCommandGroup performing spin-up then launch
-   */
-  public Command launchSequenceCommand() {
-    // Spin up the launcher briefly, then run launcher+feeder to shoot until
-    // interrupted
-    return new edu.wpi.first.wpilibj2.command.SequentialCommandGroup(
-        spinUpCommand().withTimeout(FuelConstants.SPIN_UP_SECONDS),
-         new WaitCommand(SPIN_UP_SECONDS),
-        launchCommand());
-  }
-
-  /**
-   * Launch command: runs launcher + feeder until interrupted.
-   * Extracted from previous commented code so launchSequenceCommand can call it.
-   */
-  public Command launchCommand() {
-    return new RunCommand(this::launch,this).withName("Launch");
-  }
 
   @Override
   public void periodic() {
@@ -192,4 +205,24 @@ public class FuelSubsystem extends SubsystemBase {
   public Command stopCommand() {
     return new RunCommand(this::stop, this).withName("Stop");
   }
+
+  private boolean isShooterAt(double velocity) {
+    return MathUtil.isNear(shooterEncoder.getVelocity(),
+        velocity, 100);
+  }
+
+  /**
+   * Trigger: Is the shooter spinning at the required velocity?
+   */
+  public final Trigger isShooterSpinning = new Trigger(
+      () -> isShooterAt(SHOOTER_SHOOTING_VELOCITY) || shooterEncoder.getVelocity() > SHOOTER_SHOOTING_VELOCITY);
+
+  public final Trigger isShooterSpinningBackwards = new Trigger(
+      () -> isShooterAt(-5000) || shooterEncoder.getVelocity() < -5000);
+
+  /**
+   * Trigger: Is the shooter stopped?
+   */
+  public final Trigger isShooterStopped = new Trigger(() -> isShooterAt(0));
+
 }

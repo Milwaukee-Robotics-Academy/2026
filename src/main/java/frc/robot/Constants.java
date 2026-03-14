@@ -56,14 +56,14 @@ public static final class FuelConstants {
     public static final double INDEXER_LAUNCHING_PERCENT = 0.4;//.6;
     public static final double INDEXER_SPIN_UP_PRE_LAUNCH_PERCENT = -0.5;
 
-    public static final double SHOOTER_INTAKING_PERCENT = 0.6;
-    public static final double SHOOTER_LAUNCHING_PERCENT = 0.93;
+    public static final double SHOOTER_INTAKING_VELOCITY = 3000;
+    public static final double SHOOTER_SHOOTING_VELOCITY = 5000;
     public static final double SHOOTER_EJECT_PERCENT = -0.8;
 
     public static final double SPIN_UP_SECONDS = 0.65;
     public static final double SHOOTER_INTAKING_SETPOINT_RPM = 3000;
     public static final double SHOOTER_LAUNCHING_SETPOINT_RPM = 5000;
-    public static final double SHOOTER_EJECT_SETPOINT_RPM = -3000;
+    public static final double SHOOTER_EJECT_VELOCITY = -3000;
   }
 
   public static final class ClimbConstants {

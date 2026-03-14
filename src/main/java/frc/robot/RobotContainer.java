@@ -130,8 +130,8 @@ public class RobotContainer
     
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
-    driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
-    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
+    driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
+    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());

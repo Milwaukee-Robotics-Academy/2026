@@ -69,9 +69,9 @@ public class CANFuelSubsystem extends SubsystemBase {
     // you to tune the values easily, and then replace the values in Constants.java
     // with your new values. For more information, see the Software Guide.
     SmartDashboard.putNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
-    SmartDashboard.putNumber("Intaking/intake", SHOOTER_INTAKING_PERCENT);
+    SmartDashboard.putNumber("Intaking/intake", SHOOTER_INTAKING_VELOCITY);
     SmartDashboard.putNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT);
-    SmartDashboard.putNumber("Launching/launcher", SHOOTER_LAUNCHING_PERCENT);
+    SmartDashboard.putNumber("Launching/launcher", SHOOTER_SHOOTING_VELOCITY);
     SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
@@ -144,7 +144,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command intakeCommand() {
     return new RunCommand(
         () -> {
-          double intakePercent = SmartDashboard.getNumber("Intaking/intake", SHOOTER_INTAKING_PERCENT);
+          double intakePercent = SmartDashboard.getNumber("Intaking/intake", SHOOTER_INTAKING_VELOCITY);
           double indexerPercent = SmartDashboard.getNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
             setIntakeLauncherRoller(intakePercent);
             setIndexerRoller(indexerPercent);
@@ -160,7 +160,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command ejectCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
         () -> {
-          double intakePercent = SmartDashboard.getNumber("Intaking/intake", SHOOTER_INTAKING_PERCENT);
+          double intakePercent = SmartDashboard.getNumber("Intaking/intake", SHOOTER_INTAKING_VELOCITY);
           double indexerPercent = SmartDashboard.getNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
           // reverse the intake and indexer to eject
           setIntakeLauncherRoller(-intakePercent);
@@ -181,7 +181,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     return new edu.wpi.first.wpilibj2.command.RunCommand(
         () -> {
           double launcherPercent = SmartDashboard.getNumber("Launching/launcher",
-              SHOOTER_LAUNCHING_PERCENT);
+              SHOOTER_SHOOTING_VELOCITY);
           setIntakeLauncherRoller(launcherPercent);
         },
         this).withName("SpinUp");
@@ -196,7 +196,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     return new edu.wpi.first.wpilibj2.command.RunCommand(
         () -> {
           setIntakeLauncherRoller(
-              SmartDashboard.getNumber("Launching/launcher", SHOOTER_LAUNCHING_PERCENT));
+              SmartDashboard.getNumber("Launching/launcher", SHOOTER_SHOOTING_VELOCITY));
           setIndexerRoller(SmartDashboard.getNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT));
         },
         this).withName("Launch");
