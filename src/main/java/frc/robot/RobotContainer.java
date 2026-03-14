@@ -56,16 +56,18 @@ public class RobotContainer
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
 
-   //TODO: check withControllerRotationAxis needs to be inverted
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
-                                                                () -> driverXbox.getLeftY() * -1,
-                                                                () -> driverXbox.getLeftX() * -1)
-                                                            .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)    // Erik's fix
-                                                            //.withControllerRotationAxis(driverXbox::getRightX)              // ORIGINAL
-                                                            .deadband(OperatorConstants.DEADBAND)
-                                                            .scaleTranslation(0.7)  // Scale down translation for better control
-                                                            .scaleRotation(0.6)        // Scale down rotation for better control
-                                                            .allianceRelativeControl(true);
+      () -> driverXbox.getLeftY() * -1,
+      () -> driverXbox.getLeftX() * -1)
+          .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)    
+          .deadband(OperatorConstants.DEADBAND)
+          .scaleTranslation(Constants.SCALE_TRANSLATION)  // Scale down translation for better control
+          .scaleRotation(Constants.SCALE_ROTATION)        // Scale down rotation for better control
+          .allianceRelativeControl(true)
+          .aim(this.getHubPose())
+          //.aimHeadingOffset(true)                         // TODO: Check with Erik if we need the newer verison of YAGSL
+          //.aimHeadingOffset(Rotation2d.k180deg)           // TODO: Determine if needed Erik's comment: Rotate the hub pose by 180 degrees to aim at the back of the hub
+          .aimWhile(driverXbox.b());
 
   /**
    * Clone's the angular velocity input stream and converts it to a fieldRelative input stream.
@@ -118,6 +120,19 @@ public class RobotContainer
     .deadband(OperatorConstants.DEADBAND)
     .scaleTranslation(0.8)
     .allianceRelativeControl(true);
+  
+  Pose2d getHubPose() {
+    if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
+      // Set to red hub
+      return new Pose2d(12, 4, new Rotation2d());
+    } else if (DriverStation.getAlliance().get() == DriverStation.Alliance.Blue) {
+      // Set to blue hub
+      return new Pose2d(4.6, 4, new Rotation2d());
+    } else {
+      // do nothing (default value to avoid comile error)
+    return new Pose2d(); 
+    }
+  }
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
