@@ -9,13 +9,11 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-//import com.revrobotics.spark.config.ClosedLoopConfig;
+import edu.wpi.first.wpilibj.DigitalInput; 
 import com.revrobotics.spark.FeedbackSensor;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
-import com.revrobotics.spark.SparkClosedLoopController;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -30,16 +28,12 @@ public class Intake extends SubsystemBase{
     private SparkFlex m_motor_9;  // intake motor
     private SparkMax m_motor_10;  // arm motor
 
-    //private SparkAbsoluteEncoder m_armEncoder;  //absolute encoder for arm position
-    //private SparkClosedLoopController m_armPID; //closed loop controller for arm position
+    // TODO: Set DIO port
+    private static final int ARM_DOWN_LIMIT_SWITCH_PORT = 0; 
+    private static final int ARM_UP_LIMIT_SWITCH_PORT = 1;    
 
-    //arm position setpoints (play with these values to find best fit for the positions)
-    // private final double ARM_OFFSET = 0.162;                       // should read 0 when arm is perfectly parallel to the ground at the offset point, adjust as needed
-
-    // private final double ARM_DOWN_POSITION = 0.0;                  // down is only zero if perfectly parallel to the ground at the offset, adjust as needed                     
-    // private final double ARM_MIDDLE_POSITION = 0.206;   
-    // private final double ARM_UP_POSITION = 0.498;
-    
+    private DigitalInput m_downLimitSwitch;
+    private DigitalInput m_upLimitSwitch;
 
     private static final double INTAKE_SPEED_FORWARD = 0.3; 
     private static final double INTAKE_SPEED_REVERSE = -0.7; 
@@ -54,9 +48,8 @@ public class Intake extends SubsystemBase{
         m_motor_9 = new SparkFlex(9, MotorType.kBrushless);
         m_motor_10 = new SparkMax(10, MotorType.kBrushless);
 
-        // get absolute encoder and closed loop controller for arm motor
-        //m_armEncoder = m_motor_10.getAbsoluteEncoder();
-        // m_armPID = m_motor_10.getClosedLoopController();
+        m_downLimitSwitch = new DigitalInput(ARM_DOWN_LIMIT_SWITCH_PORT);
+        m_upLimitSwitch = new DigitalInput(ARM_UP_LIMIT_SWITCH_PORT);
 
         // set up configs for SparkFlex motor 9 (intake)
         SparkFlexConfig global_config_flex = new SparkFlexConfig();
@@ -98,17 +91,39 @@ public class Intake extends SubsystemBase{
         m_motor_9.set(0);
     }
 
-    // ==================== SET ARM POSITION (NO ENCODER) ====================
+    // ==================== MOVE POSITION (NO ENCODER) ====================
 
-    public void armSpeedMoveUp() {
+  public void armSpeedMoveUp() {
+        if (isAtUpLimit()) {
+            m_motor_10.set(0);
+            return;
+        }
         m_motor_10.set(ARM_SPEED_MOVE_UP);
     }
+    
     public void armSpeedMoveDown() {
+        if (isAtDownLimit()) {
+            m_motor_10.set(0);
+            return;
+        }     
         m_motor_10.set(ARM_SPEED_MOVE_DOWN);
     }
+    
     public void stopArm() {
         m_motor_10.set(0);
     }
+
+    // ==================== LIMIT SWITCHES ====================
+    
+    // Check if down limit switch is pressed    
+    public boolean isAtDownLimit() {
+        return !m_downLimitSwitch.get();  // Inverted b/c false = pressed, so return true when pressed
+    }
+
+    public boolean isAtUpLimit() {
+        return !m_upLimitSwitch.get();   // Inverted b/c false = pressed, so return true when pressed
+    }
+
     // ==================== INTAKE WHEEL COMMANDS ====================
 
     public Command forwardIntakeCommand(){
