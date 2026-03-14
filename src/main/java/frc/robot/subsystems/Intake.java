@@ -95,8 +95,8 @@ public class Intake extends SubsystemBase{
             .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
             .outputRange(-0.5, 0.5)                    //limit speed to 50%
             .feedForward
-                .kCos(1.1)                                      //kCos is a cosine gravity feedforward, for an arm, use https://www.reca.lc/arm to calculate the value
-                .kCosRatio(1);                         //1 is default
+                .kCos(1.6)                                      //kCos is a cosine gravity feedforward, for an arm, use https://www.reca.lc/arm to calculate the value
+                .kCosRatio(0.04);                         //1 is default
 
         // apply configs to motors
         m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
