@@ -38,8 +38,7 @@ public class FuelSubsystem extends SubsystemBase {
 
   // Member variables for subsystem state management
   private double shooterTargetVelocity = 0.0;
-  private RelativeEncoder shooterEncoder = shooter.getEncoder();
-
+  private RelativeEncoder shooterEncoder;
   /**
    * Construct the CANFuelSubsystem.
    *
@@ -75,6 +74,7 @@ public class FuelSubsystem extends SubsystemBase {
     shooter.configure(shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     shooterController = shooter.getClosedLoopController();
+    shooterEncoder = shooter.getEncoder();
 
     shooterFollower = new SparkMax(LEFT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
     shooterFollowerConfig = new SparkMaxConfig();
