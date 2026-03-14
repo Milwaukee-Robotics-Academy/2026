@@ -22,24 +22,25 @@ public class Shooter extends SubsystemBase {
     private SparkMax m_motor_12; // shooter motor 1 (leader)
     private SparkMax m_motor_13; // shooter motor 2 (follower)
 
-    private RelativeEncoder m_encoder_12;                            // encoder motor 1 (only for leader motor, since follower will mirror it)
+    private RelativeEncoder m_encoder_12;                               // encoder motor 1 (only for leader motor, since follower will mirror it)
     private SparkClosedLoopController m_PID_12;
-    private ClosedLoopSlot m_PID_far = ClosedLoopSlot.kSlot0;      // FAR range: PID slot 0 for shooter motor 12
-    private ClosedLoopSlot m_PID_close = ClosedLoopSlot.kSlot1;    // CLOSE range: PID slot 1 for shooter motor 12
+    private ClosedLoopSlot m_PID_far = ClosedLoopSlot.kSlot0;           // FAR range: PID slot 0 for shooter motor 12
+    private ClosedLoopSlot m_PID_close = ClosedLoopSlot.kSlot1;         // CLOSE range: PID slot 1 for shooter motor 12
 
     // Target shooter speed and tolerance (adjust as needed based on testing)
-    private static final double FAR_TARGET_SHOOTER_RPM = 4000.0;  // Adjust this!
-    private static final double FAR_SPEED_TOLERANCE_RPM = 150.0;  // Within 150 RPM = ready
+    private static final double FAR_TARGET_SHOOTER_RPM = 4000.0;        // Adjust this!
+    private static final double FAR_SPEED_TOLERANCE_RPM = 150.0;        // Within 150 RPM = ready
 
-    private static final double CLOSE_TARGET_SHOOTER_RPM = 2000.0;  // Adjust this!
-    private static final double CLOSE_SPEED_TOLERANCE_RPM = 150.0;  // Within 150 RPM = ready 
+    private static final double CLOSE_TARGET_SHOOTER_RPM = 2000.0;      // Adjust this!
+    private static final double CLOSE_SPEED_TOLERANCE_RPM = 150.0;      // Within 150 RPM = ready 
 
-    //private static final double SHOOTER_SPEED_FORWARD = -0.75;       // negative = forward
-    //private static final double SHOOTER_SPEED_REVERSE = 0.5;         // positive = reverse
+    //private static final double SHOOTER_SPEED_FORWARD = -0.75;        // negative = forward
+    //private static final double SHOOTER_SPEED_REVERSE = 0.5;          // positive = reverse
 
-    private static final double FEEDER_SPEED_FORWARD = -0.5;         // negative = forward
-    private static final double FEEDER_SPEED_REVERSE = 0.5;          // positive = reverse
+    private static final double FEEDER_SPEED_FORWARD = -0.5;            // negative = forward
+    private static final double FEEDER_SPEED_REVERSE = 0.5;             // positive = reverse
 
+    private boolean m_isFarMode = true;                                 // Default to far shooting
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
 
@@ -96,25 +97,13 @@ public class Shooter extends SubsystemBase {
         m_motor_13.configure(motor_13_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
-    // ==================== SHOOTER ONLY METHODS ====================
-
-    // Set shooter motor speeds (change during testing)
-    // private void forwardShooter() {
-    //     m_motor_12.set(SHOOTER_SPEED_FORWARD); // motor 13 will automatically follow
-    // }
-    // private void reverseShooter() {
-    //     m_motor_12.set(SHOOTER_SPEED_REVERSE);      // motor 13 will automatically follow
-    // }
-    // private void stopShooter() {
-    //     m_motor_12.set(0);   // motor 13 will automatically follow
-    // }
+    // ==================== SHOOTER METHODS ====================
 
     // Get current shooter velocity in RPM
     public double getShooterVelocityRPM() {
         return m_encoder_12.getVelocity();  // Returns RPM, only read leader (motor 12)
     }
 
-    // Check if shooter is at target speed and ready to shoot
     public boolean isFarShooterReady() {
         double currentRPM = getShooterVelocityRPM();
         return Math.abs(currentRPM - FAR_TARGET_SHOOTER_RPM) < FAR_SPEED_TOLERANCE_RPM;
@@ -125,7 +114,15 @@ public class Shooter extends SubsystemBase {
         return Math.abs(currentRPM - CLOSE_TARGET_SHOOTER_RPM) < CLOSE_SPEED_TOLERANCE_RPM;
     }
 
-    // ==================== FEEDER + MOTOR METHODS ====================
+    public boolean isShooterReady() {
+        if (m_isFarMode) {
+            return isFarShooterReady();
+        } else {
+            return isCloseShooterReady();
+        }   
+    }
+
+    // ==================== SET FEEDER + MOTOR SPEEDS ====================
 
     // Set feeder motor speeds
     private void forwardFeeder() {
@@ -140,13 +137,25 @@ public class Shooter extends SubsystemBase {
 
     // Set shooter speed using closed-loop control to reach target RPM
     private void spinUpFarShooter() {
+        m_isFarMode = true; 
         m_PID_12.setSetpoint(FAR_TARGET_SHOOTER_RPM, ControlType.kVelocity, m_PID_far);               
     }
     private void spinUpCloseShooter() {
+        m_isFarMode = false; 
         m_PID_12.setSetpoint(CLOSE_TARGET_SHOOTER_RPM, ControlType.kVelocity, m_PID_close);               
     }
     private void stopShooter() {
         m_motor_12.set(0);
+    }
+
+    // ==================== COMBINED SEQUENCES ====================
+
+     private void feedIfReady() {
+        if (isShooterReady()) {
+            forwardFeeder();
+        } else {
+            stopFeeder();
+        }
     }
 
     // Spin up shooter and run feeder only when shooter is at speed
@@ -174,21 +183,25 @@ public class Shooter extends SubsystemBase {
         stopFeeder();
     }
 
-    // ==================== SHOOTER ONLY COMMANDS ====================
-   
-    // Basic forward shooter command (can be used for testing or manual control)
-    // public Command forwardShooterCommand(){
-    //     return new RunCommand(this::forwardShooter, this).withName("ForwardShooter");
-    // }
-
-    // public Command reverseShooterCommand(){
-    //     return new RunCommand(this::reverseShooter, this).withName("ReverseShooter");
-    // }
-    // public Command stopShooterCommand(){
-    //     return new InstantCommand(this::stopShooter, this).withName("StopShooter");
-    // }
-
     // ==================== FEEDER & MOTOR COMMANDS ====================
+
+    public Command spinUpCloseCommand() {
+        return new RunCommand(this::spinUpCloseShooter, this).withName("SpinUpCloseShooter");
+    }
+
+    public Command spinUpFarCommand() {
+        return new RunCommand(this::spinUpFarShooter, this).withName("SpinUpFarShooter");
+    }
+
+    public Command feedIfReadyCommand() {
+        return new RunCommand(this::feedIfReady, this).withName("FeedIfReady");
+    }
+
+     public Command forwardFeederCommand() {
+        return new RunCommand(this::forwardFeeder, this).withName("ForwardFeeder");
+    }
+
+    // ===================== COMBINED SEQUENCE COMMANDS ====================
 
     public Command shootCloseSequenceCommand() {
         return new RunCommand(this::shootCloseSequence, this).withName("ShootCloseSequence");
@@ -213,6 +226,7 @@ public class Shooter extends SubsystemBase {
     // Ready indicators
     SmartDashboard.putBoolean("Shooter/Far Ready", isFarShooterReady());
     SmartDashboard.putBoolean("Shooter/Close Ready", isCloseShooterReady());
+    SmartDashboard.putBoolean("Shooter/Ready", isShooterReady());
     
     // Target speeds (helpful to see what you're aiming for)
     SmartDashboard.putNumber("Shooter/Far Target RPM", FAR_TARGET_SHOOTER_RPM);

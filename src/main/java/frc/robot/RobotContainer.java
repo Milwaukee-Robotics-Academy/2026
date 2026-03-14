@@ -256,9 +256,11 @@ public class RobotContainer
       operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedUpCommand());      // left trigger to move arm up
 
       //shooter
-      operatorXbox.rightBumper().whileTrue(m_shooter.shootFarSequenceCommand());    // right bumper to shoot FAR
-      //operatorXbox.leftBumper().whileTrue(m_shooter.shootCloseSequenceCommand());   // bumper to shoot CLOSE
+      operatorXbox.rightBumper().whileTrue(m_shooter.spinUpFarCommand());     // right bumper to shoot FAR
+      operatorXbox.leftBumper().whileTrue(m_shooter.spinUpCloseCommand());    // left bumper to shoot CLOSE
     
+      //feeder
+      operatorXbox.x().whileTrue(m_shooter.feedIfReadyCommand());             // x to run feeder forward
     }
 
   }
