@@ -15,29 +15,13 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
-import frc.robot.Constants.FuelConstants;
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.RPM;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Second;
-import static edu.wpi.first.units.Units.Seconds;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.Pair;
-import edu.wpi.first.units.measure.AngularVelocity;
-import java.util.function.Supplier;
 import static frc.robot.Constants.FuelConstants.*;
 
 public class FuelSubsystem extends SubsystemBase {
@@ -51,7 +35,6 @@ public class FuelSubsystem extends SubsystemBase {
 
   private SparkMax indexer;
   private SparkMaxConfig indexerConfig;
-  private SparkClosedLoopController indexerController;
 
   // Member variables for subsystem state management
   private double shooterTargetVelocity = 0.0;
@@ -199,8 +182,10 @@ public class FuelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-  }
+    SmartDashboard.putNumber("Launcher/Left-Velocity", shooterFollower.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launcher/Right-Velocity", shooter.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
+}
 
   public Command stopCommand() {
     return new RunCommand(this::stop, this).withName("Stop");
