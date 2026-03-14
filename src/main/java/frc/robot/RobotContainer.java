@@ -237,9 +237,12 @@ public class RobotContainer
       operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
 
       //arm with encoder setpoints
-      operatorXbox.povDown().onTrue(m_intake.armDownCommand());
-      operatorXbox.povUp().onTrue(m_intake.armUpCommand());
-      operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
+      //operatorXbox.povDown().onTrue(m_intake.armSpeedMoveUp());
+      //operatorXbox.povUp().whileTrue(m_intake.armSpeedMoveDown());
+
+
+      
+      //operatorXbox.povRight().onTrue(m_intake.armMiddleCommand()); 
 
       //arm with manual control (testing/override, no safety)
       // operatorXbox.rightTrigger().whileTrue(m_intake.armDownCommand());   // right trigger to move arm down
