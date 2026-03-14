@@ -43,8 +43,8 @@ public final class Constants
 
 public static final class FuelConstants {
     // Motor controller IDs for Fuel Mechanism motors
-    public static final int LEFT_INTAKE_LAUNCHER_MOTOR_ID = 9;
-    public static final int RIGHT_INTAKE_LAUNCHER_MOTOR_ID = 10;
+    public static final int LEFT_SHOOTER_MOTOR_ID = 9;
+    public static final int RIGHT_SHOOTER_MOTOR_ID = 10;
     public static final int INDEXER_MOTOR_ID = 11;
 
     // Current limit for fuel mechanism motors.
@@ -56,14 +56,14 @@ public static final class FuelConstants {
     public static final double INDEXER_LAUNCHING_PERCENT = 0.4;//.6;
     public static final double INDEXER_SPIN_UP_PRE_LAUNCH_PERCENT = -0.5;
 
-    public static final double INTAKE_INTAKING_PERCENT = 0.6;
-    public static final double LAUNCHING_LAUNCHER_PERCENT = 0.93;
-    public static final double INTAKE_EJECT_PERCENT = -0.8;
+    public static final double SHOOTER_INTAKING_VELOCITY = 3000;
+    public static final double SHOOTER_SHOOTING_VELOCITY = 5000;
+    public static final double SHOOTER_EJECT_PERCENT = -0.8;
 
     public static final double SPIN_UP_SECONDS = 0.65;
-    public static final double INTAKE_INTAKING_SETPOINT_RPM = 3000;
-    public static final double LAUNCHING_LAUNCHER_SETPOINT_RPM = 5000;
-    public static final double EJECT_LAUNCHING_SETPOINT_RPM = -3000;
+    public static final double SHOOTER_INTAKING_SETPOINT_RPM = 3000;
+    public static final double SHOOTER_LAUNCHING_SETPOINT_RPM = 5000;
+    public static final double SHOOTER_EJECT_VELOCITY = -3000;
   }
 
   public static final class ClimbConstants {
