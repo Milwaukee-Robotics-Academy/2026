@@ -34,12 +34,14 @@ public class Intake extends SubsystemBase{
     private SparkClosedLoopController m_armPID; //closed loop controller for arm position
 
     //arm position setpoints (play with these values to find best fit for the positions)
-    private final double ARM_OFFSET = 0.162;                       // should read 0 when arm is perfectly parallel to the ground at the offset point, adjust as needed
+    private final double ARM_OFFSET = 0.010;                       // should read 0 when arm is perfectly parallel to the ground at the offset point, adjust as needed
 
-    private final double ARM_DOWN_POSITION = 0.0;                  // down is only zero if perfectly parallel to the ground at the offset, adjust as needed                     
-    private final double ARM_MIDDLE_POSITION = 0.206;   
-    private final double ARM_UP_POSITION = 0.498;
-    
+    private final double ARM_DOWN_POSITION = 0.152;                  // down is only zero if perfectly parallel to the ground at the offset, adjust as needed                     
+    private final double ARM_MIDDLE_POSITION = 0.358;   
+    private final double ARM_UP_POSITION = 0.65;
+    // down = .162 - offset
+    // mid = .368 - offset
+    // up = .66 - offset
 
     private static final double INTAKE_SPEED_FORWARD = 0.3; 
     private static final double INTAKE_SPEED_REVERSE = -0.7; 
@@ -93,7 +95,7 @@ public class Intake extends SubsystemBase{
             .pid(0.1, 0.0, 0.0)                            //tune these values for best performance
             .outputRange(-0.5, 0.5)                    //limit speed to 50%
             .feedForward
-                .kCos(0)                                    //kCos is a cosine gravity feedforward, for an arm, use https://www.reca.lc/arm to calculate the value
+                .kCos(1.1)                                      //kCos is a cosine gravity feedforward, for an arm, use https://www.reca.lc/arm to calculate the value
                 .kCosRatio(1);                         //1 is default
 
         // apply configs to motors
