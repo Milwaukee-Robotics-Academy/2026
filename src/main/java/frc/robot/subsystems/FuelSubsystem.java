@@ -8,6 +8,7 @@ package frc.robot.subsystems;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -21,14 +22,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.FuelConstants;
-import yams.gearing.GearBox;
-import yams.gearing.MechanismGearing;
-import yams.mechanisms.config.FlyWheelConfig;
-import yams.mechanisms.velocity.FlyWheel;
-import yams.motorcontrollers.SmartMotorController;
-import yams.motorcontrollers.SmartMotorControllerConfig;
-import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
-import yams.motorcontrollers.local.SparkWrapper;
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
@@ -40,44 +33,23 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.units.measure.AngularVelocity;
 import java.util.function.Supplier;
-
-import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
-import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import static frc.robot.Constants.FuelConstants.*;
+
+
 
 public class FuelSubsystem extends SubsystemBase {
 
-  private final SparkMax leftIntakeLauncher = new SparkMax(FuelConstants.LEFT_INTAKE_LAUNCHER_MOTOR_ID,
-      MotorType.kBrushless);
-  private final SparkMax rightIntakeLauncher = new SparkMax(FuelConstants.RIGHT_INTAKE_LAUNCHER_MOTOR_ID,
-      MotorType.kBrushless);
-  private final SmartMotorControllerConfig leftIntakeLauncherConfig = new SmartMotorControllerConfig(this)
-      .withClosedLoopController(0.00016541, 0, 0, RPM.of(5000), RotationsPerSecondPerSecond.of(2500))
-      .withGearing(new MechanismGearing(GearBox.fromTeeth(40,60)))
-      .withIdleMode(MotorMode.COAST)
-      .withTelemetry("ShooterMotor", TelemetryVerbosity.HIGH)
-      .withStatorCurrentLimit(Amps.of(40))
-      .withMotorInverted(false)
-      .withClosedLoopRampRate(Seconds.of(0.25))
-      .withOpenLoopRampRate(Seconds.of(0.25))
-      .withFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
-      .withSimFeedforward(new SimpleMotorFeedforward(0.27937, 0.089836, 0.014557))
-      .withControlMode(ControlMode.CLOSED_LOOP)
-      .withFollowers(Pair.of(rightIntakeLauncher, true));
-  private final SmartMotorController intakeLauncherController = new SparkWrapper(leftIntakeLauncher, DCMotor.getNEO(1),
-      leftIntakeLauncherConfig);
-  private final FlyWheelConfig shooterConfig = new FlyWheelConfig(intakeLauncherController)
-      .withDiameter(Inches.of(4))
-      .withMass(Pounds.of(1))
-      .withTelemetry("ShooterMech", TelemetryVerbosity.HIGH)
-      .withSoftLimit(RPM.of(-500), RPM.of(500))
-      .withSpeedometerSimulation(RPM.of(750));
-  private final FlyWheel intakeLauncherFlywheel = new FlyWheel(shooterConfig);
+  private SparkMax leftShooter;
+  private SparkMaxConfig leftShooterConfig;
+  private SparkClosedLoopController leftShooterController;
 
-  private final SparkMax indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
-  private final SparkMaxConfig indexerConfig = new SparkMaxConfig();
+  private SparkMax rightShooter;
+  private SparkMaxConfig rightShooterConfig;
+  private SparkClosedLoopController rightShooterController;
 
-
+  private SparkMax indexer;
+  private SparkMaxConfig indexerConfig;
+  private SparkClosedLoopController indexerController;
   /**
    * Construct the CANFuelSubsystem.
    *
@@ -87,45 +59,48 @@ public class FuelSubsystem extends SubsystemBase {
    */
   public FuelSubsystem() {
 
-     indexerConfig.smartCurrentLimit(INDEXER_MOTOR_CURRENT_LIMIT)
-  .voltageCompensation(12)
-    .idleMode(IdleMode.kCoast)
-    .inverted(true);
-    indexer.configure(indexerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    leftShooter = new SparkMax(LEFT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    leftShooterConfig = new SparkMaxConfig();
+    leftShooterConfig
+        .smartCurrentLimit(SHOOTER_MOTOR_CURRENT_LIMIT)
+        .voltageCompensation(12)
+        .idleMode(IdleMode.kCoast);
+    leftShooterController = leftShooter.getClosedLoopController();
+    
+    rightShooter = new SparkMax(RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    rightShooterConfig = new SparkMaxConfig();
+    rightShooterController = rightShooter.getClosedLoopController();
+
+    indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
+    indexerConfig = new SparkMaxConfig();
+    indexerController = indexer.getClosedLoopController();
+
     // put default values for various fuel operations onto the dashboard
     // all commands using this subsystem pull values from the dashbaord to allow
     // you to tune the values easily, and then replace the values in Constants.java
     // with your new values. For more information, see the Software Guide.
     SmartDashboard.putNumber("Intaking feeder roller value", INDEXER_INTAKING_PERCENT);
-    SmartDashboard.putNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
+    SmartDashboard.putNumber("Intaking intake roller value", SHOOTER_INTAKING_PERCENT);
     SmartDashboard.putNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
-    SmartDashboard.putNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT);
+    SmartDashboard.putNumber("Launching launcher roller value", SHOOTER_LAUNCHING_PERCENT);
     // SmartDashboard.putNumber("Spin-up feeder roller value",
     // SPIN_UP_FEEDER_VOLTAGE);
   }
 
   private void intake() {
-    intakeLauncherFlywheel.setMechanismVelocitySetpoint(RPM.of(Constants.FuelConstants.INTAKE_INTAKING_SETPOINT_RPM));
-    indexer.set(Constants.FuelConstants.INTAKE_INTAKING_PERCENT);
+    indexer.set(Constants.FuelConstants.SHOOTER_INTAKING_PERCENT);
   }
 
   private void spinUp() {
-    intakeLauncherFlywheel.setMechanismVelocitySetpoint(RPM.of(Constants.FuelConstants.LAUNCHING_LAUNCHER_SETPOINT_RPM));
   }
 
   private void launch() {
-    intakeLauncherFlywheel.setMechanismVelocitySetpoint(RPM.of(Constants.FuelConstants.LAUNCHING_LAUNCHER_SETPOINT_RPM));
     indexer.set(Constants.FuelConstants.INDEXER_LAUNCHING_PERCENT);
   }
 
   private void eject() {
-    intakeLauncherFlywheel.setMechanismVelocitySetpoint(RPM.of(Constants.FuelConstants.EJECT_LAUNCHING_SETPOINT_RPM));
     indexer.set(-Constants.FuelConstants.INDEXER_INTAKING_PERCENT);
   }
-  public Command sysId() {
-    return intakeLauncherFlywheel.sysId(Volts.of(10), Volts.of(1).per(Second), Seconds.of(5));
-  }
-
 
 
   /**
@@ -133,8 +108,7 @@ public class FuelSubsystem extends SubsystemBase {
    */
   public void stop() {
     indexer.set(0);
-    intakeLauncherController.setVelocity(RPM.of(0));;
-  }
+    }
 
   /**
    * Returns a command that runs the intake sequence while held.

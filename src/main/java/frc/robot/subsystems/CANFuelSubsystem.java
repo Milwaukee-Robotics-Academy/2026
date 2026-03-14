@@ -38,8 +38,8 @@ public class CANFuelSubsystem extends SubsystemBase {
    */
   public CANFuelSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
-    leftIntakeLauncher = new SparkMax(LEFT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
-    rightIntakeLauncher = new SparkMax(RIGHT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
+    leftIntakeLauncher = new SparkMax(LEFT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    rightIntakeLauncher = new SparkMax(RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
     indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
 
 
@@ -57,7 +57,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     // launching, and apply the config to the controller
     SparkMaxConfig launcherConfig = new SparkMaxConfig();
 
-    launcherConfig.smartCurrentLimit(LAUNCHER_MOTOR_CURRENT_LIMIT);
+    launcherConfig.smartCurrentLimit(SHOOTER_MOTOR_CURRENT_LIMIT);
     launcherConfig.voltageCompensation(12);
     launcherConfig.idleMode(IdleMode.kCoast);
     rightIntakeLauncher.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -69,9 +69,9 @@ public class CANFuelSubsystem extends SubsystemBase {
     // you to tune the values easily, and then replace the values in Constants.java
     // with your new values. For more information, see the Software Guide.
     SmartDashboard.putNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
-    SmartDashboard.putNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
+    SmartDashboard.putNumber("Intaking/intake", SHOOTER_INTAKING_PERCENT);
     SmartDashboard.putNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT);
-    SmartDashboard.putNumber("Launching/launcher", LAUNCHING_LAUNCHER_PERCENT);
+    SmartDashboard.putNumber("Launching/launcher", SHOOTER_LAUNCHING_PERCENT);
     SmartDashboard.putNumber("Launcher/Left-Velocity", leftIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Right-Velocity", rightIntakeLauncher.getEncoder().getVelocity());
     SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
@@ -144,7 +144,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command intakeCommand() {
     return new RunCommand(
         () -> {
-          double intakePercent = SmartDashboard.getNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
+          double intakePercent = SmartDashboard.getNumber("Intaking/intake", SHOOTER_INTAKING_PERCENT);
           double indexerPercent = SmartDashboard.getNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
             setIntakeLauncherRoller(intakePercent);
             setIndexerRoller(indexerPercent);
@@ -160,7 +160,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   public Command ejectCommand() {
     return new edu.wpi.first.wpilibj2.command.StartEndCommand(
         () -> {
-          double intakePercent = SmartDashboard.getNumber("Intaking/intake", INTAKE_INTAKING_PERCENT);
+          double intakePercent = SmartDashboard.getNumber("Intaking/intake", SHOOTER_INTAKING_PERCENT);
           double indexerPercent = SmartDashboard.getNumber("Intaking/indexer", INDEXER_INTAKING_PERCENT);
           // reverse the intake and indexer to eject
           setIntakeLauncherRoller(-intakePercent);
@@ -181,7 +181,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     return new edu.wpi.first.wpilibj2.command.RunCommand(
         () -> {
           double launcherPercent = SmartDashboard.getNumber("Launching/launcher",
-              LAUNCHING_LAUNCHER_PERCENT);
+              SHOOTER_LAUNCHING_PERCENT);
           setIntakeLauncherRoller(launcherPercent);
         },
         this).withName("SpinUp");
@@ -196,7 +196,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     return new edu.wpi.first.wpilibj2.command.RunCommand(
         () -> {
           setIntakeLauncherRoller(
-              SmartDashboard.getNumber("Launching/launcher", LAUNCHING_LAUNCHER_PERCENT));
+              SmartDashboard.getNumber("Launching/launcher", SHOOTER_LAUNCHING_PERCENT));
           setIndexerRoller(SmartDashboard.getNumber("Launching/indexer", INDEXER_LAUNCHING_PERCENT));
         },
         this).withName("Launch");
