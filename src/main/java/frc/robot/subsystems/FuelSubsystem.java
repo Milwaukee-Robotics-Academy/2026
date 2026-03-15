@@ -133,7 +133,7 @@ public class FuelSubsystem extends SubsystemBase {
   }
 
   private void intake() {
-    indexer.set(Constants.FuelConstants.SHOOTER_INTAKING_VELOCITY);
+    indexer.set(Constants.FuelConstants.INDEXER_INTAKING_PERCENT);
     setShooterVelocity(SHOOTER_EJECT_VELOCITY);
   }
 
@@ -143,9 +143,8 @@ public class FuelSubsystem extends SubsystemBase {
    * the desired speed it starts the Feeder.
    */
   public Command runShooterCommand() {
-    return this.startEnd(
-        () -> this.setShooterVelocity(SHOOTER_SHOOTING_VELOCITY),
-        () -> shooter.stopMotor()).until(isShooterAtSetpoint).andThen(
+    return new RunCommand(
+        () -> this.setShooterVelocity(SHOOTER_SHOOTING_VELOCITY), this).withTimeout(0.5).andThen(
             this.startEnd(
                 () -> {
                   this.setShooterVelocity(SHOOTER_SHOOTING_VELOCITY);
@@ -199,6 +198,7 @@ public class FuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Shooter/Left-Velocity", shooterFollower.getEncoder().getVelocity());
     SmartDashboard.putNumber("Shooter/Right-Velocity", shooter.getEncoder().getVelocity());
     SmartDashboard.putNumber("Indexer/Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putBoolean("Shooter/AtSetpoint",isShooterAtSetpoint.getAsBoolean());
 }
 
   public Command stopCommand() {
@@ -214,6 +214,6 @@ public class FuelSubsystem extends SubsystemBase {
    * Trigger: Is the shooter spinning at the required velocity?
    */
   public final Trigger isShooterAtSetpoint = new Trigger(
-      () -> isShooterAt(SHOOTER_SHOOTING_VELOCITY) || shooterEncoder.getVelocity() > SHOOTER_SHOOTING_VELOCITY);
+      () -> isShooterAt(SHOOTER_SHOOTING_VELOCITY-100) || shooterEncoder.getVelocity() > SHOOTER_SHOOTING_VELOCITY-100);
 
 }
