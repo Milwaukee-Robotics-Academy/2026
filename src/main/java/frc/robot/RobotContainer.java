@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -25,6 +26,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
+import java.util.Optional;
 import java.util.Optional;
 
 import swervelib.SwerveInputStream;
@@ -185,12 +187,6 @@ public class RobotContainer
     m_drivebase.setMotorBrake(brake);
   }
 
-public void periodic() {
-    double matchTime = DriverStation.getMatchTime();
-    SmartDashboard.putNumber("Clock/Match Time", matchTime);
-    updateShiftStates(matchTime);
-}
-
 /**
  * Update SmartDashboard booleans (Shift 1..n) in one place.
  * Keeps the mapping and ranges consolidated.
@@ -213,6 +209,14 @@ private void updateShiftStates(double matchTime) {
     SmartDashboard.putBoolean("Clock/Shift 3 Active", shift3Active);
     SmartDashboard.putBoolean("Clock/Shift 4 Active", shift4Active);
     SmartDashboard.putBoolean("Clock/Endgame Active", endgameShiftActive);
+    
+}
+
+
+public void periodic() {
+    double matchTime = DriverStation.getMatchTime();
+    SmartDashboard.putNumber("Clock/Match Time", matchTime);
+    updateShiftStates(matchTime);
 }
 
 private static boolean isBetween(double t, double startInclusive, double endExclusive) {
