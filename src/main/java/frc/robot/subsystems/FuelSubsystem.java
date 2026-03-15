@@ -70,6 +70,10 @@ public class FuelSubsystem extends SubsystemBase {
         // Set PID values for position control
         .p(SmartDashboard.getNumber("Shooter/kP", kP))
         .outputRange(-1, 1);
+    shooterConfig.encoder
+        .uvwMeasurementPeriod(8)
+        .quadratureAverageDepth(2)
+        .quadratureMeasurementPeriod(8);
     shooterConfig.closedLoop.maxMotion
         // Set MAXMotion parameters for MAXMotion Velocity control
         .cruiseVelocity(5000)
