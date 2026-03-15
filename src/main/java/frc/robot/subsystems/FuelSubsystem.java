@@ -189,9 +189,9 @@ public class FuelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Launcher/Left-Velocity", shooterFollower.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Launcher/Right-Velocity", shooter.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Launcher/Indexer-Velocity", indexer.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Shooter/Left-Velocity", shooterFollower.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Shooter/Right-Velocity", shooter.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Indexer/Velocity", indexer.getEncoder().getVelocity());
 }
 
   public Command stopCommand() {
