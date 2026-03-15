@@ -38,10 +38,10 @@ public class FuelSubsystem extends SubsystemBase {
 
   // Member variables for subsystem state management
   private double shooterTargetVelocity = 0.0;
-  private RelativeEncoder shooterEncoder = shooter.getEncoder();
+  private RelativeEncoder shooterEncoder;
 
   private double kP = 0.0002;
-  private double kV = 12 / (5600 / 12.0); // 5600 rpm is the free speed of a Neo at 12V, so this gives us volts per rpm.
+  private double kV = 0.0021; // 5600 rpm is the free speed of a Neo at 12V, so this gives us volts per rpm.
   private double kA = 0.0; // You may need to tune this value based on how quickly you want the shooter to accelerate and decelerate.
 
   /**
@@ -62,30 +62,31 @@ public class FuelSubsystem extends SubsystemBase {
     shooterConfig
         .inverted(false)
         .idleMode(IdleMode.kCoast)
-        .closedLoopRampRate(1.0)
-        .openLoopRampRate(1.0)
+        .closedLoopRampRate(0.5)
+        .openLoopRampRate(0.5)
         .smartCurrentLimit(80);
     shooterConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        // Set PID values for position control
-        .p(SmartDashboard.getNumber("Shooter/kP", kP))
-        .outputRange(-1, 1);
+         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+         // Set PID values for position control
+         .p(SmartDashboard.getNumber("Shooter/kP", kP))
+         .outputRange(-1, 1);
     shooterConfig.encoder
         .uvwMeasurementPeriod(8)
         .quadratureAverageDepth(2)
         .quadratureMeasurementPeriod(8);
     shooterConfig.closedLoop.maxMotion
-        // Set MAXMotion parameters for MAXMotion Velocity control
-        .cruiseVelocity(5000)
-        .maxAcceleration(10000)
-        .allowedProfileError(1);
+         // Set MAXMotion parameters for MAXMotion Velocity control
+         .cruiseVelocity(5000)
+         .maxAcceleration(10000);
+    //     .allowedProfileError(1);
+        
     // Nominal voltage is 12V, free speed of a Neo is 5600 rpm, so kV is 12V / 5600 rpm. Since feedforward.kV is in V/rpm,  
     // sort we take
     // the reciprocol.
     shooterConfig.closedLoop
             .feedForward.kV(SmartDashboard.getNumber("Shooter/kV", kV)); // 5600 rpm is the free speed of a Neo at 12V, so this gives us volts per rpm.
     shooter.configure(shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+    shooterEncoder = shooter.getEncoder ();
     shooterController = shooter.getClosedLoopController();
     shooterEncoder = shooter.getEncoder();
 
@@ -123,6 +124,7 @@ public class FuelSubsystem extends SubsystemBase {
    */
   private void setShooterVelocity(double velocity) {
     shooterController.setSetpoint(velocity, ControlType.kMAXMotionVelocityControl);
+   // shooter.set(1);
     shooterTargetVelocity = velocity;
   }
 
@@ -132,6 +134,7 @@ public class FuelSubsystem extends SubsystemBase {
 
   private void intake() {
     indexer.set(Constants.FuelConstants.SHOOTER_INTAKING_VELOCITY);
+    setShooterVelocity(SHOOTER_EJECT_VELOCITY);
   }
 
   /**
