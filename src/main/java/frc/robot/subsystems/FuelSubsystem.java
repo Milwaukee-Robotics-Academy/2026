@@ -38,7 +38,12 @@ public class FuelSubsystem extends SubsystemBase {
 
   // Member variables for subsystem state management
   private double shooterTargetVelocity = 0.0;
-  private RelativeEncoder shooterEncoder;
+  private RelativeEncoder shooterEncoder = shooter.getEncoder();
+
+  private double kP = 0.0002;
+  private double kV = 12 / 5600 / 12.0; // 5600 rpm is the free speed of a Neo at 12V, so this gives us volts per rpm.
+  private double kA = 0.0; // You may need to tune this value based on how quickly you want the shooter to accelerate and decelerate.
+
   /**
    * Construct the CANFuelSubsystem.
    *
@@ -47,6 +52,10 @@ public class FuelSubsystem extends SubsystemBase {
    * motor inversion where appropriate.
    */
   public FuelSubsystem() {
+
+    SmartDashboard.putNumber("Shooter/kP", kP);
+    SmartDashboard.putNumber("Shooter/kV", kV);
+    SmartDashboard.putNumber("Shooter/kA", kA);
 
     shooter = new SparkMax(RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
     shooterConfig = new SparkMaxConfig();
@@ -59,7 +68,7 @@ public class FuelSubsystem extends SubsystemBase {
     shooterConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         // Set PID values for position control
-        .p(0.0002)
+        .p(SmartDashboard.getNumber("Shooter/kP", kP))
         .outputRange(-1, 1);
     shooterConfig.closedLoop.maxMotion
         // Set MAXMotion parameters for MAXMotion Velocity control
@@ -70,7 +79,7 @@ public class FuelSubsystem extends SubsystemBase {
     // sort we take
     // the reciprocol.
     shooterConfig.closedLoop
-            .feedForward.kV(12 / 5600 / 12.0); // 5600 rpm is the free speed of a Neo at 12V, so this gives us volts per rpm.
+            .feedForward.kV(SmartDashboard.getNumber("Shooter/kV", kV)); // 5600 rpm is the free speed of a Neo at 12V, so this gives us volts per rpm.
     shooter.configure(shooterConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     shooterController = shooter.getClosedLoopController();
@@ -96,12 +105,10 @@ public class FuelSubsystem extends SubsystemBase {
     // all commands using this subsystem pull values from the dashbaord to allow
     // you to tune the values easily, and then replace the values in Constants.java
     // with your new values. For more information, see the Software Guide.
-    SmartDashboard.putNumber("Indexer roller value", INDEXER_INTAKING_PERCENT);
-    SmartDashboard.putNumber("Shooter intaking roller value", SHOOTER_INTAKING_VELOCITY);
-    SmartDashboard.putNumber("Indexer shooting roller value", INDEXER_LAUNCHING_PERCENT);
-    SmartDashboard.putNumber("Shooter shooting roller value", SHOOTER_SHOOTING_VELOCITY);
-    // SmartDashboard.putNumber("Spin-up feeder roller value",
-    // SPIN_UP_FEEDER_VOLTAGE);
+    SmartDashboard.putNumber("Indexer/IntakingPercent", INDEXER_INTAKING_PERCENT);
+    SmartDashboard.putNumber("Shooter/IntakingVelocity", SHOOTER_INTAKING_VELOCITY);
+    SmartDashboard.putNumber("Indexer/ShootingPercent", INDEXER_LAUNCHING_PERCENT);
+    SmartDashboard.putNumber("Shooter/ShootingVelocity", SHOOTER_SHOOTING_VELOCITY);
   }
 
   /**
@@ -131,7 +138,7 @@ public class FuelSubsystem extends SubsystemBase {
   public Command runShooterCommand() {
     return this.startEnd(
         () -> this.setShooterVelocity(SHOOTER_SHOOTING_VELOCITY),
-        () -> shooter.stopMotor()).until(isShooterSpinning).andThen(
+        () -> shooter.stopMotor()).until(isShooterAtSetpoint).andThen(
             this.startEnd(
                 () -> {
                   this.setShooterVelocity(SHOOTER_SHOOTING_VELOCITY);
@@ -199,15 +206,7 @@ public class FuelSubsystem extends SubsystemBase {
   /**
    * Trigger: Is the shooter spinning at the required velocity?
    */
-  public final Trigger isShooterSpinning = new Trigger(
+  public final Trigger isShooterAtSetpoint = new Trigger(
       () -> isShooterAt(SHOOTER_SHOOTING_VELOCITY) || shooterEncoder.getVelocity() > SHOOTER_SHOOTING_VELOCITY);
-
-  public final Trigger isShooterSpinningBackwards = new Trigger(
-      () -> isShooterAt(-5000) || shooterEncoder.getVelocity() < -5000);
-
-  /**
-   * Trigger: Is the shooter stopped?
-   */
-  public final Trigger isShooterStopped = new Trigger(() -> isShooterAt(0));
 
 }
