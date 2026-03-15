@@ -49,14 +49,14 @@ public static final class FuelConstants {
 
     // Current limit for fuel mechanism motors.
     public static final int INDEXER_MOTOR_CURRENT_LIMIT = 80;
-    public static final int LAUNCHER_MOTOR_CURRENT_LIMIT = 80;
+    public static final int SHOOTER_MOTOR_CURRENT_LIMIT = 80;
 
     // All values likely need to be tuned based on your robot
     public static final double INDEXER_INTAKING_PERCENT = -0.5; //-.8 
     public static final double INDEXER_LAUNCHING_PERCENT = 0.4;//.6;
     public static final double INDEXER_SPIN_UP_PRE_LAUNCH_PERCENT = -0.5;
 
-    public static final double SHOOTER_INTAKING_VELOCITY = -3000;
+    public static final double SHOOTER_INTAKING_VELOCITY = 3000;
     public static final double SHOOTER_SHOOTING_VELOCITY = 5000;
     public static final double SHOOTER_EJECT_PERCENT = -0.8;
 
