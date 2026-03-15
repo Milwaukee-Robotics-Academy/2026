@@ -41,7 +41,7 @@ public class FuelSubsystem extends SubsystemBase {
   private RelativeEncoder shooterEncoder;
 
   private double kP = 0.0002;
-  private double kV = 0.0021; // 5600 rpm is the free speed of a Neo at 12V, so this gives us volts per rpm.
+  private double kV = 0.0021; // 
   private double kA = 0.0; // You may need to tune this value based on how quickly you want the shooter to accelerate and decelerate.
 
   /**
