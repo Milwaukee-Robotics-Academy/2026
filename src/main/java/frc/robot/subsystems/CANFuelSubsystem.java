@@ -38,8 +38,8 @@ public class CANFuelSubsystem extends SubsystemBase {
    */
   public CANFuelSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
-    leftIntakeLauncher = new SparkMax(LEFT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
-    rightIntakeLauncher = new SparkMax(RIGHT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
+    leftIntakeLauncher = new SparkMax(LEFT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
+    rightIntakeLauncher = new SparkMax(RIGHT_SHOOTER_MOTOR_ID, MotorType.kBrushless);
     indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
 
 
@@ -57,7 +57,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     // launching, and apply the config to the controller
     SparkMaxConfig launcherConfig = new SparkMaxConfig();
 
-    launcherConfig.smartCurrentLimit(LAUNCHER_MOTOR_CURRENT_LIMIT);
+    launcherConfig.smartCurrentLimit(SHOOTER_MOTOR_CURRENT_LIMIT);
     launcherConfig.voltageCompensation(12);
     launcherConfig.idleMode(IdleMode.kCoast);
     rightIntakeLauncher.configure(launcherConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
