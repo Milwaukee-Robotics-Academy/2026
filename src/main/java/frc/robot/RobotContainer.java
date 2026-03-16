@@ -10,6 +10,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,7 +23,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.FuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
-
+import java.util.Optional;
 
 import swervelib.SwerveInputStream;
 
@@ -162,10 +163,102 @@ public class RobotContainer
     m_drivebase.setMotorBrake(brake);
   }
 
-public void periodic() {
+  /**
+   * Update SmartDashboard booleans (Shift 1..n) in one place.
+   * Keeps the mapping and ranges consolidated.
+   */
+  private void updateShiftStates(double matchTime) {
+    // If matchTime < 0, treat all shifts as inactive (or choose different behavior
+    // above)
+    boolean shift1Active = isBetween(matchTime, 30, 55);
+    boolean shift2Active = isBetween(matchTime, 55, 80);
+    boolean shift3Active = isBetween(matchTime, 80, 105);
+    boolean shift4Active = isBetween(matchTime, 105, 120);
+    boolean endgameShiftActive = isBetween(matchTime, 120, 150);
+    boolean autoShiftActive = isBetween(matchTime, 0, 20);
+    boolean transitionShiftActive = isBetween(matchTime, 20, 30);
+
+    SmartDashboard.putBoolean("Clock/Hub Active?", isHubActive());
+    SmartDashboard.putBoolean("Clock/Auto Active", autoShiftActive);
+    SmartDashboard.putBoolean("Clock/Transition Active", transitionShiftActive);
+    SmartDashboard.putBoolean("Clock/Shift 1 Active", shift1Active);
+    SmartDashboard.putBoolean("Clock/Shift 2 Active", shift2Active);
+    SmartDashboard.putBoolean("Clock/Shift 3 Active", shift3Active);
+    SmartDashboard.putBoolean("Clock/Shift 4 Active", shift4Active);
+    SmartDashboard.putBoolean("Clock/Endgame Active", endgameShiftActive);
+
+  }
+
+  public void periodic() {
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(m_drivebase);
     SmartDashboard.putData(m_fuelSubsystem);
+    double matchTime = DriverStation.getMatchTime();
+    SmartDashboard.putNumber("Clock/Match Time", matchTime);
+    updateShiftStates(matchTime);
+  }
 
-}
+  private static boolean isBetween(double t, double startInclusive, double endExclusive) {
+    return t >= startInclusive && t < endExclusive;
+  }
+
+  public boolean isHubActive() {
+    Optional<Alliance> alliance = DriverStation.getAlliance();
+    // If we have no alliance, we cannot be enabled, therefore no hub.
+    if (alliance.isEmpty()) {
+      return false;
+    }
+    // Hub is always enabled in autonomous.
+    if (DriverStation.isAutonomousEnabled()) {
+      return true;
+    }
+    // At this point, if we're not teleop enabled, there is no hub.
+    if (!DriverStation.isTeleopEnabled()) {
+      return false;
+    }
+
+    // We're teleop enabled, compute.
+    double matchTime = DriverStation.getMatchTime();
+    String gameData = DriverStation.getGameSpecificMessage();
+    // If we have no game data, we cannot compute, assume hub is active, as its
+    // likely early in teleop.
+    if (gameData.isEmpty()) {
+      return true;
+    }
+    boolean redInactiveFirst = false;
+    switch (gameData.charAt(0)) {
+      case 'R' -> redInactiveFirst = true;
+      case 'B' -> redInactiveFirst = false;
+      default -> {
+        // If we have invalid game data, assume hub is active.
+        return true;
+      }
+    }
+
+    // Shift was is active for blue if red won auto, or red if blue won auto.
+    boolean shift1Active = switch (alliance.get()) {
+      case Red -> !redInactiveFirst;
+      case Blue -> redInactiveFirst;
+    };
+
+    if (matchTime > 130) {
+      // Transition shift, hub is active.
+      return true;
+    } else if (matchTime > 105) {
+      // Shift 1
+      return shift1Active;
+    } else if (matchTime > 80) {
+      // Shift 2
+      return !shift1Active;
+    } else if (matchTime > 55) {
+      // Shift 3
+      return shift1Active;
+    } else if (matchTime > 30) {
+      // Shift 4
+      return !shift1Active;
+    } else {
+      // End game, hub always active.
+      return true;
+    }
+  }
 }
