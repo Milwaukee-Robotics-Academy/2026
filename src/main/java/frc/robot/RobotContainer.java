@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.CANFuelSubsystem;
+import frc.robot.subsystems.FuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.Optional;
@@ -42,7 +42,7 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
-  private final CANFuelSubsystem m_fuelSubsystem = new CANFuelSubsystem();
+  private final FuelSubsystem m_fuelSubsystem = new FuelSubsystem();
  // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
@@ -75,7 +75,8 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-NamedCommands.registerCommand("shoot", m_fuelSubsystem.launchSequenceCommand().withTimeout(3));
+    NamedCommands.registerCommand("shoot", m_fuelSubsystem.runShooterCommand().withTimeout(3));
+
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -130,8 +131,8 @@ NamedCommands.registerCommand("shoot", m_fuelSubsystem.launchSequenceCommand().w
     
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
-    driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
-    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
+    driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
+    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
@@ -162,7 +163,6 @@ NamedCommands.registerCommand("shoot", m_fuelSubsystem.launchSequenceCommand().w
   {
     m_drivebase.setMotorBrake(brake);
   }
-
 /**
  * Update SmartDashboard booleans (Shift 1..n) in one place.
  * Keeps the mapping and ranges consolidated.
@@ -185,12 +185,13 @@ private void updateShiftStates(double matchTime) {
     SmartDashboard.putBoolean("Clock/Shift 3 Active", shift3Active);
     SmartDashboard.putBoolean("Clock/Shift 4 Active", shift4Active);
     SmartDashboard.putBoolean("Clock/Endgame Active", endgameShiftActive);
-    
+
 }
-
-
 public void periodic() {
-    double matchTime = DriverStation.getMatchTime();
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putData(m_fuelSubsystem);
+double matchTime = DriverStation.getMatchTime();
     SmartDashboard.putNumber("Clock/Match Time", matchTime);
     updateShiftStates(matchTime);
 }
