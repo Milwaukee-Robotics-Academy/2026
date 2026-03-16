@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -39,6 +40,7 @@ public class RobotContainer
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandXboxController operatorXbox = new CommandXboxController(1);
+  final PowerDistribution pdh = new PowerDistribution();
  
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
@@ -97,8 +99,20 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
-  }
 
+    // Register persistent Sendable items once (moved out of periodic)
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putData(m_fuelSubsystem);
+    SmartDashboard.putData(pdh);
+    SmartDashboard.putNumber("Clock/Match Time", 0.0);
+    SmartDashboard.putBoolean("Clock/Shift 1 Active", false);
+  }
+  Pose2d getDrivingDirection() {
+    return m_drivebase.getPose().plus(new Transform2d(driverXbox.getLeftX() * -10, driverXbox.getLeftY() * -10, m_drivebase.getPose().getRotation()));
+
+  }
+  
   Pose2d getHubPose() {
      if (DriverStation.getAlliance().get() == DriverStation.Alliance.Red) {
     // Set to red hub
@@ -208,6 +222,64 @@ public void periodic() {
 
 private static boolean isBetween(double t, double startInclusive, double endExclusive) {
     return t >= startInclusive && t < endExclusive;
+}
+public boolean isHubActive() {
+  Optional<Alliance> alliance = DriverStation.getAlliance();
+  // If we have no alliance, we cannot be enabled, therefore no hub.
+  if (alliance.isEmpty()) {
+    return false;
+  }
+  // Hub is always enabled in autonomous.
+  if (DriverStation.isAutonomousEnabled()) {
+    return true;
+  }
+  // At this point, if we're not teleop enabled, there is no hub.
+  if (!DriverStation.isTeleopEnabled()) {
+    return false;
+  }
+
+  // We're teleop enabled, compute.
+  double matchTime = DriverStation.getMatchTime();
+  String gameData = DriverStation.getGameSpecificMessage();
+  // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
+  if (gameData.isEmpty()) {
+    return true;
+  }
+  boolean redInactiveFirst = false;
+  switch (gameData.charAt(0)) {
+    case 'R' -> redInactiveFirst = true;
+    case 'B' -> redInactiveFirst = false;
+    default -> {
+      // If we have invalid game data, assume hub is active.
+      return true;
+    }
+  }
+
+  // Shift was is active for blue if red won auto, or red if blue won auto.
+  boolean shift1Active = switch (alliance.get()) {
+    case Red -> !redInactiveFirst;
+    case Blue -> redInactiveFirst;
+  };
+
+  if (matchTime > 130) {
+    // Transition shift, hub is active.
+    return true;
+  } else if (matchTime > 105) {
+    // Shift 1
+    return shift1Active;
+  } else if (matchTime > 80) {
+    // Shift 2
+    return !shift1Active;
+  } else if (matchTime > 55) {
+    // Shift 3
+    return shift1Active;
+  } else if (matchTime > 30) {
+    // Shift 4
+    return !shift1Active;
+  } else {
+    // End game, hub always active.
+    return true;
+  }
 }
 public boolean isHubActive() {
   Optional<Alliance> alliance = DriverStation.getAlliance();
