@@ -191,7 +191,7 @@ public void periodic() {
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(m_drivebase);
     SmartDashboard.putData(m_fuelSubsystem);
-double matchTime = DriverStation.getMatchTime();
+    double matchTime = DriverStation.getMatchTime();
     SmartDashboard.putNumber("Clock/Match Time", matchTime);
     updateShiftStates(matchTime);
 }
