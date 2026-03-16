@@ -9,6 +9,18 @@
           "data": {
             "pathName": "Straight back"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "go to neutral"
+          }
         }
       ]
     }
