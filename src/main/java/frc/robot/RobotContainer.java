@@ -123,10 +123,10 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(defaultDriveStream);
+    Command defaultDriveStreamCommand = m_drivebase.driveFieldOriented(defaultDriveStream);
     Command driveRotatingTowardsTravelCommand = m_drivebase.driveFieldOriented(driveRotatingTowardsTravel);
 
-    m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
+    m_drivebase.setDefaultCommand(defaultDriveStreamCommand); // Overrides drive command above!
 
     driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
     // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
@@ -147,7 +147,7 @@ public class RobotContainer
     operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
 
     driverXbox.x().toggleOnTrue(driveRotatingTowardsTravelCommand);
-    driverXbox.b().whileTrue(driveFieldOrientedAnglularVelocity);
+    driverXbox.b().whileTrue(defaultDriveStreamCommand);
 
     m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
