@@ -52,18 +52,26 @@ public class RobotContainer
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
    */
-  SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
+  SwerveInputStream driveStream = SwerveInputStream.of(m_drivebase.getSwerveDrive(),
       () -> driverXbox.getLeftY() * -1,
       () -> driverXbox.getLeftX() * -1)
       .withControllerRotationAxis(() -> driverXbox.getRightX() * -1)
       .deadband(OperatorConstants.DEADBAND)
       .scaleTranslation(Constants.SCALE_TRANSLATION)
       .allianceRelativeControl(true)
-      .scaleRotation(Constants.SCALE_ROTATION)
+      .scaleRotation(Constants.SCALE_ROTATION);
+
+  SwerveInputStream defaultDriveStream = driveStream.copy()
       .aim(this.getHubPose())
       .aimHeadingOffset(true)
       .aimHeadingOffset(Rotation2d.k180deg) // Rotate the hub pose by 180 degrees to aim at the back of the hub
       .aimWhile(driverXbox.b());
+
+    SwerveInputStream driveRotatingTowardsTravel = driveStream.copy()
+      .headingWhile(true)
+      .withControllerHeadingAxis(
+        ()-> driverXbox.getLeftX() * -1, 
+        ()-> driverXbox.getLeftY() * -1);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -114,21 +122,20 @@ public class RobotContainer
   private void configureBindings()
   {
 
-    Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(driveAngularVelocity);
+    Command driveFieldOrientedAnglularVelocity = m_drivebase.driveFieldOriented(defaultDriveStream);
+    Command driveRotatingTowardsTravelCommand = m_drivebase.driveFieldOriented(driveRotatingTowardsTravel);
 
+    m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
-      m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
-
-      driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
-      //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
-      driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
-
+    driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
+    // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+    driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
+    driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
 
     // While the left bumper on operator controller is held, intake Fuel
     driverXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
     operatorXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
-    
+
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
     driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
@@ -137,10 +144,9 @@ public class RobotContainer
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
     operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
-   // While the down arrow on the directional pad is held it will unclimb the robot
-  //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
-    // While the up arrow on the directional pad is held it will cimb the robot
-   // driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
+
+    driverXbox.x().toggleOnTrue(driveRotatingTowardsTravelCommand);
+    driverXbox.b().whileTrue(driveFieldOrientedAnglularVelocity);
 
     m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
