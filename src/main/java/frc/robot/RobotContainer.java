@@ -22,10 +22,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.CANFuelSubsystem;
+import frc.robot.subsystems.FuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.Optional;
+
 import swervelib.SwerveInputStream;
 
 /**
@@ -44,8 +45,8 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
-  private final CANFuelSubsystem m_fuelSubsystem = new CANFuelSubsystem();
- // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
+  private final FuelSubsystem m_fuelSubsystem = new FuelSubsystem();
+  final PowerDistribution pdh = new PowerDistribution();
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -73,6 +74,7 @@ public class RobotContainer
       .withControllerHeadingAxis(
         ()-> driverXbox.getLeftX() * -1, 
         ()-> driverXbox.getLeftY() * -1);
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -84,7 +86,8 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-    NamedCommands.registerCommand("shoot", m_fuelSubsystem.launchSequenceCommand().withTimeout(3).withName("Auto Shoot"));
+    NamedCommands.registerCommand("shoot", m_fuelSubsystem.runShooterCommand().withTimeout(3).withName("Auto Shoot"));
+
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -137,23 +140,21 @@ public class RobotContainer
     Command defaultDriveStreamCommand = m_drivebase.driveFieldOriented(defaultDriveStream);
     Command driveRotatingTowardsTravelCommand = m_drivebase.driveFieldOriented(driveRotatingTowardsTravel);
 
+    m_drivebase.setDefaultCommand(defaultDriveStreamCommand); // Overrides drive command above!
 
-      m_drivebase.setDefaultCommand(defaultDriveStreamCommand); // Overrides drive command above!
-
-      driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
-      //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
-      driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
-      driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
-
+    driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
+    // driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
+    driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
+    driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
 
     // While the left bumper on operator controller is held, intake Fuel
     driverXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
     operatorXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
-    
+
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
-    driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
-    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.launchSequenceCommand());
+    driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
+    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
@@ -184,6 +185,7 @@ public class RobotContainer
     m_drivebase.setMotorBrake(brake);
   }
 
+
 /**
  * Update SmartDashboard booleans (Shift 1..n) in one place.
  * Keeps the mapping and ranges consolidated.
@@ -206,11 +208,13 @@ private void updateShiftStates(double matchTime) {
     SmartDashboard.putBoolean("Clock/Shift 3 Active", shift3Active);
     SmartDashboard.putBoolean("Clock/Shift 4 Active", shift4Active);
     SmartDashboard.putBoolean("Clock/Endgame Active", endgameShiftActive);
-    
+
 }
-
-
 public void periodic() {
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putData(m_fuelSubsystem);
+    SmartDashboard.putData(pdh);
     double matchTime = DriverStation.getMatchTime();
     SmartDashboard.putNumber("Clock/Match Time", matchTime);
     updateShiftStates(matchTime);
@@ -218,6 +222,64 @@ public void periodic() {
 
 private static boolean isBetween(double t, double startInclusive, double endExclusive) {
     return t >= startInclusive && t < endExclusive;
+}
+public boolean isHubActive() {
+  Optional<Alliance> alliance = DriverStation.getAlliance();
+  // If we have no alliance, we cannot be enabled, therefore no hub.
+  if (alliance.isEmpty()) {
+    return false;
+  }
+  // Hub is always enabled in autonomous.
+  if (DriverStation.isAutonomousEnabled()) {
+    return true;
+  }
+  // At this point, if we're not teleop enabled, there is no hub.
+  if (!DriverStation.isTeleopEnabled()) {
+    return false;
+  }
+
+  // We're teleop enabled, compute.
+  double matchTime = DriverStation.getMatchTime();
+  String gameData = DriverStation.getGameSpecificMessage();
+  // If we have no game data, we cannot compute, assume hub is active, as its likely early in teleop.
+  if (gameData.isEmpty()) {
+    return true;
+  }
+  boolean redInactiveFirst = false;
+  switch (gameData.charAt(0)) {
+    case 'R' -> redInactiveFirst = true;
+    case 'B' -> redInactiveFirst = false;
+    default -> {
+      // If we have invalid game data, assume hub is active.
+      return true;
+    }
+  }
+
+  // Shift was is active for blue if red won auto, or red if blue won auto.
+  boolean shift1Active = switch (alliance.get()) {
+    case Red -> !redInactiveFirst;
+    case Blue -> redInactiveFirst;
+  };
+
+  if (matchTime > 130) {
+    // Transition shift, hub is active.
+    return true;
+  } else if (matchTime > 105) {
+    // Shift 1
+    return shift1Active;
+  } else if (matchTime > 80) {
+    // Shift 2
+    return !shift1Active;
+  } else if (matchTime > 55) {
+    // Shift 3
+    return shift1Active;
+  } else if (matchTime > 30) {
+    // Shift 4
+    return !shift1Active;
+  } else {
+    // End game, hub always active.
+    return true;
+  }
 }
 public boolean isHubActive() {
   Optional<Alliance> alliance = DriverStation.getAlliance();
