@@ -74,7 +74,7 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-
+NamedCommands.registerCommand("shoot", m_fuelSubsystem.launchSequenceCommand().withTimeout(3));
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
 
