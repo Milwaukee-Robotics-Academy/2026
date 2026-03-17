@@ -134,7 +134,7 @@ public class FuelSubsystem extends SubsystemBase {
 
   private void intake() {
     indexer.set(Constants.FuelConstants.INDEXER_INTAKING_PERCENT);
-    setShooterVelocity(SHOOTER_EJECT_VELOCITY);
+    setShooterVelocity(SHOOTER_INTAKING_VELOCITY);
   }
 
   /**
