@@ -60,6 +60,8 @@ public class Intake extends SubsystemBase{
         m_downLimitSwitch = new DigitalInput(ARM_DOWN_LIMIT_SWITCH_PORT);
         m_upLimitSwitch = new DigitalInput(ARM_UP_LIMIT_SWITCH_PORT);
 
+        m_armEncoder = m_motor_10.getAbsoluteEncoder();
+
         // set up configs for SparkFlex motor 9 (intake)
         SparkFlexConfig global_config_flex = new SparkFlexConfig();
         SparkFlexConfig motor_9_config = new SparkFlexConfig();
