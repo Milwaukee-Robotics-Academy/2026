@@ -11,8 +11,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj.DigitalInput; 
 import com.revrobotics.spark.FeedbackSensor;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.ResetMode;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.PersistMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,9 +30,16 @@ public class Intake extends SubsystemBase{
     private SparkFlex m_motor_9;  // intake motor
     private SparkMax m_motor_10;  // arm motor
 
+    private SparkAbsoluteEncoder m_armEncoder;
+
     // TODO: Set DIO port
     private static final int ARM_DOWN_LIMIT_SWITCH_PORT = 0; 
-    private static final int ARM_UP_LIMIT_SWITCH_PORT = 1;    
+    private static final int ARM_UP_LIMIT_SWITCH_PORT = 1;  
+    
+    private static final double ARM_DOWN_POSITION = 0.152;   
+    private static final double ARM_UP_POSITION = 0.65;    
+
+    private static final double ARM_POSITION_TOLERANCE = 0.02;  // Adjust based on testing
 
     private DigitalInput m_downLimitSwitch;
     private DigitalInput m_upLimitSwitch;
@@ -75,6 +84,10 @@ public class Intake extends SubsystemBase{
         motor_10_config
             .apply(global_config_max);
 
+        motor_10_config.absoluteEncoder
+            .positionConversionFactor(1.0)
+            .inverted(true); // Invert encoder to match motor direction
+
         m_motor_9.configure(motor_9_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
         m_motor_10.configure(motor_10_config,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     }
@@ -91,7 +104,40 @@ public class Intake extends SubsystemBase{
         m_motor_9.set(0);
     }
 
-    // ==================== MOVE POSITION (NO ENCODER) ====================
+    // ==================== CHECKS LIMIT POSITION ====================
+
+    public boolean isAtDownLimitSwitch() {
+        return !m_downLimitSwitch.get();   // Inverted b/c DigitalInput returns false when pressed, so return true when pressed
+    }
+    public boolean isAtUpLimitSwitch() {
+        return !m_upLimitSwitch.get();   // Inverted b/c DigitalInput returns false when pressed, so return true when pressed
+    }
+
+    // ==================== CHECKS ENCODER POSITION ====================
+    
+    public double getArmPosition() {
+        return m_armEncoder.getPosition();
+    }
+    public boolean isAtDownEncoderLimit() {
+        double position = getArmPosition();
+        return position <= (ARM_DOWN_POSITION + ARM_POSITION_TOLERANCE);
+    }
+
+    public boolean isAtUpEncoderLimit() {
+        double position = getArmPosition();
+        return position >= (ARM_UP_POSITION - ARM_POSITION_TOLERANCE);
+    }
+
+    // ==================== CHECKS LIMITS ====================
+    
+    public boolean isAtUpLimit() {
+        return isAtUpLimitSwitch() || isAtUpEncoderLimit();   // Inverted b/c false = pressed, so return true when pressed
+    }
+
+    public boolean isAtDownLimit() {
+        return isAtDownLimitSwitch() || isAtDownEncoderLimit();  // Inverted b/c false = pressed, so return true when pressed
+    }
+      // ==================== MOVES ARM ====================
 
   public void armSpeedMoveUp() {
         if (isAtUpLimit()) {
@@ -113,18 +159,7 @@ public class Intake extends SubsystemBase{
         m_motor_10.set(0);
     }
 
-    // ==================== LIMIT SWITCHES ====================
-    
-    // Check if down limit switch is pressed    
-    public boolean isAtDownLimit() {
-        return !m_downLimitSwitch.get();  // Inverted b/c false = pressed, so return true when pressed
-    }
-
-    public boolean isAtUpLimit() {
-        return !m_upLimitSwitch.get();   // Inverted b/c false = pressed, so return true when pressed
-    }
-
-    // ==================== INTAKE WHEEL COMMANDS ====================
+        // ==================== INTAKE WHEEL COMMANDS ====================
 
     public Command forwardIntakeCommand(){
         return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
@@ -135,6 +170,7 @@ public class Intake extends SubsystemBase{
     public Command stopIntakeCommand(){
         return new InstantCommand(this::stopIntake, this).withName("StopIntake");
     }
+
 
     // ==================== ARM COMMANDS (NO ENCODER) ====================
 
