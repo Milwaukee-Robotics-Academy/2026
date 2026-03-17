@@ -127,7 +127,7 @@ public class RobotContainer
 
       m_drivebase.setDefaultCommand(defaultDriveStreamCommand); // Overrides drive command above!
 
-      driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
+      //driverXbox.x().whileTrue(Commands.runOnce(m_drivebase::lock, m_drivebase).repeatedly());
       //driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
       driverXbox.start().onTrue((Commands.runOnce(m_drivebase::zeroGyroWithAlliance)));
       driverXbox.back().whileTrue(m_drivebase.centerModulesCommand());
