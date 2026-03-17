@@ -145,11 +145,9 @@ public class RobotContainer
     // the intake
     driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
     operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
-   // While the down arrow on the directional pad is held it will unclimb the robot
-  //  driverXbox.povDown().whileTrue(new ClimbDown(m_climberSubsystem));
-    // While the up arrow on the directional pad is held it will cimb the robot
-   // driverXbox.povUp().whileTrue(new ClimbUp(m_climberSubsystem));
 
+    driverXbox.x().toggleOnTrue(driveRotatingTowardsTravelCommand);
+    driverXbox.b().whileTrue(defaultDriveStreamCommand);
     m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
  //   m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
