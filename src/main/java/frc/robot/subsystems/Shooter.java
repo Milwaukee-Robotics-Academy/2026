@@ -25,36 +25,30 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class Shooter extends SubsystemBase {
-  private SparkMax feeder;
-  private SparkMax bottomShooter;
-  private SparkMax topShooter;
-  private SparkMax agitator;
+
+  private SparkMax shooter;
+  private SparkMax disturbAgitator;
+  private SparkMax spinAgitator;
+  private SparkMax loader;
   /** Creates a new EndEffector. */
   public Shooter() {
-    feeder =  new SparkMax(15, MotorType.kBrushless);
-    agitator = new SparkMax(11, MotorType.kBrushless);
-    bottomShooter =  new SparkMax(13, MotorType.kBrushless);
-    topShooter =  new SparkMax(14, MotorType.kBrushless);
+
+    spinAgitator = new SparkMax(12, MotorType.kBrushless);
+    shooter =  new SparkMax(14, MotorType.kBrushless);
+    disturbAgitator =  new SparkMax(13, MotorType.kBrushless);
+    loader = new SparkMax(15, MotorType.kBrushless);
     SparkMaxConfig global_config = new SparkMaxConfig();
-    SparkMaxConfig feederConfig = new SparkMaxConfig();
-    SparkMaxConfig bottomShooterConfig = new SparkMaxConfig();
-    SparkMaxConfig topShooterConfig = new SparkMaxConfig();
+
+    SparkMaxConfig shooterConfig = new SparkMaxConfig();
     global_config
       .smartCurrentLimit(50)
       .idleMode(IdleMode.kBrake);
-    feederConfig
-      .apply(global_config)      
-      .inverted(true);
-    bottomShooterConfig
+    shooterConfig
       .apply(global_config)
       .inverted(false);
-    topShooterConfig
-      .apply(global_config)
-      .inverted(true);
 
-    feeder.configure(feederConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-    bottomShooter.configure(bottomShooterConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
-    topShooter.configure(topShooterConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+   
+    shooter.configure(shooterConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
     /**
     SmartDashboard.putNumber("Intake sensor", intakeSensor.getRange());
     SmartDashboard.putNumber("Acquired sensor", acquiredSensor.getRange());
@@ -65,32 +59,34 @@ public class Shooter extends SubsystemBase {
     */
   }
 private void loadUp(){
-  feeder.set(0.7);
-  agitator.set(.1);
+
+  spinAgitator.set(0.1);
+  disturbAgitator.set(-0.1);
+  loader.set(0.25);
 }
 private void stop(){
-  feeder.set(0);
-  bottomShooter.set(0);
-  topShooter.set(0);
-  agitator.set(0);
+
+  shooter.set(0);
+  disturbAgitator.set(0);
+  spinAgitator.set(0);
+  loader.set(0);
 }
 
 private void oppositeAgitate(){
-  agitator.set(-0.1);
+  spinAgitator.set(0.1);
+  disturbAgitator.set(-0.1);
 }
 private void shoot(){
-  bottomShooter.set(0.58);
-  topShooter.set(0.18);
+  shooter.set(-0.8);
 }
 private void hyperShot(){
-  bottomShooter.set(1);
-  topShooter.set(0.5);
+  shooter.set(-1);
 }
 
 private void spitBack(){
-  feeder.set(-0.25);
-  bottomShooter.set(-0.25);
-  topShooter.set(-0.25);
+
+  shooter.set(0.25);
+  loader.set(0.1);
 }
 public Command loadUpCommand(){
   return new RunCommand(this::loadUp, this).withName("loadUp");
