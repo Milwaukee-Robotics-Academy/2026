@@ -103,7 +103,7 @@ public class Intake extends SubsystemBase {
 
 
   private void intake(){
-    m_intakeMotor.set(0.7);
+    m_intakeMotor.set(0.85);
   }
 
   private void stopIntake(){
@@ -113,7 +113,7 @@ public class Intake extends SubsystemBase {
   }
 
   private void outtake(){
-    m_intakeMotor.set(-0.5);
+    m_intakeMotor.set(-0.6);
   }
 
   private void raiseArm(){
@@ -133,6 +133,10 @@ public class Intake extends SubsystemBase {
   private void armDown(){
     m_rightArmEncoder.setPosition(2);
     m_leftArmEncoder.setPosition(2);
+  }
+  private void armUp(){
+    m_rightArmEncoder.setPosition(1);
+    m_leftArmEncoder.setPosition(1);
   }
 
   public Command intakeCommand(){
