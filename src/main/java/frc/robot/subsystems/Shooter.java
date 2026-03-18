@@ -150,7 +150,7 @@ public class Shooter extends SubsystemBase {
 
     // ==================== COMBINED SEQUENCES ====================
 
-     private void feedIfReady() {
+    private void feedIfReady() {
         if (isShooterReady()) {
             forwardFeeder();
         } else {
