@@ -149,6 +149,9 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("closeShoot", m_shooter.spinUpCloseCommand());
+    NamedCommands.registerCommand("farShoot", m_shooter.spinUpFarCommand());
+    NamedCommands.registerCommand("feedMe", m_feeder.forwardCommand());
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -255,8 +258,8 @@ public class RobotContainer
       operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
 
       //arm with limit switches
-      operatorXbox.rightTrigger().whileTrue(m_intake.armSpeedDownCommand());   // right trigger to move arm down
-      operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedUpCommand());      // left trigger to move arm up
+      operatorXbox.rightTrigger().whileTrue(m_intake.armSpeedUpCommand());   // right trigger to move arm UP
+      operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedDownCommand());   // left trigger to move arm DOWN
 
       //shooter
       operatorXbox.rightBumper().whileTrue(m_shooter.spinUpFarCommand());     // right bumper to shoot FAR

@@ -1,0 +1,25 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "{Right] Trench to mid neutral field w turn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Middle of Fuel to [Right] Trench"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

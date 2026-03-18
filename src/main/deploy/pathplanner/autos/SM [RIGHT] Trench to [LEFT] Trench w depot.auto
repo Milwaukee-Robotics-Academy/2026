@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "middle to [right] trench"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "[Right] Trench through Neutral Zone Fuel"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "[Right] End of Neutral Zone Fuel to [Left] Trench"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "[Left] shoot test"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

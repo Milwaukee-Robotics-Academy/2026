@@ -1,0 +1,25 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "[Right] Trench through Neutral Zone Fuel"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "[Right] End of Neutral Zone Fuel to [Left] Trench"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

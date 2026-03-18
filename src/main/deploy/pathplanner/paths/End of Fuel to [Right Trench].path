@@ -1,0 +1,59 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.291855421686748,
+        "y": 1.5434819277108445
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.133746987951807,
+        "y": 0.49442168674698816
+      },
+      "isLocked": false,
+      "linkedName": "right side of neutral fuel FACE RIGHT mid"
+    },
+    {
+      "anchor": {
+        "x": 2.0412048192771084,
+        "y": 0.6036987951807224
+      },
+      "prevControl": {
+        "x": 5.734771084337356,
+        "y": 0.5381325301204822
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "About to Shoot from Right"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.2580912863070506,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -90.0
+  },
+  "useDefaultConstraints": true
+}

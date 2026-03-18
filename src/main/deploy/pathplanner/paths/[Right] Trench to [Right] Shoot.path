@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.724072289149965,
+        "y": 0.6583373493921147
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.259759036137916,
+        "y": 1.4123493975848875
+      },
+      "isLocked": false,
+      "linkedName": "start right trench"
+    },
+    {
+      "anchor": {
+        "x": 1.1451325301204816,
+        "y": 2.1007951807228915
+      },
+      "prevControl": {
+        "x": 2.434602409638554,
+        "y": 1.4560602409638557
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "jenny right shoot"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 30.350095894187042
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 4.3495825323501743e-10
+  },
+  "useDefaultConstraints": true
+}

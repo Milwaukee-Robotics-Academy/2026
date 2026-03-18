@@ -1,0 +1,59 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.724072289149965,
+        "y": 0.6583373493921147
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.701759036144578,
+        "y": 0.691120481927711
+      },
+      "isLocked": false,
+      "linkedName": "start right trench"
+    },
+    {
+      "anchor": {
+        "x": 8.280927710843374,
+        "y": 4.024072289156626
+      },
+      "prevControl": {
+        "x": 10.160493975903616,
+        "y": 1.8603855421686752
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "middle of fuel from thr [RIGHT]"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9734439834024882,
+      "rotationDegrees": 88.5149626556065
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.5,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -178.2376089763396
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 4.3495825323501743e-10
+  },
+  "useDefaultConstraints": true
+}
