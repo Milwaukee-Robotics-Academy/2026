@@ -345,7 +345,7 @@ public class Vision
                                Units.inchesToMeters(12),
                                Units.inchesToMeters(18.5)),
                                //x y and zheight from the middle robot center, x is forward, y is left, z is up
-             VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1)),
+             VecBuilder.fill(8, 8, 12), VecBuilder.fill(5, 5, 10)),
     /**
      * Right Camera
      */
@@ -355,7 +355,7 @@ public class Vision
               new Translation3d(Units.inchesToMeters(-14.5),
                                 Units.inchesToMeters(-12),
                                 Units.inchesToMeters(18.5)),
-              VecBuilder.fill(4, 4, 8), VecBuilder.fill(0.5, 0.5, 1));
+              VecBuilder.fill(8, 8, 12), VecBuilder.fill(5, 5, 10));
   
     // Latency alert to use when high latency is detected.
   
