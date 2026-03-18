@@ -36,7 +36,7 @@ public class Intake extends SubsystemBase{
     private static final int ARM_DOWN_LIMIT_SWITCH_PORT = 0; 
     private static final int ARM_UP_LIMIT_SWITCH_PORT = 1;  
     
-    private static final double ARM_DOWN_POSITION = 0.152;   
+    private static final double ARM_DOWN_POSITION = 0.162;   
     private static final double ARM_UP_POSITION = 0.65;    
 
     private static final double ARM_POSITION_TOLERANCE = 0.02;  // Adjust based on testing

@@ -6,6 +6,7 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Feeder;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.swervedrive.Vision;
 
@@ -47,6 +48,7 @@ public class RobotContainer
                                                                                 "swerve/maxSwerve"));
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
+  private final Feeder m_feeder = new Feeder();
   //private final Vision m_vision;
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
@@ -66,7 +68,7 @@ public class RobotContainer
           .allianceRelativeControl(true)
           .aim(this.getHubPose())
           //.aimHeadingOffset(true)                         // TODO: Check with Erik if we need the newer verison of YAGSL
-          //.aimHeadingOffset(Rotation2d.k180deg)           // TODO: Determine if needed Erik's comment: Rotate the hub pose by 180 degrees to aim at the back of the hub
+          //.aimHeadingOffset(Rotation2d.k180deg)           
           .aimWhile(driverXbox.b());
 
   /**
@@ -183,7 +185,8 @@ public class RobotContainer
 
    // set default commands
     m_drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity);
-    m_shooter.setDefaultCommand(m_shooter.stopAllCommand());
+    m_shooter.setDefaultCommand(m_shooter.stopCommand());
+    m_feeder.setDefaultCommand(m_feeder.stopCommand());
     m_intake.setDefaultCommand(m_intake.stopAllCommand());
 
     if (RobotBase.isSimulation()) {
@@ -260,9 +263,14 @@ public class RobotContainer
       operatorXbox.leftBumper().whileTrue(m_shooter.spinUpCloseCommand());    // left bumper to shoot CLOSE
     
       //feeder
-      operatorXbox.x().whileTrue(m_shooter.feedIfReadyCommand());             // x to run feeder forward
+       operatorXbox.x().whileTrue(
+            Commands.either(
+                m_feeder.forwardCommand(),      // command if true
+                Commands.none(),                // command if false
+                m_shooter::isShooterReady       // condition to check
+            )
+        );
     }
-
   }
 
   /**

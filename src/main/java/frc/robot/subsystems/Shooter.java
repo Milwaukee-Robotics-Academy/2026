@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Shooter extends SubsystemBase {
     
-    private SparkMax m_motor_11; // feeder motor
     private SparkMax m_motor_12; // shooter motor 1 (leader)
     private SparkMax m_motor_13; // shooter motor 2 (follower)
 
@@ -37,29 +36,19 @@ public class Shooter extends SubsystemBase {
     //private static final double SHOOTER_SPEED_FORWARD = -0.75;        // negative = forward
     //private static final double SHOOTER_SPEED_REVERSE = 0.5;          // positive = reverse
 
-    private static final double FEEDER_SPEED_FORWARD = -0.5;            // negative = forward
-    private static final double FEEDER_SPEED_REVERSE = 0.5;             // positive = reverse
-
     private boolean m_isFarMode = true;                                 // Default to far shooting
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
 
     public Shooter() {
 
-        // initialize motor 11, 12, and 13 as a SparkMax motor
-        m_motor_11 = new SparkMax(11, MotorType.kBrushless); // feeder motor
+        // initialize motors
         m_motor_12 = new SparkMax(12, MotorType.kBrushless); // shooter motor 1 (leader)
         m_motor_13 = new SparkMax(13, MotorType.kBrushless); // shooter motor 2 (follower)
 
         // get encoder for leader shooter motor (motor 12)
         m_encoder_12 = m_motor_12.getEncoder();
         m_PID_12 = m_motor_12.getClosedLoopController();
-
-        // FEEDER MOTOR CONFIG (motor 11)
-        SparkMaxConfig motor_11_config = new SparkMaxConfig();
-        motor_11_config
-            .smartCurrentLimit(40)
-            .idleMode(IdleMode.kBrake);
         
         // LEADER MOTOR CONFIG (motor 12)
         SparkMaxConfig motor_12_config = new SparkMaxConfig();
@@ -71,8 +60,6 @@ public class Shooter extends SubsystemBase {
             .positionConversionFactor(1.0)      // 1 rotation = 1.0 units
             .velocityConversionFactor(1.0);     // 1 RPM = 1.0 units
         
-        
-        // Documentation for closed loop config: https://docs.revrobotics.com/revlib/spark/closed-loop/feed-forward-control
         // Configure for FAR shooting (slot 0)
         motor_12_config.closedLoop
             .pid(0.0002, 0.0, 0.0, m_PID_far)       // PID for far shooting, start with small P and tune later
@@ -92,7 +79,6 @@ public class Shooter extends SubsystemBase {
             .idleMode(IdleMode.kBrake);
         motor_13_config.follow(12, true);     // false = same direction, true = opposite direction if motors are mirrored
 
-        m_motor_11.configure(motor_11_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_12.configure(motor_12_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         m_motor_13.configure(motor_13_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
@@ -122,18 +108,7 @@ public class Shooter extends SubsystemBase {
         }   
     }
 
-    // ==================== SET FEEDER + MOTOR SPEEDS ====================
-
-    // Set feeder motor speeds
-    private void forwardFeeder() {
-        m_motor_11.set(FEEDER_SPEED_FORWARD);
-    }
-    private void reverseFeeder() {
-        m_motor_11.set(FEEDER_SPEED_REVERSE);
-    }
-    private void stopFeeder() {
-        m_motor_11.set(0);
-    }
+    // ==================== SET MOTOR SPEEDS ====================
 
     // Set shooter speed using closed-loop control to reach target RPM
     private void spinUpFarShooter() {
@@ -148,42 +123,7 @@ public class Shooter extends SubsystemBase {
         m_motor_12.set(0);
     }
 
-    // ==================== COMBINED SEQUENCES ====================
-
-    private void feedIfReady() {
-        if (isShooterReady()) {
-            forwardFeeder();
-        } else {
-            stopFeeder();
-        }
-    }
-
-    // Spin up shooter and run feeder only when shooter is at speed
-    private void shootFarSequence() {
-        spinUpFarShooter();
-        if (isFarShooterReady()) {
-            forwardFeeder();
-        } else {
-            stopFeeder();
-        }
-    }
-
-    private void shootCloseSequence() {
-        spinUpCloseShooter();
-        if (isCloseShooterReady()) {
-            forwardFeeder();
-        } else {
-            stopFeeder();
-        }
-    }
-
-    // Turn off shooter and feeder
-    private void stopAll() {
-        stopShooter();
-        stopFeeder();
-    }
-
-    // ==================== FEEDER & MOTOR COMMANDS ====================
+    // ==================== SHOOTER COMMANDS ====================
 
     public Command spinUpCloseCommand() {
         return new RunCommand(this::spinUpCloseShooter, this).withName("SpinUpCloseShooter");
@@ -193,26 +133,8 @@ public class Shooter extends SubsystemBase {
         return new RunCommand(this::spinUpFarShooter, this).withName("SpinUpFarShooter");
     }
 
-    public Command feedIfReadyCommand() {
-        return new RunCommand(this::feedIfReady, this).withName("FeedIfReady");
-    }
-
-     public Command forwardFeederCommand() {
-        return new RunCommand(this::forwardFeeder, this).withName("ForwardFeeder");
-    }
-
-    // ===================== COMBINED SEQUENCE COMMANDS ====================
-
-    public Command shootCloseSequenceCommand() {
-        return new RunCommand(this::shootCloseSequence, this).withName("ShootCloseSequence");
-    }
-
-    public Command shootFarSequenceCommand() {
-        return new RunCommand(this::shootFarSequence, this).withName("ShootFarSequence");
-    }
-
-    public Command stopAllCommand() {
-        return new RunCommand(this::stopAll, this).withName("StopAll");
+    public Command stopCommand() {
+        return new RunCommand(this::stopShooter, this).withName("StopShooter");
     }
 
     @Override
