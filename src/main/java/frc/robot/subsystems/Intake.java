@@ -36,8 +36,8 @@ public class Intake extends SubsystemBase{
     private static final int ARM_DOWN_LIMIT_SWITCH_PORT = 0; 
     private static final int ARM_UP_LIMIT_SWITCH_PORT = 1;  
     
-    private static final double ARM_DOWN_POSITION = 0.162;   
-    private static final double ARM_UP_POSITION = 0.65;    
+    private static final double ARM_DOWN_POSITION = 0.822;   
+    private static final double ARM_UP_POSITION = 0.359;    
 
     private static final double ARM_POSITION_TOLERANCE = 0.02;  // Adjust based on testing
 
@@ -133,11 +133,13 @@ public class Intake extends SubsystemBase{
     // ==================== CHECKS LIMITS ====================
     
     public boolean isAtUpLimit() {
-        return isAtUpLimitSwitch() || isAtUpEncoderLimit();   // Inverted b/c false = pressed, so return true when pressed
+        //return isAtUpLimitSwitch() || isAtUpEncoderLimit();   // Inverted b/c false = pressed, so return true when pressed
+        return isAtUpEncoderLimit();
     }
 
     public boolean isAtDownLimit() {
-        return isAtDownLimitSwitch() || isAtDownEncoderLimit();  // Inverted b/c false = pressed, so return true when pressed
+        //return isAtDownLimitSwitch() || isAtDownEncoderLimit();  // Inverted b/c false = pressed, so return true when pressed
+        return isAtDownEncoderLimit();
     }
       // ==================== MOVES ARM ====================
 
