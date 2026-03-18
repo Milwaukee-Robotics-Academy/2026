@@ -1,0 +1,63 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Prep"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "shootCommand"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Left Annoy"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "lowerArmCommand"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Left VROOM"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "intakeCommand"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
