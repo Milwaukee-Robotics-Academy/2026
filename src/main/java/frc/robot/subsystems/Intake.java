@@ -52,9 +52,7 @@ public class Intake extends SubsystemBase {
     SparkMaxConfig intakeMotorConfig = new SparkMaxConfig();
     global_config
       .smartCurrentLimit(0)
-      .idleMode(IdleMode.kBrake);
-    rightArmMotorConfig
-      .apply(global_config);    
+      .idleMode(IdleMode.kBrake);  
     rightArmMotorConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
         // Set PID values for position control. We don't need to pass a closed loop
@@ -71,7 +69,11 @@ public class Intake extends SubsystemBase {
         .positionWrappingEnabled(true);
     leftArmMotorConfig
       .apply(global_config)
-      .inverted(true);
+      .inverted(true)
+      .idleMode(IdleMode.kBrake);
+      rightArmMotorConfig
+      .apply(global_config)
+      .idleMode(IdleMode.kBrake);
     intakeMotorConfig
       .apply(global_config)
       .inverted(true);
@@ -158,6 +160,9 @@ public class Intake extends SubsystemBase {
     
   public Command stop2Command(){
     return new InstantCommand(this::stopArm, this).withName("StopArm");
+  }
+  public Command upSetCommand(){
+    return new InstantCommand(this::armUp, this).withName("armUp");
   }
 
   @Override
