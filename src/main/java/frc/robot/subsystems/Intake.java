@@ -109,10 +109,10 @@ public class Intake extends SubsystemBase{
     // ==================== CHECKS LIMIT POSITION ====================
 
     public boolean isAtDownLimitSwitch() {
-        return !m_downLimitSwitch.get();   // Inverted b/c DigitalInput returns false when pressed, so return true when pressed
+        return m_downLimitSwitch.get();   // return true when pressed, false when not pressed (assuming normally open switch)
     }
     public boolean isAtUpLimitSwitch() {
-        return !m_upLimitSwitch.get();   // Inverted b/c DigitalInput returns false when pressed, so return true when pressed
+        return m_upLimitSwitch.get();     // return true when pressed, false when not pressed (assuming normally open switch)
     }
 
     // ==================== CHECKS ENCODER POSITION ====================
