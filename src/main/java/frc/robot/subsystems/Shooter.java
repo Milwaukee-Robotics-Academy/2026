@@ -30,7 +30,7 @@ public class Shooter extends SubsystemBase {
     private static final double FAR_TARGET_SHOOTER_RPM = 4000.0;        // Adjust this!
     private static final double FAR_SPEED_TOLERANCE_RPM = 150.0;        // Within 150 RPM = ready
 
-    private static final double CLOSE_TARGET_SHOOTER_RPM = 2000.0;      // Adjust this!
+    private static final double CLOSE_TARGET_SHOOTER_RPM = 3000.0;      // Adjust this!
     private static final double CLOSE_SPEED_TOLERANCE_RPM = 150.0;      // Within 150 RPM = ready 
 
     //private static final double SHOOTER_SPEED_FORWARD = -0.75;        // negative = forward
@@ -70,7 +70,7 @@ public class Shooter extends SubsystemBase {
         motor_12_config.closedLoop
             .pid(0.0002, 0.0, 0.0, m_PID_close)     // PID for close shooting, can be same as far or tuned separately
             .outputRange(-1.0, 1.0)             // Full power range
-            .feedForward.kV(0.0002, m_PID_close);      // CLOSE SHooting: kV = 1 / max RPM (1 represents full power)
+            .feedForward.kV(0.0022, m_PID_close);      // CLOSE SHooting: kV = 1 / max RPM (1 represents full power)
 
         // FOLLOWER MOTOR CONFIG (motor 13)
         SparkMaxConfig motor_13_config = new SparkMaxConfig();
