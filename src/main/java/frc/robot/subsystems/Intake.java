@@ -9,7 +9,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.DigitalInput; 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 //import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
@@ -39,7 +41,7 @@ public class Intake extends SubsystemBase{
     private static final double ARM_DOWN_POSITION = 0.822;   
     private static final double ARM_UP_POSITION = 0.359;    
 
-    private static final double ARM_POSITION_TOLERANCE = 0.02;  // Adjust based on testing
+    private static final double ARM_POSITION_TOLERANCE = 0.0;  // Adjust based on testing
 
     private DigitalInput m_downLimitSwitch;
     private DigitalInput m_upLimitSwitch;
@@ -109,10 +111,10 @@ public class Intake extends SubsystemBase{
     // ==================== CHECKS LIMIT POSITION ====================
 
     public boolean isAtDownLimitSwitch() {
-        return m_downLimitSwitch.get();   // return true when pressed, false when not pressed (assuming normally open switch)
+        return !m_downLimitSwitch.get();   // return true when pressed
     }
     public boolean isAtUpLimitSwitch() {
-        return m_upLimitSwitch.get();     // return true when pressed, false when not pressed (assuming normally open switch)
+        return !m_upLimitSwitch.get();     // return true when pressed
     }
 
     // ==================== CHECKS ENCODER POSITION ====================
@@ -122,24 +124,24 @@ public class Intake extends SubsystemBase{
     }
     public boolean isAtDownEncoderLimit() {
         double position = getArmPosition();
-        return position <= (ARM_DOWN_POSITION + ARM_POSITION_TOLERANCE);
+        return position >= (ARM_DOWN_POSITION + ARM_POSITION_TOLERANCE);
     }
 
     public boolean isAtUpEncoderLimit() {
         double position = getArmPosition();
-        return position >= (ARM_UP_POSITION - ARM_POSITION_TOLERANCE);
+        return position <= (ARM_UP_POSITION - ARM_POSITION_TOLERANCE);
     }
 
     // ==================== CHECKS LIMITS ====================
     
     public boolean isAtUpLimit() {
-        //return isAtUpLimitSwitch() || isAtUpEncoderLimit();   // Inverted b/c false = pressed, so return true when pressed
-        return isAtUpEncoderLimit();
+        return isAtUpLimitSwitch() || isAtUpEncoderLimit();  
+        //return isAtUpLimitSwitch();
     }
 
     public boolean isAtDownLimit() {
-        //return isAtDownLimitSwitch() || isAtDownEncoderLimit();  // Inverted b/c false = pressed, so return true when pressed
-        return isAtDownEncoderLimit();
+        return isAtDownLimitSwitch() || isAtDownEncoderLimit();  
+        //return isAtDownLimitSwitch();
     }
       // ==================== MOVES ARM ====================
 
@@ -203,6 +205,16 @@ public class Intake extends SubsystemBase{
     public void periodic() {
         // This method will be called once per scheduler run
         // You can use this to update SmartDashboard values or perform other periodic tasks
+        SmartDashboard.putNumber("Encoder", m_armEncoder.getPosition());
+
+        SmartDashboard.putBoolean("Down Switch", isAtDownLimitSwitch());
+        SmartDashboard.putBoolean("Up Switch", isAtUpLimitSwitch());
+
+        SmartDashboard.putBoolean("Down Encoder", isAtDownEncoderLimit());
+        SmartDashboard.putBoolean("Up Encoder", isAtUpEncoderLimit());
+
+        SmartDashboard.putBoolean("At Down Limit", isAtDownLimit());
+        SmartDashboard.putBoolean("At Up Limit", isAtUpLimit());
 
     }
 }
