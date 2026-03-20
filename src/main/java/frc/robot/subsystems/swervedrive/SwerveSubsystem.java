@@ -67,7 +67,7 @@ public class SwerveSubsystem extends SubsystemBase
   /**
    * Enable vision odometry updates while driving.
    */
-  private final boolean     visionDriveTest = false;
+  private final boolean     visionDriveTest = true;
  
   /**
    * PhotonVision class to keep an accurate odometry.
@@ -89,13 +89,16 @@ public class SwerveSubsystem extends SubsystemBase
    */
    public SwerveSubsystem(File directory)
   { 
-    boolean blueAlliance = false;
-    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
-                                                                      Meter.of(4)),
-                                                    Rotation2d.fromDegrees(0))
-                                       : new Pose2d(new Translation2d(Meter.of(16),
-                                                                      Meter.of(4)),
-                                                    Rotation2d.fromDegrees(180));
+    boolean blueAlliance = DriverStation.getAlliance().isPresent()
+        ? DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+        : false;
+//TODO: Update starting pose based on your robot's actual starting position. The origin (0, 0) is the center of the field on the blue alliance side, so adjust accordingly if your robot starts in a different location. Also, make sure to set the correct heading (rotation) for your robot at the start.
+    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(3.7),
+        Meter.of(4)),
+        Rotation2d.fromDegrees(0))
+        : new Pose2d(new Translation2d(Meter.of(12.7),
+            Meter.of(4)),
+            Rotation2d.fromDegrees(180));
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try
