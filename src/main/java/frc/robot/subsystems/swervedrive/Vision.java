@@ -52,7 +52,7 @@ public class Vision
    * April Tag Field Layout of the year.
    */
   public static final AprilTagFieldLayout fieldLayout                     = AprilTagFieldLayout.loadField(
-      AprilTagFields.k2025ReefscapeAndyMark);
+      AprilTagFields.k2026RebuiltAndymark);
   /**
    * Ambiguity defined as a value between (0,1). Used in {@link Vision#filterPose}.
    */
@@ -334,6 +334,7 @@ public class Vision
    */
   enum Cameras
   {
+//TODO: Update camera NAME, positions and rotations based on your robot's actual configuration. The current values are placeholders and may not reflect the actual setup of your robot. Make sure to measure the position of each camera relative to the center of the robot and update the translation and rotation values accordingly. Also, adjust the standard deviations for pose estimation based on the expected accuracy of your cameras and the noise in their measurements.    
     /**
      * Left Camera
      */
