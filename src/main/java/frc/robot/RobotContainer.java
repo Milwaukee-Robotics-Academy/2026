@@ -50,7 +50,6 @@ public class RobotContainer
   private final Intake m_intake = new Intake();
   private final Shooter m_shooter = new Shooter();
   private final Feeder m_feeder = new Feeder();
-  //private final Vision m_vision;
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -141,9 +140,7 @@ public class RobotContainer
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer()
-  {
-    //m_vision = new Vision(m_drivebase.getSwerveDrive());
-    
+  { 
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -153,6 +150,17 @@ public class RobotContainer
     NamedCommands.registerCommand("closeShoot", m_shooter.spinUpCloseCommand());
     NamedCommands.registerCommand("farShoot", m_shooter.spinUpFarCommand());
     NamedCommands.registerCommand("feedMe", m_feeder.forwardCommand());
+
+    NamedCommands.registerCommand("spinAndShoot",
+      m_shooter.spinUpFarCommand()
+        .alongWith(
+          Commands.waitUntil(m_shooter::isFarShooterReady)
+            .andThen(m_feeder.forwardCommand())
+            .withTimeout(10.0)
+        )
+        .withTimeout(3.0)
+        .asProxy()
+    );
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();

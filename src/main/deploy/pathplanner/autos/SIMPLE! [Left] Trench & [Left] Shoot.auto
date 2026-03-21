@@ -19,19 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "farShoot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "feedMe"
+            "name": "spinAndShoot"
           }
         }
       ]
