@@ -152,13 +152,13 @@ public class RobotContainer
     NamedCommands.registerCommand("feedMe", m_feeder.forwardCommand());
 
     NamedCommands.registerCommand("spinAndShoot",
-      m_shooter.spinUpFarCommand()
+      m_shooter.spinUpFarCommand().repeatedly()
         .alongWith(
           Commands.waitUntil(m_shooter::isFarShooterReady)
             .andThen(m_feeder.forwardCommand())
-            .withTimeout(10.0)
+            .withTimeout(2.0)
         )
-        .withTimeout(3.0)
+        .withTimeout(5)
         .asProxy()
     );
 
