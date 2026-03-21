@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -266,13 +267,6 @@ public class RobotContainer
       operatorXbox.leftBumper().whileTrue(m_shooter.spinUpCloseCommand());    // left bumper to shoot CLOSE
     
       //feeder
-      //  operatorXbox.x().whileTrue(
-      //       Commands.either(
-      //           m_feeder.forwardCommand(),      // command if true
-      //           Commands.none(),                // command if false
-      //           m_shooter::isShooterReady       // condition to check
-      //       )
-      //   );
         operatorXbox.x().whileTrue(
           Commands.waitUntil(m_shooter::isShooterReady)   // adds wait until shooter is ready
             .andThen(m_feeder.forwardCommand())
@@ -285,12 +279,19 @@ public class RobotContainer
    *
    * @return the command to run in autonomous
    */
-  private Command getAutonomousCommand() {
+  public Command getAutonomousCommand() {
     // Pass in the selected auto from the SmartDashboard as our desired autnomous commmand 
     return autoChooser.getSelected();
   }
 
-  private void setMotorBrake(boolean brake) {
+  public void setMotorBrake(boolean brake) {
     m_drivebase.setMotorBrake(brake);
+  }
+  public void periodic() {
+    SmartDashboard.putData(CommandScheduler.getInstance());
+    SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putData(m_intake);
+    SmartDashboard.putData(m_shooter);
+    SmartDashboard.putData(m_feeder);
   }
 }
