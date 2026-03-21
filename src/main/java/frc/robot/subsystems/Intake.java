@@ -46,7 +46,7 @@ public class Intake extends SubsystemBase{
     private DigitalInput m_downLimitSwitch;
     private DigitalInput m_upLimitSwitch;
 
-    private static final double INTAKE_SPEED_FORWARD = 0.3; 
+    private static final double INTAKE_SPEED_FORWARD = 0.4; 
     private static final double INTAKE_SPEED_REVERSE = -0.7; 
 
     private static final double ARM_SPEED_MOVE_UP = -0.3;   //up = negative (arm is inverted)
