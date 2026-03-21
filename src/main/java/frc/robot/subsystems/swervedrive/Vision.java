@@ -338,7 +338,7 @@ public class Vision
     /**
      * Left Camera
      */
-    LEFT_CAM("left",
+    LEFT_CAM("Arducam_OV9782_USB_Camera",
              new Rotation3d(0, 0, Math.toRadians(90)),
              //roll pitch and yaw
              new Translation3d(Units.inchesToMeters(-14.5),
@@ -350,7 +350,7 @@ public class Vision
      * Right Camera
      */
     
-    RIGHT_CAM("right",
+    RIGHT_CAM("Arducam_OV9281_USB_Camera",
               new Rotation3d(0, 0, Math.toRadians(-90)),
               new Translation3d(Units.inchesToMeters(-14.5),
                                 Units.inchesToMeters(-12),
