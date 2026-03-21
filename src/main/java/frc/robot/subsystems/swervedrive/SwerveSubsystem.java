@@ -80,9 +80,9 @@ public class SwerveSubsystem extends SubsystemBase
         ? DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
         : false;
   //TODO: Update starting pose based on your starting position. The origin (0, 0) is the center of the field at the intersection of the alliance lines and the center line. +X is towards the opponent's side, +Y is towards the left wall (from the perspective of the blue alliance), and 0 degrees is facing towards the opponent's side.
-    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(3.7),
-        Meter.of(4)),
-        Rotation2d.fromDegrees(180))
+    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(3.7), // x-value distance (meters)
+        Meter.of(4)),                                                // y-value distance (meters)
+        Rotation2d.fromDegrees(180))                        // Rotation (0=faceing opponent's side, CCW positive)
         : new Pose2d(new Translation2d(Meter.of(12.7),
             Meter.of(4)),
             Rotation2d.fromDegrees(0));
