@@ -76,13 +76,16 @@ public class SwerveSubsystem extends SubsystemBase
    */
    public SwerveSubsystem(File directory)
   { 
-    boolean blueAlliance = false;
-    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
-                                                                      Meter.of(4)),                 
-                                                    Rotation2d.fromDegrees(0))
-                                       : new Pose2d(new Translation2d(Meter.of(16),                                                                                                                                                                                                                                                   
-                                                                      Meter.of(4)),
-                                                    Rotation2d.fromDegrees(180));
+    boolean blueAlliance = DriverStation.getAlliance().isPresent()
+        ? DriverStation.getAlliance().get() == DriverStation.Alliance.Blue
+        : false;
+  //TODO: Update starting pose based on your starting position. The origin (0, 0) is the center of the field at the intersection of the alliance lines and the center line. +X is towards the opponent's side, +Y is towards the left wall (from the perspective of the blue alliance), and 0 degrees is facing towards the opponent's side.
+    Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(3.7),
+        Meter.of(4)),
+        Rotation2d.fromDegrees(180))
+        : new Pose2d(new Translation2d(Meter.of(12.7),
+            Meter.of(4)),
+            Rotation2d.fromDegrees(0));
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try
