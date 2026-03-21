@@ -266,12 +266,16 @@ public class RobotContainer
       operatorXbox.leftBumper().whileTrue(m_shooter.spinUpCloseCommand());    // left bumper to shoot CLOSE
     
       //feeder
-       operatorXbox.x().whileTrue(
-            Commands.either(
-                m_feeder.forwardCommand(),      // command if true
-                Commands.none(),                // command if false
-                m_shooter::isShooterReady       // condition to check
-            )
+      //  operatorXbox.x().whileTrue(
+      //       Commands.either(
+      //           m_feeder.forwardCommand(),      // command if true
+      //           Commands.none(),                // command if false
+      //           m_shooter::isShooterReady       // condition to check
+      //       )
+      //   );
+        operatorXbox.x().whileTrue(
+          Commands.waitUntil(m_shooter::isShooterReady)   // adds wait until shooter is ready
+            .andThen(m_feeder.forwardCommand())
         );
     }
   }
