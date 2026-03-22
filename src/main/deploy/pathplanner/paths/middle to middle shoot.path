@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.145132530120482,
-        "y": 2.111722891566265
+        "x": 1.6587349397590363,
+        "y": 4.045927710843373
       },
       "isLocked": false,
       "linkedName": "middle start position"
     },
     {
       "anchor": {
-        "x": 1.1451325301204816,
-        "y": 2.1007951807228915
+        "x": 1.6915180722891563,
+        "y": 4.067783132530121
       },
       "prevControl": {
-        "x": 3.5164457831325304,
-        "y": 4.056855421686747
+        "x": 3.5820120481927713,
+        "y": 4.035
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "jenny right shoot"
+      "linkedName": "middle shoot"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 72.95606606368432
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
