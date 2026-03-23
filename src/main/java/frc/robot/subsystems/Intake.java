@@ -102,8 +102,6 @@ public class Intake extends SubsystemBase {
   }
 
 
-
-
   private void intake(){
     m_intakeMotor.set(0.85);
   }

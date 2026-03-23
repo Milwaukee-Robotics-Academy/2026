@@ -60,8 +60,8 @@ public class Shooter extends SubsystemBase {
   }
 private void loadUp(){
 
-  spinAgitator.set(0.1);
-  disturbAgitator.set(-0.1);
+  spinAgitator.set(0.25);
+  disturbAgitator.set(-0.08);
   loader.set(0.25);
 }
 private void stop(){
@@ -73,32 +73,42 @@ private void stop(){
 }
 
 private void oppositeAgitate(){
-  spinAgitator.set(0.1);
-  disturbAgitator.set(-0.1);
+  spinAgitator.set(-0.1);
+ // disturbAgitator.set(-0.1);
 }
 private void shoot(){
   shooter.set(-0.8);
 }
-private void hyperShot(){
-  shooter.set(-1);
+private void midShot(){
+  shooter.set(-.6);
 }
 
 private void spitBack(){
 
   shooter.set(0.25);
-  loader.set(0.1);
+  loader.set(-0.1);
+}
+
+private void autoShoot(){
+  shooter.set(-0.8);
+  loader.set(0.25);
+  spinAgitator.set(0.25);
+  disturbAgitator.set(-0.08);
 }
 public Command loadUpCommand(){
   return new RunCommand(this::loadUp, this).withName("loadUp");
 }
-public Command hyperShotCommand(){
-  return new RunCommand(this::hyperShot, this).withName("hyperShot");
+public Command midShotCommand(){
+  return new RunCommand(this::midShot, this).withName("midShot");
 }
 public Command spitbackCommand(){
   return new RunCommand(this::spitBack, this).withName("spitBack");
 }
 public Command shootCommand(){
   return new RunCommand(this::shoot, this).withName("shoot");
+}
+public Command autoShootCommand(){
+  return new RunCommand(this::autoShoot, this).withName("autoShoot");
 }
 
 /**public Command outtakeAndStopCommand(){
