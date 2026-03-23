@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.security.PrivateKey;
-
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
