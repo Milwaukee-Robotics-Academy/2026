@@ -20,6 +20,7 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.PersistMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -188,6 +189,26 @@ public class Intake extends SubsystemBase{
     }
     public Command stopArmCommand(){
         return new InstantCommand(this::stopArm, this).withName("StopArm");
+    }
+
+    // Moves arm up and down once using speed commands, with 2 second wait in between
+    public Command jiggleArm() {
+
+        return Commands.sequence(
+            // Down --> Up
+            new RunCommand(this::armSpeedMoveUp, this)
+            .until(this::isAtUpLimit),
+
+            Commands.waitSeconds(2),
+
+            // Up --> Down
+            new RunCommand(this::armSpeedMoveDown, this)
+            .until(this::isAtDownLimit),
+
+            Commands.waitSeconds(.5)
+
+        ).withName("JiggleArm");
+
     }
 
     // ==================== ARM & INTAKE COMMANDS (NO ENCODER) ====================
