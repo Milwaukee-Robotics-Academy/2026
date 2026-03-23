@@ -152,13 +152,12 @@ public class RobotContainer
     NamedCommands.registerCommand("feedMe", m_feeder.forwardCommand());
 
     NamedCommands.registerCommand("spinAndShoot",
-      m_shooter.spinUpFarCommand().repeatedly()
+      m_shooter.spinUpFarCommand()
         .alongWith(
           Commands.waitUntil(m_shooter::isFarShooterReady)
             .andThen(m_feeder.forwardCommand())
-            .withTimeout(2.0)
         )
-        .withTimeout(5)
+        .withTimeout(10)
         .asProxy()
     );
 
@@ -301,5 +300,8 @@ public class RobotContainer
     SmartDashboard.putData(m_intake);
     SmartDashboard.putData(m_shooter);
     SmartDashboard.putData(m_feeder);
+    SmartDashboard.putNumber("pose/x", m_drivebase.getPose().getX());
+    SmartDashboard.putNumber("pose/y", m_drivebase.getPose().getY());
+    SmartDashboard.putNumber("pose/theta", m_drivebase.getPose().getRotation().getDegrees());
   }
 }
