@@ -35,7 +35,6 @@ public class Intake extends SubsystemBase{
 
     private SparkAbsoluteEncoder m_armEncoder;
 
-    // TODO: Set DIO port
     private static final int ARM_DOWN_LIMIT_SWITCH_PORT = 0; 
     private static final int ARM_UP_LIMIT_SWITCH_PORT = 1;  
     
@@ -52,6 +51,16 @@ public class Intake extends SubsystemBase{
 
     private static final double ARM_SPEED_MOVE_UP = -0.3;   //up = negative (arm is inverted)
     private static final double ARM_SPEED_MOVE_DOWN = 0.1;  //down = positive
+
+    private static final double UP_PAUSE = 0.01;
+    private static final double DOWN_PAUSE = 0.01;
+
+    private static final double MOVE_TIME_DOWN = .1;
+    private static final double MOVE_TIME_UP = .5;
+
+    private boolean m_intakeRunningForward = false;
+    private boolean m_intakeRunningReverse = false;
+
 
     // ==================== CONSTRUCTOR (CONFIGURE MOTORS) ====================
     
@@ -101,12 +110,16 @@ public class Intake extends SubsystemBase{
 
     private void forwardIntake() {
         m_motor_9.set(INTAKE_SPEED_FORWARD);
+        m_intakeRunningForward = true;
     }
     private void reverseIntake() {
         m_motor_9.set(INTAKE_SPEED_REVERSE);
+        m_intakeRunningReverse = true;
     }
     private void stopIntake() {
         m_motor_9.set(0);
+        m_intakeRunningForward = false;
+        m_intakeRunningReverse = false;
     }
 
     // ==================== CHECKS LIMIT POSITION ====================
@@ -191,24 +204,33 @@ public class Intake extends SubsystemBase{
         return new InstantCommand(this::stopArm, this).withName("StopArm");
     }
 
-    // Moves arm up and down once using speed commands, with 2 second wait in between
-    public Command jiggleArm() {
+    // ==================== JIGGLE ARM ====================
+    // Jiggle arm up and down to agitate balls 
+    public Command jiggleArmRepeating() {
 
         return Commands.sequence(
-            // Down --> Up
+
             new RunCommand(this::armSpeedMoveUp, this)
-            .until(this::isAtUpLimit),
+                .until(this::isAtUpLimit)
+                .withTimeout(MOVE_TIME_UP),
 
-            Commands.waitSeconds(2),
+            Commands.waitSeconds(UP_PAUSE),  
 
-            // Up --> Down
             new RunCommand(this::armSpeedMoveDown, this)
-            .until(this::isAtDownLimit),
+                .until(this::isAtDownLimit)
+                .withTimeout(MOVE_TIME_DOWN),
 
-            Commands.waitSeconds(.5)
+            Commands.waitSeconds(DOWN_PAUSE)  
 
-        ).withName("JiggleArm");
+        ).repeatedly()
 
+     .withName("JiggleArmRepeating");
+    }
+
+    // return arm to down position
+    public Command returnToDownCommand() {
+            return new RunCommand(this::armSpeedMoveDown, this)
+                .until(this::isAtDownLimit);
     }
 
     // ==================== ARM & INTAKE COMMANDS (NO ENCODER) ====================
@@ -236,6 +258,9 @@ public class Intake extends SubsystemBase{
 
         SmartDashboard.putBoolean("At Down Limit", isAtDownLimit());
         SmartDashboard.putBoolean("At Up Limit", isAtUpLimit());
+
+        SmartDashboard.putBoolean("Intake/Wheels Running", m_intakeRunningForward);
+        SmartDashboard.putBoolean("Intake/Wheels Running", m_intakeRunningReverse);
 
     }
 }

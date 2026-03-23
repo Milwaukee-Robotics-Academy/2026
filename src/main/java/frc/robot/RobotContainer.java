@@ -136,6 +136,45 @@ public class RobotContainer
     }
   }
 
+ /**
+ * Complete shoot sequence:
+ * 1. Spin up shooter and wait for ready
+ * 2. Feed + shoot for 2 seconds (no agitation)
+ * 3. Add agitation (jiggle + intake) and continue everything
+ * 4. Everything runs until X released
+ */
+private Command completeShootSequenceCommand() {
+    return Commands.sequence(
+
+        // Spin up far shooter
+        Commands.parallel(
+            m_shooter.spinUpFarCommand(),
+            Commands.waitUntil(m_shooter::isShooterReady)
+        ),
+
+        // Step 2: Feed + shoot for 2 seconds (no agitation)
+        Commands.deadline(
+            Commands.waitSeconds(2.0),      // ✅ Run for exactly 2 seconds
+            m_feeder.forwardCommand(),      // Feed during those 2 seconds
+            m_shooter.spinUpFarCommand()    // Shoot during those 2 seconds
+        ),
+        Commands.print("Starting agitation..."),
+        
+        // Step 3: Everything runs continuously (until X released)
+        Commands.parallel(
+            m_shooter.spinUpFarCommand(),       // Shooter continuously
+            m_feeder.forwardCommand(),          // Feeder continuously
+            m_intake.jiggleArmRepeating(),      // Jiggle continuously 
+            m_intake.forwardIntakeCommand()     // Intake continuously
+        )
+        
+    ).finallyDo((interrupted) -> {
+        if (interrupted) {
+            m_intake.returnToDownCommand();
+        }
+        m_shooter.stopCommand();
+    }).withName("CompleteShootSequence");
+}
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -263,22 +302,25 @@ public class RobotContainer
 
       // ==================== OPERATOR COMMANDS ====================
       //intake wheels 
-      operatorXbox.y().whileTrue(m_intake.forwardIntakeCommand());
-      operatorXbox.a().whileTrue(m_intake.reverseIntakeCommand()); 
+      operatorXbox.y().toggleOnTrue(m_intake.forwardIntakeCommand());
+      operatorXbox.a().toggleOnTrue(m_intake.reverseIntakeCommand()); 
 
       //arm with limit switches
       operatorXbox.rightTrigger().whileTrue(m_intake.armSpeedUpCommand());   // right trigger to move arm UP
       operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedDownCommand());   // left trigger to move arm DOWN
 
+      // shoot
+      operatorXbox.rightBumper().whileTrue(completeShootSequenceCommand());
+
       //shooter
-      operatorXbox.rightBumper().whileTrue(m_shooter.spinUpFarCommand());     // right bumper to shoot FAR
-      operatorXbox.leftBumper().whileTrue(m_shooter.spinUpCloseCommand());    // left bumper to shoot CLOSE
+      // operatorXbox.rightBumper().whileTrue(m_shooter.spinUpFarCommand());     // right bumper to shoot FAR
+      // operatorXbox.leftBumper().whileTrue(m_shooter.spinUpCloseCommand());    // left bumper to shoot CLOSE
     
       //feeder
-        operatorXbox.x().whileTrue(
-          Commands.waitUntil(m_shooter::isShooterReady)   // adds wait until shooter is ready
-            .andThen(m_feeder.forwardCommand())
-        );
+      // operatorXbox.x().whileTrue(
+      //   Commands.waitUntil(m_shooter::isShooterReady)   // adds wait until shooter is ready
+      //     .andThen(m_feeder.forwardCommand())
+      // );
     }
   }
 
