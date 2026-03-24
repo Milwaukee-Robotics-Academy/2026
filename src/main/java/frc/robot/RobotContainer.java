@@ -136,36 +136,13 @@ public class RobotContainer
     }
   }
 
- /**
- * Complete shoot sequence:
- * 1. Spin up shooter and wait for ready
- * 2. Feed + shoot for 2 seconds (no agitation)
- * 3. Add agitation (jiggle + intake) and continue everything
- * 4. Everything runs until X released
- */
-private Command completeShootSequenceCommand() {
+  // Spin up shooter, start feeder
+  private Command completeShootSequenceCommand() {
     return Commands.sequence(
-            m_shooter.spinUpFarCommand().until(m_shooter::isShooterReady),
-            m_feeder.forwardCommand().,      
-            m_shooter.spinUpFarCommand()    
-        ),
-        Commands.print("Starting agitation..."),
-        
-        // Step 3: Everything runs continuously (until X released)
-        Commands.parallel(
-            m_shooter.spinUpFarCommand(),       // Shooter continuously
-            m_feeder.forwardCommand(),          // Feeder continuously
-            m_intake.jiggleArmRepeating()      // Jiggle continuously 
-            //m_intake.forwardIntakeCommand()     // Intake continuously
-        )
-        
-    ).finallyDo((interrupted) -> {
-        if (interrupted) {
-            m_intake.returnToDownCommand();
-        }
-        m_shooter.stopCommand();
-    }).withName("CompleteShootSequence");
-}
+        m_shooter.spinUpFarCommand().until(m_shooter::isShooterReady),
+        m_feeder.forwardCommand()).withName("completeShootSequenceCommand");
+  }
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
