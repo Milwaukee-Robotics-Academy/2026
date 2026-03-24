@@ -16,7 +16,7 @@ public class Feeder extends SubsystemBase {
     
     private SparkMax m_motor_11;  // feeder motor
 
-    private static final double FEEDER_SPEED_FORWARD = -0.5;
+    private static final double FEEDER_SPEED_FORWARD = -0.7;
     private static final double FEEDER_SPEED_REVERSE = 0.5;
 
     // ==================== CONSTRUCTOR ====================

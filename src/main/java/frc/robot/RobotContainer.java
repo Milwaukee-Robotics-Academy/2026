@@ -278,6 +278,7 @@ public class RobotContainer
       operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedDownCommand());   // left trigger to move arm DOWN
 
       operatorXbox.povUp().toggleOnTrue(m_intake.jiggleArmRepeatingCommand());
+      operatorXbox.x().onTrue(m_intake.returnArmToDownCommand());
 
       // shoot
       operatorXbox.rightBumper().whileTrue(spinAndShootTeleopCommand());

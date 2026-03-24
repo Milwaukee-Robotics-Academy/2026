@@ -46,7 +46,7 @@ public class Intake extends SubsystemBase{
     private DigitalInput m_downLimitSwitch;
     private DigitalInput m_upLimitSwitch;
 
-    private static final double INTAKE_SPEED_FORWARD = 0.4; 
+    private static final double INTAKE_SPEED_FORWARD = 0.8; 
     private static final double INTAKE_SPEED_REVERSE = -0.7; 
 
     private static final double UNCLOG_WHEEL_SPEED = 0.4;
@@ -86,7 +86,7 @@ public class Intake extends SubsystemBase{
 
         // configure flex motor settings (intake)
         global_config_flex
-            .smartCurrentLimit(40) // 60-80 for Vortex
+            .smartCurrentLimit(50) // 60-80 for Vortex
             .idleMode(IdleMode.kBrake);
 
         motor_9_config
