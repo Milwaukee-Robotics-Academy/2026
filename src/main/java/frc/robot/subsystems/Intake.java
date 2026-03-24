@@ -194,23 +194,6 @@ public class Intake extends SubsystemBase{
         return new InstantCommand(this::stopArm, this).withName("StopArm");
     }
 
-    public Command jiggleArmCommand() {
-        return Commands.sequence(
-            // Cycle 1: Down -> Up
-            new RunCommand(this::armSpeedMoveUp, this)
-            .until(this::isAtUpLimit),
-            
-            Commands.waitSeconds(JIGGLE_PAUSE_TIME_UP),
-
-            // Cycle 2: Up -> Down
-            new RunCommand(this::armSpeedMoveDown, this)
-            .until(this::isAtDownLimit),  
-
-            Commands.waitSeconds(JIGGLE_PAUSE_TIME_DOWN),
-            
-        ).withName("JiggleArm");
-}
-
     // ==================== ARM & INTAKE COMMANDS (NO ENCODER) ====================
 
     public Command stopAllCommand() {
