@@ -145,18 +145,9 @@ public class RobotContainer
  */
 private Command completeShootSequenceCommand() {
     return Commands.sequence(
-
-        // Spin up far shooter
-        Commands.parallel(
-            m_shooter.spinUpFarCommand(),
-            Commands.waitUntil(m_shooter::isShooterReady)
-        ),
-
-        // Step 2: Feed + shoot for 2 seconds (no agitation)
-        Commands.deadline(
-            Commands.waitSeconds(2.0),      // ✅ Run for exactly 2 seconds
-            m_feeder.forwardCommand(),      // Feed during those 2 seconds
-            m_shooter.spinUpFarCommand()    // Shoot during those 2 seconds
+            m_shooter.spinUpFarCommand().until(m_shooter::isShooterReady),
+            m_feeder.forwardCommand().,      
+            m_shooter.spinUpFarCommand()    
         ),
         Commands.print("Starting agitation..."),
         
@@ -164,8 +155,8 @@ private Command completeShootSequenceCommand() {
         Commands.parallel(
             m_shooter.spinUpFarCommand(),       // Shooter continuously
             m_feeder.forwardCommand(),          // Feeder continuously
-            m_intake.jiggleArmRepeating(),      // Jiggle continuously 
-            m_intake.forwardIntakeCommand()     // Intake continuously
+            m_intake.jiggleArmRepeating()      // Jiggle continuously 
+            //m_intake.forwardIntakeCommand()     // Intake continuously
         )
         
     ).finallyDo((interrupted) -> {

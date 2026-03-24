@@ -205,26 +205,15 @@ public class Intake extends SubsystemBase{
     }
 
     // ==================== JIGGLE ARM ====================
-    // Jiggle arm up and down to agitate balls 
+    // Jiggle arm up and down to agitate balls
     public Command jiggleArmRepeating() {
 
         return Commands.sequence(
-
-            new RunCommand(this::armSpeedMoveUp, this)
-                .until(this::isAtUpLimit)
-                .withTimeout(MOVE_TIME_UP),
-
-            Commands.waitSeconds(UP_PAUSE),  
-
-            new RunCommand(this::armSpeedMoveDown, this)
-                .until(this::isAtDownLimit)
-                .withTimeout(MOVE_TIME_DOWN),
-
-            Commands.waitSeconds(DOWN_PAUSE)  
-
-        ).repeatedly()
-
-     .withName("JiggleArmRepeating");
+                new RunCommand(this::armSpeedMoveUp, this)
+                        .until(this::isAtUpLimit)
+                        .withTimeout(MOVE_TIME_UP),
+                Commands.waitSeconds(UP_PAUSE)).repeatedly()
+                .withName("JiggleArmRepeating");
     }
 
     // return arm to down position
