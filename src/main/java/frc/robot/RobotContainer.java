@@ -137,10 +137,11 @@ public class RobotContainer
   }
 
   // Spin up shooter, start feeder
-  private Command completeShootSequenceCommand() {
-    return Commands.sequence(
-        m_shooter.spinUpFarCommand().until(m_shooter::isShooterReady),
-        m_feeder.forwardCommand()).withName("completeShootSequenceCommand");
+  private Command spinAndShootTeleopCommand() {
+    return m_shooter.spinUpFarCommand().alongWith(
+        Commands.waitUntil(m_shooter::isFarShooterReady)
+            .andThen(m_feeder.forwardCommand())
+            .withName("spingAndShootTeleopCommand"));
   }
 
   /**
@@ -158,14 +159,13 @@ public class RobotContainer
     NamedCommands.registerCommand("farShoot", m_shooter.spinUpFarCommand());
     NamedCommands.registerCommand("feedMe", m_feeder.forwardCommand());
 
-    NamedCommands.registerCommand("spinAndShoot",
-      m_shooter.spinUpFarCommand().repeatedly()
+    NamedCommands.registerCommand("spinAndShootAutoCommand",
+      m_shooter.spinUpFarCommand()
         .alongWith(
           Commands.waitUntil(m_shooter::isFarShooterReady)
             .andThen(m_feeder.forwardCommand())
-            .withTimeout(2.0)
         )
-        .withTimeout(5)
+        .withTimeout(10)
         .asProxy()
     );
 
@@ -277,8 +277,10 @@ public class RobotContainer
       operatorXbox.rightTrigger().whileTrue(m_intake.armSpeedUpCommand());   // right trigger to move arm UP
       operatorXbox.leftTrigger().whileTrue(m_intake.armSpeedDownCommand());   // left trigger to move arm DOWN
 
+      operatorXbox.povUp().toggleOnTrue(m_intake.jiggleArmRepeatingCommand());
+
       // shoot
-      operatorXbox.rightBumper().whileTrue(completeShootSequenceCommand());
+      operatorXbox.rightBumper().whileTrue(spinAndShootTeleopCommand());
 
       //shooter
       // operatorXbox.rightBumper().whileTrue(m_shooter.spinUpFarCommand());     // right bumper to shoot FAR

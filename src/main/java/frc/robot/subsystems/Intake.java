@@ -49,14 +49,16 @@ public class Intake extends SubsystemBase{
     private static final double INTAKE_SPEED_FORWARD = 0.4; 
     private static final double INTAKE_SPEED_REVERSE = -0.7; 
 
+    private static final double UNCLOG_WHEEL_SPEED = 0.4;
+
     private static final double ARM_SPEED_MOVE_UP = -0.3;   //up = negative (arm is inverted)
     private static final double ARM_SPEED_MOVE_DOWN = 0.1;  //down = positive
 
-    private static final double UP_PAUSE = 0.01;
+    private static final double UP_PAUSE = 1;
     private static final double DOWN_PAUSE = 0.01;
 
-    private static final double MOVE_TIME_DOWN = .1;
     private static final double MOVE_TIME_UP = .5;
+    private static final double MOVE_TIME_DOWN = .1;
 
     private boolean m_intakeRunningForward = false;
     private boolean m_intakeRunningReverse = false;
@@ -150,36 +152,40 @@ public class Intake extends SubsystemBase{
     
     public boolean isAtUpLimit() {
         return isAtUpLimitSwitch() || isAtUpEncoderLimit();  
-        //return isAtUpLimitSwitch();
     }
 
     public boolean isAtDownLimit() {
         return isAtDownLimitSwitch() || isAtDownEncoderLimit();  
-        //return isAtDownLimitSwitch();
     }
-      // ==================== MOVES ARM ====================
+    
+    // ==================== MOVES ARM & TURNS ON INTAKE WHEELS ====================
 
-  public void armSpeedMoveUp() {
+    public void armSpeedMoveUp() {
         if (isAtUpLimit()) {
             m_motor_10.set(0);
+            m_motor_9.set(0);
             return;
         }
         m_motor_10.set(ARM_SPEED_MOVE_UP);
+        m_motor_9.set(UNCLOG_WHEEL_SPEED);
     }
     
     public void armSpeedMoveDown() {
         if (isAtDownLimit()) {
             m_motor_10.set(0);
+            m_motor_9.set(0);
             return;
         }     
         m_motor_10.set(ARM_SPEED_MOVE_DOWN);
+        m_motor_9.set(UNCLOG_WHEEL_SPEED);
     }
     
     public void stopArm() {
         m_motor_10.set(0);
+        m_motor_9.set(0);
     }
 
-        // ==================== INTAKE WHEEL COMMANDS ====================
+    // ==================== INTAKE WHEEL COMMANDS ====================
 
     public Command forwardIntakeCommand(){
         return new RunCommand(this::forwardIntake, this).withName("ForwardIntake");
@@ -206,8 +212,7 @@ public class Intake extends SubsystemBase{
 
     // ==================== JIGGLE ARM ====================
     // Jiggle arm up and down to agitate balls
-    public Command jiggleArmRepeating() {
-
+    public Command jiggleArmRepeatingCommand() {
         return Commands.sequence(
                 new RunCommand(this::armSpeedMoveUp, this)
                         .until(this::isAtUpLimit)
@@ -217,7 +222,7 @@ public class Intake extends SubsystemBase{
     }
 
     // return arm to down position
-    public Command returnToDownCommand() {
+    public Command returnArmToDownCommand() {
             return new RunCommand(this::armSpeedMoveDown, this)
                 .until(this::isAtDownLimit);
     }
