@@ -52,13 +52,13 @@ public class Intake extends SubsystemBase{
     private static final double UNCLOG_WHEEL_SPEED = 0.4;
 
     private static final double ARM_SPEED_MOVE_UP = -0.3;   //up = negative (arm is inverted)
-    private static final double ARM_SPEED_MOVE_DOWN = 0.1;  //down = positive
+    private static final double ARM_SPEED_MOVE_DOWN = 0.05;  //down = positive
 
     private static final double UP_PAUSE = 1;
     private static final double DOWN_PAUSE = 1;
 
-    private static final double MOVE_TIME_UP = .02;
-    private static final double MOVE_TIME_DOWN = .1;
+    private static final double MOVE_TIME_UP = .3;
+    private static final double MOVE_TIME_DOWN = .02;
 
     private boolean m_intakeRunningForward = false;
     private boolean m_intakeRunningReverse = false;
