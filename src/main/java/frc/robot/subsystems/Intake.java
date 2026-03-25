@@ -55,10 +55,10 @@ public class Intake extends SubsystemBase{
     private static final double ARM_SPEED_MOVE_DOWN = 0.1;  //down = positive
 
     private static final double UP_PAUSE = 1;
-    private static final double DOWN_PAUSE = 0.01;
+    //private static final double DOWN_PAUSE = 0.01;
 
-    private static final double MOVE_TIME_UP = .5;
-    private static final double MOVE_TIME_DOWN = .1;
+    private static final double MOVE_TIME_UP = .02;
+    //private static final double MOVE_TIME_DOWN = .1;
 
     private boolean m_intakeRunningForward = false;
     private boolean m_intakeRunningReverse = false;
@@ -138,24 +138,27 @@ public class Intake extends SubsystemBase{
     public double getArmPosition() {
         return m_armEncoder.getPosition();
     }
+
     public boolean isAtDownEncoderLimit() {
         double position = getArmPosition();
-        return position >= (ARM_DOWN_POSITION + ARM_POSITION_TOLERANCE);
+        return (position <= (ARM_DOWN_POSITION + ARM_POSITION_TOLERANCE)) && (position >= (ARM_DOWN_POSITION - ARM_POSITION_TOLERANCE));
     }
 
     public boolean isAtUpEncoderLimit() {
         double position = getArmPosition();
-        return position <= (ARM_UP_POSITION - ARM_POSITION_TOLERANCE);
+        return (position >= (ARM_UP_POSITION - ARM_POSITION_TOLERANCE)) && (position <= (ARM_UP_POSITION + ARM_POSITION_TOLERANCE));
     }
 
     // ==================== CHECKS LIMITS ====================
     
     public boolean isAtUpLimit() {
-        return isAtUpLimitSwitch() || isAtUpEncoderLimit();  
+        //return isAtUpLimitSwitch() || isAtUpEncoderLimit();  
+        return isAtUpLimitSwitch();
     }
 
     public boolean isAtDownLimit() {
         return isAtDownLimitSwitch() || isAtDownEncoderLimit();  
+        //return isAtDownLimitSwitch();
     }
     
     // ==================== MOVES ARM & TURNS ON INTAKE WHEELS ====================
@@ -215,7 +218,6 @@ public class Intake extends SubsystemBase{
     public Command jiggleArmRepeatingCommand() {
         return Commands.sequence(
                 new RunCommand(this::armSpeedMoveUp, this)
-                        .until(this::isAtUpLimit)
                         .withTimeout(MOVE_TIME_UP),
                 Commands.waitSeconds(UP_PAUSE)).repeatedly()
                 .withName("JiggleArmRepeating");
