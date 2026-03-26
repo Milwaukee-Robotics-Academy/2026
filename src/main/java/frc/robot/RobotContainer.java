@@ -137,12 +137,21 @@ public class RobotContainer
   }
 
   // Spin up shooter, start feeder
-  private Command spinAndShootTeleopCommand() {
+  private Command spinAndShootTeleopFarCommand() {
     return m_shooter.spinUpFarCommand().alongWith(
         Commands.waitUntil(m_shooter::isFarShooterReady)
             .andThen(m_feeder.forwardCommand())
             .withName("spingAndShootTeleopCommand"));
   }
+
+   // Spin up shooter, start feeder
+  private Command spinAndShootTeleopCloseCommand() {
+    return m_shooter.spinUpCloseCommand().alongWith(
+        Commands.waitUntil(m_shooter::isCloseShooterReady)
+            .andThen(m_feeder.forwardCommand())
+            .withName("spingAndShootTeleopCommand"));
+  }
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -159,10 +168,20 @@ public class RobotContainer
     NamedCommands.registerCommand("farShoot", m_shooter.spinUpFarCommand());
     NamedCommands.registerCommand("feedMe", m_feeder.forwardCommand());
 
-    NamedCommands.registerCommand("spinAndShootAutoCommand",
+    NamedCommands.registerCommand("AutoFarCommand",
       m_shooter.spinUpFarCommand()
         .alongWith(
           Commands.waitUntil(m_shooter::isFarShooterReady)
+            .andThen(m_feeder.forwardCommand())
+        )
+        .withTimeout(10)
+        .asProxy()
+    );
+
+     NamedCommands.registerCommand("AutoCloseCommand",
+      m_shooter.spinUpCloseCommand()
+        .alongWith(
+          Commands.waitUntil(m_shooter::isCloseShooterReady)
             .andThen(m_feeder.forwardCommand())
         )
         .withTimeout(10)
@@ -281,7 +300,8 @@ public class RobotContainer
       operatorXbox.x().onTrue(m_intake.returnArmToDownCommand());
 
       // shoot
-      operatorXbox.rightBumper().whileTrue(spinAndShootTeleopCommand());
+      operatorXbox.rightBumper().whileTrue(spinAndShootTeleopFarCommand());
+      operatorXbox.leftBumper().whileTrue(spinAndShootTeleopCloseCommand());
 
       //shooter
       // operatorXbox.rightBumper().whileTrue(m_shooter.spinUpFarCommand());     // right bumper to shoot FAR
