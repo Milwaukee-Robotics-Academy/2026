@@ -14,7 +14,7 @@ used in both TimedRobot and Command-Based Robot templates.
 
 ### Installation
 
-Vendor URL:
+Vendor URL: 
 
 ```
 https://broncbotz3481.github.io/YAGSL-Lib/yagsl/yagsl.json
