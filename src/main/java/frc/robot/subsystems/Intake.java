@@ -157,8 +157,9 @@ public class Intake extends SubsystemBase{
     }
 
     public boolean isAtDownLimit() {
-        return isAtDownLimitSwitch() || isAtDownEncoderLimit();  
+        //return isAtDownLimitSwitch() || isAtDownEncoderLimit();  
         //return isAtDownLimitSwitch();
+        return isAtDownEncoderLimit();
     }
     
     // ==================== MOVES ARM & TURNS ON INTAKE WHEELS ====================
