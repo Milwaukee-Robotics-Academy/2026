@@ -159,7 +159,8 @@ public class Intake extends SubsystemBase{
     public boolean isAtDownLimit() {
         //return isAtDownLimitSwitch() || isAtDownEncoderLimit();  
         //return isAtDownLimitSwitch();
-        return isAtDownEncoderLimit();
+        //return isAtDownEncoderLimit();
+        return false;
     }
     
     // ==================== MOVES ARM & TURNS ON INTAKE WHEELS ====================
@@ -167,26 +168,21 @@ public class Intake extends SubsystemBase{
     public void armSpeedMoveUp() {
         if (isAtUpLimit()) {
             m_motor_10.set(0);
-            m_motor_9.set(0);
             return;
         }
         m_motor_10.set(ARM_SPEED_MOVE_UP);
-        m_motor_9.set(UNCLOG_WHEEL_SPEED);
     }
     
     public void armSpeedMoveDown() {
         if (isAtDownLimit()) {
             m_motor_10.set(0);
-            m_motor_9.set(0);
             return;
         }     
         m_motor_10.set(ARM_SPEED_MOVE_DOWN);
-        m_motor_9.set(UNCLOG_WHEEL_SPEED);
     }
     
     public void stopArm() {
         m_motor_10.set(0);
-        m_motor_9.set(0);
     }
 
     // ==================== INTAKE WHEEL COMMANDS ====================
