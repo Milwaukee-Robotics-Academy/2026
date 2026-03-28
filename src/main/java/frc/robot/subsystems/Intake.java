@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
@@ -22,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Intake extends SubsystemBase {
   private SparkMax m_rightArmMotor;
   private SparkMax m_leftArmMotor;
-  private SparkMax m_intakeMotor;
+  private SparkFlex m_intakeMotor;
   private SparkClosedLoopController m_leftArmController;
   private SparkClosedLoopController m_rightArmController;
   private RelativeEncoder m_rightArmEncoder;
@@ -36,7 +37,7 @@ public class Intake extends SubsystemBase {
   public Intake(){
     m_rightArmMotor =  new SparkMax(9, MotorType.kBrushless);
     m_leftArmMotor =  new SparkMax(10, MotorType.kBrushless);
-    m_intakeMotor =  new SparkMax(11, MotorType.kBrushless);
+    m_intakeMotor =  new SparkFlex(11, MotorType.kBrushless);
     m_rightArmEncoder = m_rightArmMotor.getEncoder();
     m_leftArmEncoder = m_leftArmMotor.getEncoder();
     m_intakeEncoder = m_intakeMotor.getEncoder();
@@ -49,7 +50,7 @@ public class Intake extends SubsystemBase {
     SparkMaxConfig leftArmMotorConfig = new SparkMaxConfig();
     SparkMaxConfig intakeMotorConfig = new SparkMaxConfig();
     global_config
-      .smartCurrentLimit(0)
+      .smartCurrentLimit(80)
       .idleMode(IdleMode.kBrake);  
     rightArmMotorConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
@@ -74,6 +75,7 @@ public class Intake extends SubsystemBase {
       .idleMode(IdleMode.kBrake);
     intakeMotorConfig
       .apply(global_config)
+      .smartCurrentLimit(40)
       .inverted(true);
     //Apply motor configuration to SparkMaxes
     m_rightArmMotor.configure(rightArmMotorConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
