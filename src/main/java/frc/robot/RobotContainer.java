@@ -114,10 +114,12 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-    NamedCommands.registerCommand("shootCommand", m_Shooter.shootCommand().withTimeout(9));
-    NamedCommands.registerCommand("loadUpCommand", m_Shooter.loadUpCommand().withTimeout(9));
+    NamedCommands.registerCommand("autoShootCommand", m_Shooter.autoShootCommand().withTimeout(9));
+    NamedCommands.registerCommand("autoMidShootCommand", m_Shooter.autoMidShootCommand().withTimeout(9));
     NamedCommands.registerCommand("intakeCommand", m_Intake.intakeCommand().withTimeout(5));
     NamedCommands.registerCommand("lowerArmCommand", m_Intake.goDownFunctionCommand().withTimeout(3));
+    NamedCommands.registerCommand("raiseArmCommand", m_Intake.goUpFunctionCommand().withTimeout(3));
+    NamedCommands.registerCommand("waitCommand", m_Intake.stop2Command().withTimeout(3));
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -219,7 +221,7 @@ public class RobotContainer
       operatorXbox.b().whileTrue(m_Intake.goDownFunctionCommand());
       operatorXbox.povUp().whileTrue(m_Shooter.oppositeAgitateCommand()); 
       operatorXbox.povDown().onTrue(m_Intake.upSetCommand()); 
-      operatorXbox.povLeft().whileTrue(m_Shooter.hyperShotCommand());
+      operatorXbox.povLeft().whileTrue(m_Shooter.midShotCommand());
  //   }
 
   }

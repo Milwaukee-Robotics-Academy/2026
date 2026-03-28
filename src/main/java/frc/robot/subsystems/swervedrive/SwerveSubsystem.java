@@ -80,7 +80,7 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private       SwerveDrivePoseEstimator poseEstimator;
 
-  private       QuestNavSubsystem questNav;
+//  private       QuestNavSubsystem questNav;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -157,7 +157,7 @@ public class SwerveSubsystem extends SubsystemBase
     if (visionDriveTest)
     {
       swerveDrive.updateOdometry();
-      questNav.poseOdometry(swerveDrive);
+    //  questNav.poseOdometry(swerveDrive);
       // Old vision code
       //vision.updatePoseEstimation(swerveDrive);
     }
