@@ -51,6 +51,8 @@ public class RobotContainer
   private final Shooter m_shooter = new Shooter();
   private final Feeder m_feeder = new Feeder();
 
+  private static final double MOVE_TIME_DOWN_AUTO = .04;
+
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
 
@@ -186,6 +188,12 @@ public class RobotContainer
         )
         .withTimeout(10)
         .asProxy()
+    );
+
+    NamedCommands.registerCommand("AutoLowerArmCommand",
+      m_intake.armSpeedDownCommand()
+        .until(
+          m_intake::isAtDownLimit).withTimeout(MOVE_TIME_DOWN_AUTO)
     );
 
     //Have the autoChooser pull in all PathPlanner autos as options
