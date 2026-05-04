@@ -22,9 +22,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
 import edu.wpi.first.math.MathUtil;
-import static frc.robot.Constants.FuelConstants.*;
+import static frc.robot.Constants.ShooterConstants.*;
 
-public class FuelSubsystem extends SubsystemBase {
+public class Shooter extends SubsystemBase {
 
   private SparkMax shooterFollower;
   private SparkMaxConfig shooterFollowerConfig;
@@ -51,7 +51,7 @@ public class FuelSubsystem extends SubsystemBase {
    * default SmartDashboard tuning values, and configures current limits and
    * motor inversion where appropriate.
    */
-  public FuelSubsystem() {
+  public Shooter() {
 
     SmartDashboard.putNumber("Shooter/kP", kP);
     SmartDashboard.putNumber("Shooter/kV", kV);
@@ -133,7 +133,7 @@ public class FuelSubsystem extends SubsystemBase {
   }
 
   private void intake() {
-    indexer.set(Constants.FuelConstants.INDEXER_INTAKING_PERCENT);
+    indexer.set(Constants.ShooterConstants.INDEXER_INTAKING_PERCENT);
     setShooterVelocity(SHOOTER_INTAKING_VELOCITY);
   }
 

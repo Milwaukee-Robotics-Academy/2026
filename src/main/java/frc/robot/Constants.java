@@ -41,7 +41,7 @@ public final class Constants
     public static final double WHEEL_LOCK_TIME = 10; // seconds
   }
 
-public static final class FuelConstants {
+public static final class ShooterConstants {
     // Motor controller IDs for Fuel Mechanism motors
     public static final int LEFT_SHOOTER_MOTOR_ID = 9;
     public static final int RIGHT_SHOOTER_MOTOR_ID = 10;
@@ -66,6 +66,19 @@ public static final class FuelConstants {
     public static final double SHOOTER_EJECT_VELOCITY = -3000;
   }
 
+
+public static final class IntakeConstants {
+    // Motor controller IDs for Fuel Mechanism motors
+    public static final int INTAKE_MOTOR_ID = 12;
+
+    // Current limit for fuel mechanism motors.
+    public static final int INTAKE_MOTOR_CURRENT_LIMIT = 80;
+    
+    // All values likely need to be tuned based on your robot
+    public static final double INTAKING_PERCENT = -0.5; //-.8 
+    public static final double EJECT_PERCENT = 0.4;//.6;
+  }
+  
   public static final class ClimbConstants {
     // Motor controller IDs for Climb motor
     public static final int CLIMBER_MOTOR_ID = 12;
