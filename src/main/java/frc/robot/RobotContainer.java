@@ -25,6 +25,8 @@ import frc.robot.subsystems.FuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.Optional;
+import com.playingwithfusion.TimeOfFlight;
+import com.playingwithfusion.TimeOfFlight.RangingMode;
 
 import swervelib.SwerveInputStream;
 
@@ -39,11 +41,13 @@ public class RobotContainer
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandXboxController operatorXbox = new CommandXboxController(1);
+  // Create instance of Time-Of_Flight driver for device 0
+  private final TimeOfFlight m_rangeSensor = new TimeOfFlight(0);
  
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
-  private final FuelSubsystem m_fuelSubsystem = new FuelSubsystem();
+ // private final FuelSubsystem m_fuelSubsystem = new FuelSubsystem();
   private final PowerDistribution pdh = new PowerDistribution();
  // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
@@ -84,7 +88,7 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-    NamedCommands.registerCommand("shoot", m_fuelSubsystem.runShooterCommand().withTimeout(3));
+  //  NamedCommands.registerCommand("shoot", m_fuelSubsystem.runShooterCommand().withTimeout(3));
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -97,6 +101,7 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
   }
 
   Pose2d getHubPose() {
@@ -135,21 +140,21 @@ public class RobotContainer
 
 
     // While the left bumper on operator controller is held, intake Fuel
-    driverXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
-    operatorXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
+  //  driverXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
+  //  operatorXbox.leftBumper().toggleOnTrue(m_fuelSubsystem.intakeCommand());
     
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
-    driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
-    operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
+  //  driverXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
+  //  operatorXbox.rightBumper().toggleOnTrue(m_fuelSubsystem.runShooterCommand());
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
-    driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
-    operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
+  //  driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
+  //  operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
 
     driverXbox.x().toggleOnTrue(driveRotatingTowardsTravelCommand);
     driverXbox.b().whileTrue(defaultDriveStreamCommand);
-    m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
+   // m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
  //   m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
 
@@ -197,8 +202,9 @@ private void updateShiftStates(double matchTime) {
 public void periodic() {
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(m_drivebase);
-    SmartDashboard.putData(m_fuelSubsystem);
+   // SmartDashboard.putData(m_fuelSubsystem);
     SmartDashboard.putData(pdh);
+    SmartDashboard.putNumber("Range Sensor/Distance", m_rangeSensor.getRange());
     double matchTime = DriverStation.getMatchTime();
     SmartDashboard.putNumber("Clock/Match Time", matchTime);
     updateShiftStates(matchTime);
