@@ -99,6 +99,8 @@ public class RobotContainer
     //Add a simple auto option to have the robot drive forward for 1 second then stop
     autoChooser.addOption("Drive Forward", m_drivebase.driveForward().withTimeout(1));
 
+    m_rangeSensor.setRangingMode(TimeOfFlight.RangingMode.Long, 24);
+
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
