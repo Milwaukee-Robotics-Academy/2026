@@ -152,6 +152,9 @@ public class SwerveSubsystem extends SubsystemBase {
       swerveDrive.updateOdometry();
       vision.updatePoseEstimation(swerveDrive);
     }
+    SmartDashboard.putNumber("Pose/x",getPose().getX());
+    SmartDashboard.putNumber("Pose/y",getPose().getY());
+    SmartDashboard.putNumber("Pose/theta-radians",getPose().getRotation().getRadians());
   }
 
   @Override
