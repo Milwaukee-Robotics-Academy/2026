@@ -50,7 +50,7 @@ public class RobotContainer
   private final SwerveSubsystem m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
 
- private final QuestNavSubsystem m_quest = new QuestNavSubsystem();
+ private final QuestNavSubsystem m_quest = new QuestNavSubsystem(m_drivebase);
                                                                                 
  // private final FuelSubsystem m_fuelSubsystem = new FuelSubsystem();
   private final PowerDistribution pdh = new PowerDistribution();
