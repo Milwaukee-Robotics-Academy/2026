@@ -1,0 +1,52 @@
+{
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "OdometryTracking": {
+          "double[]##v_/SmartDashboard/OdometryTracking/Robot": {
+            "open": true
+          },
+          "double[]##v_/SmartDashboard/OdometryTracking/drivetrain": {
+            "open": true
+          },
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Auto Chooser": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/OdometryTracking": "Field2d",
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/PhotonAlerts": "Alerts",
+      "/SmartDashboard/Scheduler": "Scheduler",
+      "/SmartDashboard/SwerveSubsystem": "Subsystem"
+    },
+    "windows": {
+      "/SmartDashboard/OdometryTracking": {
+        "bottom": 1914,
+        "height": 8.069275856018066,
+        "left": 245,
+        "right": 3942,
+        "top": 118,
+        "width": 16.54119300842285,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
+    "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "5"
+  }
+}
