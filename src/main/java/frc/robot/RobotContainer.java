@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -21,12 +22,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.FuelSubsystem;
+import frc.robot.subsystems.QuestNavSubsystem;
+// import frc.robot.subsystems.FuelSubsystem; // unused - enable if FuelSubsystem is added back in
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.Optional;
 import com.playingwithfusion.TimeOfFlight;
-import com.playingwithfusion.TimeOfFlight.RangingMode;
+// import com.playingwithfusion.TimeOfFlight.RangingMode; // unused import
 
 import swervelib.SwerveInputStream;
 
@@ -47,12 +49,17 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
+
+ private final QuestNavSubsystem m_quest = new QuestNavSubsystem();
+                                                                                
  // private final FuelSubsystem m_fuelSubsystem = new FuelSubsystem();
   private final PowerDistribution pdh = new PowerDistribution();
  // private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
+  // Field for odometry tracking visualization
+  private final Field2d OdometryTracking = new Field2d();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -103,6 +110,13 @@ public class RobotContainer
 
     //Put the autoChooser on the SmartDashboard
     SmartDashboard.putData("Auto Chooser", autoChooser);
+
+  // Initialize OdometryTracking with three named poses: drivetrain, vision, quest
+  // Use current robot pose for drivetrain, and placeholder offsets for vision and quest
+  OdometryTracking.getObject("drivetrain").setPose(m_drivebase.getPose());
+  OdometryTracking.getObject("vision").setPose(m_drivebase.getVisionPose());
+  OdometryTracking.getObject("quest").setPose(m_quest.getPose());
+  SmartDashboard.putData("OdometryTracking", OdometryTracking);
 
   }
 

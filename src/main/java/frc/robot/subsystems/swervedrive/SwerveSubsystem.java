@@ -70,6 +70,11 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   private Vision vision;
 
+  private Pose2d autoStartPose;
+  private Pose2d visionPose;
+  private Pose2d questPose;
+
+
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
    *
@@ -150,7 +155,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest) {
       swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+    //  vision.updatePoseEstimation(swerveDrive);
     }
     SmartDashboard.putNumber("Pose/x",getPose().getX());
     SmartDashboard.putNumber("Pose/y",getPose().getY());
@@ -557,6 +562,10 @@ public Rotation2d getAngleToTarget(Translation2d target) {
    */
   public Pose2d getPose() {
     return swerveDrive.getPose();
+  }
+
+  public Pose2d getVisionPose() {
+    return vision.getPose();
   }
 
   /**

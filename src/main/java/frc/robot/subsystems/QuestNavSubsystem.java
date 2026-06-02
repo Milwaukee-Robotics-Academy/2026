@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import gg.questnav.questnav.QuestNav;
 import gg.questnav.questnav.PoseFrame;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.Matrix;
 import swervelib.SwerveDrive;
@@ -44,6 +45,22 @@ public class QuestNavSubsystem extends SubsystemBase
 
             }
         }
+    }
+
+    public Pose2d getPose() {
+        PoseFrame[] frames = questNav.getAllUnreadPoseFrames();
+        
+        for (PoseFrame frame : frames){
+            if (frame.isTracking()){
+                Pose3d questPose = frame.questPose3d();
+                double timestamp = frame.dataTimestamp();
+
+                Pose3d robotPose = questPose.transformBy(ROBOT_TO_QUEST.inverse());
+
+                return robotPose.toPose2d();
+            }
+        }
+        return new Pose2d(); // Return default pose if no tracking frame is available
     }
     
 }

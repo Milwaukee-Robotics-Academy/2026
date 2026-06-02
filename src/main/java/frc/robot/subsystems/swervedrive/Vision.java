@@ -156,6 +156,10 @@ public class Vision {
 
   }
 
+  public Pose2d getPose() {
+    return getEstimatedGlobalPose(Cameras.LEFT_CAM).map(est -> est.estimatedPose.toPose2d()).orElse(new Pose2d());
+  }
+
   /**
    * Generates the estimated robot pose. Returns empty if:
    * <ul>
