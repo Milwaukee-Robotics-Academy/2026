@@ -170,7 +170,7 @@ public class RobotContainer
   //  operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
 
     driverXbox.x().toggleOnTrue(m_drivebase.updateVisionPoseCommand());
-    driverXbox.a().whileTrue(((Subsystem) m_quest).run(() -> m_quest.resetPose(m_drivebase.getPose())));
+    driverXbox.a().whileTrue(m_quest.resetPoseCommand(m_drivebase.getPose()));
     driverXbox.b().whileTrue(defaultDriveStreamCommand);
    // m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 

@@ -17,6 +17,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
@@ -167,6 +168,20 @@ public class QuestNavSubsystem {
   public void resetPose(Pose2d robotPose) {
     resetPose(new Pose3d(robotPose));
   }
+
+  public Command resetPoseCommand(Pose2d robotPose) {
+    return new Command() {
+      @Override
+      public void initialize() {
+        resetPose(robotPose);
+      }
+
+      @Override
+      public boolean isFinished() {
+        return true;
+      }
+    }.withName("Reset QuestNav Pose");
+}
    public Pose2d getPose() {
         PoseFrame[] frames = m_questNav.getAllUnreadPoseFrames();
         
