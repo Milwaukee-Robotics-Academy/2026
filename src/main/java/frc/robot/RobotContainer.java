@@ -224,6 +224,9 @@ public void periodic() {
     double matchTime = DriverStation.getMatchTime();
     SmartDashboard.putNumber("Clock/Match Time", matchTime);
     updateShiftStates(matchTime);
+    OdometryTracking.getObject("drivetrain").setPose(m_drivebase.getPose());
+    OdometryTracking.getObject("vision").setPose(m_drivebase.getVisionPose());
+    OdometryTracking.getObject("quest").setPose(m_quest.getPose());
 }
 
 private static boolean isBetween(double t, double startInclusive, double endExclusive) {
