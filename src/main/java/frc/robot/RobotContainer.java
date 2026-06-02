@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -169,6 +170,7 @@ public class RobotContainer
   //  operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
 
     driverXbox.x().toggleOnTrue(m_drivebase.updateVisionPoseCommand());
+    driverXbox.a().whileTrue(((Subsystem) m_quest).run(() -> m_quest.resetPose(m_drivebase.getPose())));
     driverXbox.b().whileTrue(defaultDriveStreamCommand);
    // m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
