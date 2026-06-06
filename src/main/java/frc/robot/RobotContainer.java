@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.util.Optional;
 import com.playingwithfusion.TimeOfFlight;
 import com.playingwithfusion.TimeOfFlight.RangingMode;
+import edu.wpi.first.math.util.Units;
 
 import swervelib.SwerveInputStream;
 
@@ -207,7 +209,7 @@ public void periodic() {
     SmartDashboard.putData(m_drivebase);
    // SmartDashboard.putData(m_fuelSubsystem);
     SmartDashboard.putData(pdh);
-    SmartDashboard.putNumber("Range Sensor/Distance", m_rangeSensor.getRange());
+    SmartDashboard.putNumber("Range Sensor/Distance", m_rangeSensor.getRange()/1000 + Units.inchesToMeters(8.5)); // Convert mm to m and add distance from the sensor to the center of the robot
     double matchTime = DriverStation.getMatchTime();
     SmartDashboard.putNumber("Clock/Match Time", matchTime);
     updateShiftStates(matchTime);
