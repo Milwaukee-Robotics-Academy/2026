@@ -317,7 +317,7 @@ public class Vision {
      * Left Camera
      */
     LEFT_CAM("Arducam_OV9281_USB_Camera",
-        new Rotation3d(0, 0, Math.toRadians(12)),
+        new Rotation3d(0, 0, Math.toRadians(-12)),
         new Translation3d(Units.inchesToMeters(12.5),
             Units.inchesToMeters(-11.5),
             Units.inchesToMeters(8)),
