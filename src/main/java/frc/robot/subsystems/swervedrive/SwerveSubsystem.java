@@ -35,7 +35,10 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.subsystems.QuestNavSubsystem;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
+import gg.questnav.questnav.QuestNav;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -59,7 +62,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * Swerve drive object.
    */
-  private final SwerveDrive swerveDrive;
+  private final TestSwerveDrive swerveDrive;
 
   /**
    * Enable vision odometry updates while driving.
@@ -69,11 +72,10 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * PhotonVision class to keep an accurate odometry.
    */
-  private Vision vision;
+  private Vision m_vision;
+  private QuestNavSubsystem m_questNav;
 
-  private Pose2d autoStartPose;
-  private Pose2d visionPose;
-  private Pose2d questPose;
+
 
 
   /**
@@ -95,7 +97,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try {
-      swerveDrive = new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED, startingPose);
+      swerveDrive = (TestSwerveDrive)new SwerveParser(directory).createSwerveDrive(Constants.MAX_SPEED, startingPose);
       // Alternative method if you don't want to supply the conversion factor via JSON
       // files.
       // swerveDrive = new SwerveParser(directory).createSwerveDrive(maximumSpeed,
@@ -137,7 +139,7 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param controllerCfg Swerve Controller.
    */
   public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
-    swerveDrive = new SwerveDrive(driveCfg,
+    swerveDrive = (TestSwerveDrive) new SwerveDrive(driveCfg,
         controllerCfg,
         Constants.MAX_SPEED,
         new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
@@ -148,12 +150,17 @@ public class SwerveSubsystem extends SubsystemBase {
    * Setup the photon vision class.
    */
   public void setupPhotonVision() {
-    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+    m_vision = new Vision(swerveDrive::getPose, swerveDrive.field);
+    m_questNav = new QuestNavSubsystem();
   }
 
-    public Command updateVisionPoseCommand() {
-      
-    return new RunCommand(() -> vision.updatePoseEstimation(swerveDrive)).withName("Update Vision Pose");
+  public Command updateVisionPoseCommand() {    
+    return new RunCommand(() -> m_vision.updatePoseEstimation(swerveDrive)).withName("Update Vision Pose");
+  }
+
+  public Command updateQuestPoseCommand() {
+
+    return new RunCommand(() -> m_questNav.updatePoseEstimation(swerveDrive)).withName("Update Quest Pose");
   }
 
   @Override
@@ -571,7 +578,7 @@ public Rotation2d getAngleToTarget(Translation2d target) {
   }
 
   public Pose2d getVisionPose() {
-    return vision.getPose();
+    return swerveDrive.getVisionEstimatedPose();
   }
 
   /**
@@ -755,5 +762,13 @@ public Rotation2d getAngleToTarget(Translation2d target) {
    */
   public SwerveDrive getSwerveDrive() {
     return swerveDrive;
+  }
+
+  public Pose2d getQuestPose() {
+    return swerveDrive.getQuestEstimatedPose();
+  }
+
+  public void addVisiontoRobotPose() {
+  m_vision.updatePoseEstimation(swerveDrive);
   }
 }
