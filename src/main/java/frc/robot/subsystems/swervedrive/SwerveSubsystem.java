@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.subsystems.QuestNavSubsystem;
 import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +70,8 @@ public class SwerveSubsystem extends SubsystemBase {
    * PhotonVision class to keep an accurate odometry.
    */
   private Vision vision;
+
+  private QuestNavSubsystem questNavSubsystem;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -113,14 +116,17 @@ public class SwerveSubsystem extends SubsystemBase {
     // possible
     if (visionDriveTest) {
       setupPhotonVision();
-      // Stop the odometry thread if we are using vision that way we can synchronize
-      // updates better.
-      swerveDrive.stopOdometryThread();
-    }
-    setupPathPlanner();
-  }
+      setupQuestNav();
+            // Stop the odometry thread if we are using vision that way we can synchronize
+            // updates better.
+            swerveDrive.stopOdometryThread();
+          }
+          setupPathPlanner();
+        }
+      
 
-  /**
+      
+      /**
    * Construct the swerve drive.
    *
    * @param driveCfg      SwerveDriveConfiguration for the swerve.
@@ -141,6 +147,9 @@ public class SwerveSubsystem extends SubsystemBase {
     vision = new Vision(swerveDrive::getPose, swerveDrive.field);
   }
 
+  private void setupQuestNav() {
+  questNav = new QuestNavSubsystem(swerveDrive);
+  }
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
