@@ -1,83 +1,168 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
-import gg.questnav.questnav.QuestNav;
-import gg.questnav.questnav.PoseFrame;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import gg.questnav.questnav.PoseFrame;
+import gg.questnav.questnav.QuestNav;
 import swervelib.SwerveDrive;
-import java.util.function.Supplier;
 
-import org.photonvision.simulation.VisionSystemSim;
+import java.util.ArrayList;
+import java.util.List;
 
-import edu.wpi.first.math.Matrix;
-import swervelib.SwerveDrive;
+public class QuestNavSubsystem {
+  private final QuestNav m_questNav = new QuestNav();
+  private final SwerveDrive m_drivetrain;
 
-public class QuestNavSubsystem extends SubsystemBase {
-  private QuestNav questNav = new QuestNav();
-  private Supplier<Pose2d> currentPose;
-  private Field2d field2d;
+  /**
+   * Transform from robot center to the Quest headset mounting location.
+   * Adjust x/y/z (meters) and yaw/pitch/roll (radians) to match your physical mounting.
+   */
+  private static final Transform3d ROBOT_TO_QUEST =
+      new Transform3d(
+          new Translation3d(0.0, 0.0, 0.5),
+          new Rotation3d(0.0, 0.0, 0.0));
 
- 
+  private static final Matrix<N3, N1> QUESTNAV_STD_DEVS =
+      VecBuilder.fill(
+          0.02,       // X position trust (20mm)
+          0.02,       // Y position trust (20mm)
+          0.0872665); // Rotation trust (5 degrees)
 
-  @Override
-  public void periodic() {
-    questNav.commandPeriodic();
+  private static final AprilTagFieldLayout FIELD_LAYOUT =
+      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+  private static final double BATTERY_LOW_PERCENT = 20;
+  private static final double BATTERY_CRITICAL_PERCENT = 10;
+
+  // NT struct publishers for AdvantageScope 3D visualization
+  private final StructArrayPublisher<Pose3d> m_allPosesPub;
+  private final StructArrayPublisher<Pose3d> m_acceptedPosesPub;
+  private final StructArrayPublisher<Pose3d> m_rejectedPosesPub;
+  private final StructPublisher<Pose3d> m_latestPosePub;
+
+  private double m_lastPoseTimestamp = -1;
+
+  public QuestNavSubsystem(SwerveDrive drivetrain) {
+    m_drivetrain = drivetrain;
+
+    var nt = NetworkTableInstance.getDefault();
+    m_allPosesPub =
+        nt.getStructArrayTopic("QuestNav/RobotPoses", Pose3d.struct).publish();
+    m_acceptedPosesPub =
+        nt.getStructArrayTopic("QuestNav/RobotPosesAccepted", Pose3d.struct).publish();
+    m_rejectedPosesPub =
+        nt.getStructArrayTopic("QuestNav/RobotPosesRejected", Pose3d.struct).publish();
+    m_latestPosePub =
+        nt.getStructTopic("QuestNav/LatestRobotPose", Pose3d.struct).publish();
+
+    m_questNav.setVersionCheckEnabled(false);
+
+    m_questNav.onConnected(() ->
+        System.out.println("Quest connected!"));
+    m_questNav.onDisconnected(() ->
+        DriverStation.reportWarning("Quest disconnected!", false));
+    m_questNav.onTrackingAcquired(() ->
+        System.out.println("Quest tracking acquired!"));
+    m_questNav.onTrackingLost(() ->
+        DriverStation.reportWarning("Quest tracking lost!", false));
+    m_questNav.onLowBattery((int) BATTERY_LOW_PERCENT, level ->
+        DriverStation.reportWarning("Quest battery low: " + level + "%", false));
+    m_questNav.onCommandSuccess(response ->
+        System.out.println("Pose reset succeeded: " + response.getCommandId()));
+    m_questNav.onCommandFailure(response ->
+        DriverStation.reportError(
+            "Pose reset failed: " + response.getErrorMessage(), false));
   }
 
-  Matrix<N3, N1> QUESTNAV_STD_DEVS = VecBuilder.fill(
-      0.02, // Trust down to 2cm in X direction
-      0.02, // Trust down to 2cm in Y direction
-      0.035 // Trust down to 2 degrees rotational
-  );
+  public void periodic() {
+    m_questNav.commandPeriodic();
 
-  Transform3d ROBOT_TO_QUEST = new Transform3d( /* TODO: Put your x, y, z, yaw, pitch, and roll offsets here! */ );
+    // Publish device diagnostics
+    boolean connected = m_questNav.isConnected();
+    boolean tracking = m_questNav.isTracking();
+    SmartDashboard.putBoolean("QuestNav/Connected", connected);
+    SmartDashboard.putBoolean("QuestNav/Tracking", tracking);
+    SmartDashboard.putNumber("QuestNav/Latency", m_questNav.getLatency());
+    m_questNav.getBatteryPercent().ifPresent(b -> {
+      SmartDashboard.putNumber("QuestNav/Battery%", b);
+      if (b < BATTERY_CRITICAL_PERCENT) {
+        DriverStation.reportWarning("Quest battery CRITICAL: " + b + "%", false);
+      }
+    });
+    m_questNav.getTrackingLostCounter().ifPresent(
+        c -> SmartDashboard.putNumber("QuestNav/TrackingLostCount", c));
 
-  public void updatePoseEstimation(SwerveDrive swerve) {
-    PoseFrame[] frames = questNav.getAllUnreadPoseFrames();
+    // Process all unread pose frames
+    PoseFrame[] frames = m_questNav.getAllUnreadPoseFrames();
+    SmartDashboard.putNumber("QuestNav/UnreadFrames", frames.length);
+
+    List<Pose3d> allPoses = new ArrayList<>();
+    List<Pose3d> acceptedPoses = new ArrayList<>();
+    List<Pose3d> rejectedPoses = new ArrayList<>();
 
     for (PoseFrame frame : frames) {
-      if (frame.isTracking()) {
-        Pose3d questPose = frame.questPose3d();
-        double timestamp = frame.dataTimestamp();
+      Pose3d questPose = frame.questPose3d();
+      Pose3d robotPose = questPose.plus(ROBOT_TO_QUEST.inverse());
 
-        Pose3d robotPose = questPose.transformBy(ROBOT_TO_QUEST.inverse());
-
-        swerve.addVisionMeasurement(robotPose.toPose2d(), timestamp, QUESTNAV_STD_DEVS);
-
+      allPoses.add(robotPose);
+      if (shouldReject(robotPose)) {
+        rejectedPoses.add(robotPose);
+        continue;
       }
+
+      acceptedPoses.add(robotPose);
+
+      if (frame.isTracking() && SmartDashboard.getBoolean("QuestNav/UsePose", true)) {
+        m_drivetrain.addVisionMeasurement(
+            robotPose.toPose2d(), frame.dataTimestamp(), QUESTNAV_STD_DEVS);
+      }
+
+      m_lastPoseTimestamp = frame.dataTimestamp();
+    }
+
+    // Publish pose arrays for AdvantageScope 3D field visualization
+    m_allPosesPub.set(allPoses.toArray(Pose3d[]::new));
+    m_acceptedPosesPub.set(acceptedPoses.toArray(Pose3d[]::new));
+    m_rejectedPosesPub.set(rejectedPoses.toArray(Pose3d[]::new));
+
+    if (!allPoses.isEmpty()) {
+      m_latestPosePub.set(allPoses.get(allPoses.size() - 1));
+    }
+
+    if (m_lastPoseTimestamp > 0) {
+      SmartDashboard.putNumber(
+          "QuestNav/TimeSinceLastPose", Timer.getTimestamp() - m_lastPoseTimestamp);
     }
   }
 
+  private boolean shouldReject(Pose3d pose) {
+    return pose.getX() < 0.0
+        || pose.getX() > FIELD_LAYOUT.getFieldLength()
+        || pose.getY() < 0.0
+        || pose.getY() > FIELD_LAYOUT.getFieldWidth();
+  }
 
   public void resetPose(Pose3d robotPose) {
     Pose3d questPose = robotPose.plus(ROBOT_TO_QUEST);
-    questNav.setPose(questPose);
+    m_questNav.setPose(questPose);
   }
 
   public void resetPose(Pose2d robotPose) {
     resetPose(new Pose3d(robotPose));
   }
-
-  public Command resetPoseCommand(Pose2d robotPose) {
-    return new Command() {
-      @Override
-      public void initialize() {
-        resetPose(robotPose);
-      }
-
-      @Override
-      public boolean isFinished() {
-        return true;
-      }
-    }.withName("Reset QuestNav Pose");
-  }
-
 }

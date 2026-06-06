@@ -148,7 +148,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   private void setupQuestNav() {
-  questNav = new QuestNavSubsystem(swerveDrive);
+    questNavSubsystem = new QuestNavSubsystem(swerveDrive);
   }
   @Override
   public void periodic() {
