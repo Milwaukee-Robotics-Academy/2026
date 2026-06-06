@@ -51,7 +51,7 @@ public class RobotContainer
   private final SwerveSubsystem m_drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/maxSwerve"));
 
- private final QuestNavSubsystem m_quest = new QuestNavSubsystem(m_drivebase);
+ private final QuestNavSubsystem m_quest = new QuestNavSubsystem();
                                                                                 
  // private final FuelSubsystem m_fuelSubsystem = new FuelSubsystem();
   private final PowerDistribution pdh = new PowerDistribution();
@@ -116,7 +116,7 @@ public class RobotContainer
   // Use current robot pose for drivetrain, and placeholder offsets for vision and quest
   OdometryTracking.getObject("drivetrain").setPose(m_drivebase.getPose());
   OdometryTracking.getObject("vision").setPose(m_drivebase.getVisionPose());
-  OdometryTracking.getObject("quest").setPose(m_quest.getPose());
+  OdometryTracking.getObject("quest").setPose(m_drivebase.getQuestPose());
   SmartDashboard.putData("OdometryTracking", OdometryTracking);
 
   }
@@ -169,8 +169,8 @@ public class RobotContainer
   //  driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
   //  operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
 
-    driverXbox.x().toggleOnTrue(m_drivebase.updateVisionPoseCommand());
-    driverXbox.a().whileTrue(m_quest.resetPoseCommand(m_drivebase.getPose()));
+    driverXbox.x().toggleOnTrue(Commands.run(m_drivebase::addVisiontoRobotPose).withName("Add Vision to Pose"));
+    driverXbox.a().whileTrue(m_drivebase.updateQuestPoseCommand());
     driverXbox.b().whileTrue(defaultDriveStreamCommand);
    // m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
@@ -228,7 +228,7 @@ public void periodic() {
     updateShiftStates(matchTime);
     OdometryTracking.getObject("drivetrain").setPose(m_drivebase.getPose());
     OdometryTracking.getObject("vision").setPose(m_drivebase.getVisionPose());
-    OdometryTracking.getObject("quest").setPose(m_quest.getPose());
+    OdometryTracking.getObject("quest").setPose(m_drivebase.getQuestPose());
 }
 
 private static boolean isBetween(double t, double startInclusive, double endExclusive) {
