@@ -158,7 +158,7 @@ public class RobotContainer
    // m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
  //   m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
-    SmartDashboard.putBoolean("Odometry/VisionEnabled", true);
+    SmartDashboard.putBoolean("Odometry/VisionEnabled", false);
     SmartDashboard.putBoolean("Odometry/QuestEnabled", false);
 
   }
