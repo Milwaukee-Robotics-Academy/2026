@@ -150,6 +150,10 @@ public class SwerveSubsystem extends SubsystemBase {
   private void setupQuestNav() {
     questNavSubsystem = new QuestNavSubsystem(swerveDrive);
   }
+
+  public void resetQuestNavPose() {
+    questNavSubsystem.resetPose(swerveDrive.getPose());
+  }
   @Override
   public void periodic() {
     // When vision is enabled we must manually update odometry in SwerveDrive
