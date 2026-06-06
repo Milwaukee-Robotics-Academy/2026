@@ -21,7 +21,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.FuelSubsystem;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import java.util.Optional;
@@ -159,6 +158,8 @@ public class RobotContainer
    // m_fuelSubsystem.setDefaultCommand(m_fuelSubsystem.stopCommand());
 
  //   m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
+    SmartDashboard.putBoolean("Odometry/VisionEnabled", true);
+    SmartDashboard.putBoolean("Odometry/QuestEnabled", false);
 
   }
 
