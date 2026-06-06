@@ -157,7 +157,16 @@ public class Vision {
   }
 
   public Pose2d getPose() {
-    return getEstimatedGlobalPose(Cameras.LEFT_CAM).map(est -> est.estimatedPose.toPose2d()).orElse(new Pose2d());
+   for (Cameras camera : Cameras.values()) {
+      Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
+      if (poseEst.isPresent()) {
+        EstimatedRobotPose pose = poseEst.get();
+        return pose.estimatedPose.toPose2d();
+      }
+
+      
+    }
+          return new Pose2d();
   }
 
   /**
@@ -321,7 +330,7 @@ public class Vision {
      * Left Camera
      */
     LEFT_CAM("Arducam_OV9281_USB_Camera",
-        new Rotation3d(0, 0, Math.toRadians(12)),
+        new Rotation3d(0, 0, Math.toRadians(-12)),
         new Translation3d(Units.inchesToMeters(12.5),
             Units.inchesToMeters(-11.5),
             Units.inchesToMeters(8)),
