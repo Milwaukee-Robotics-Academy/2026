@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
@@ -34,7 +35,7 @@ public class QuestNavSubsystem {
    */
   private static final Transform3d ROBOT_TO_QUEST =
       new Transform3d(
-          new Translation3d(0.0, 0.0, 0.5),
+          new Translation3d(Units.metersToInches(12.0), Units.metersToInches(0.0), Units.metersToInches(12)),
           new Rotation3d(0.0, 0.0, 0.0));
 
   private static final Matrix<N3, N1> QUESTNAV_STD_DEVS =
@@ -44,7 +45,7 @@ public class QuestNavSubsystem {
           0.0872665); // Rotation trust (5 degrees)
 
   private static final AprilTagFieldLayout FIELD_LAYOUT =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+      AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltAndymark);
 
   private static final double BATTERY_LOW_PERCENT = 20;
   private static final double BATTERY_CRITICAL_PERCENT = 10;
