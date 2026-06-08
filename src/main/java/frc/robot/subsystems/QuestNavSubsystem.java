@@ -132,6 +132,9 @@ public class QuestNavSubsystem {
         m_drivetrain.addVisionMeasurement(
             robotPose.toPose2d(), frame.dataTimestamp(), QUESTNAV_STD_DEVS);
       }
+      SmartDashboard.putNumber("Odometry/quest/X", robotPose.getX());
+      SmartDashboard.putNumber("Odometry/quest/Y", robotPose.getY()); 
+      SmartDashboard.putNumber("Odometry/quest/Heading", Units.radiansToDegrees(robotPose.getRotation().getAngle()));
 
       m_lastPoseTimestamp = frame.dataTimestamp();
     }
@@ -161,9 +164,11 @@ public class QuestNavSubsystem {
   public void resetPose(Pose3d robotPose) {
     Pose3d questPose = robotPose.plus(ROBOT_TO_QUEST);
     m_questNav.setPose(questPose);
+    //m_questNav.setPose(new Pose3d(3,3,12, new Rotation3d(0,0,Math.toRadians(180))));
   }
 
   public void resetPose(Pose2d robotPose) {
-    resetPose(new Pose3d(robotPose));
+    resetPose(new Pose3d(robotPose.getX(), robotPose.getY(),0, new Rotation3d(0, 0, robotPose.getRotation().getRadians())));
   }
+
 }

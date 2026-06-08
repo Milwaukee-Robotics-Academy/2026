@@ -138,6 +138,7 @@ public class SwerveSubsystem extends SubsystemBase {
         Constants.MAX_SPEED,
         new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
             Rotation2d.fromDegrees(0)));
+    resetQuestNavPose();
   }
 
   /**
@@ -159,11 +160,17 @@ public class SwerveSubsystem extends SubsystemBase {
     // When vision is enabled we must manually update odometry in SwerveDrive
     if (visionDriveTest) {
       swerveDrive.updateOdometry();
-      if (SmartDashboard.getBoolean("Odometry/VisionEnabled", true)) {
-        vision.updatePoseEstimation(swerveDrive);
-      }
+      vision.updatePoseEstimation(swerveDrive);
     }
+    updateDashboard();
+    questNavSubsystem.periodic();
   }
+  
+  private void updateDashboard() {
+    SmartDashboard.putNumber("Odometry/Swerve/Heading", getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("Odometry/Swerve/X", getPose().getX());
+    SmartDashboard.putNumber("Odometry/Swerve/Y", getPose().getY());
+  } 
 
   @Override
   public void simulationPeriodic() {

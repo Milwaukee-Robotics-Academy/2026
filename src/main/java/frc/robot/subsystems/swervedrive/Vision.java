@@ -142,13 +142,15 @@ public class Vision {
       Optional<EstimatedRobotPose> poseEst = getEstimatedGlobalPose(camera);
       if (poseEst.isPresent()) {
         var pose = poseEst.get();
-        swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
-            pose.timestampSeconds,
-            camera.curStdDevs);
-        SmartDashboard.putNumber(camera.name() + "/x", pose.estimatedPose.getTranslation().getX());
-        SmartDashboard.putNumber(camera.name() + "/y", pose.estimatedPose.getTranslation().getY());
-        SmartDashboard.putNumber(camera.name() + "/angle", pose.estimatedPose.toPose2d().getRotation().getDegrees());
-        SmartDashboard.putNumber(camera.name() + "/posetimestamp", pose.timestampSeconds);
+        if(SmartDashboard.getBoolean("Odometry/VisionEnabled", true)) {
+          swerveDrive.addVisionMeasurement(pose.estimatedPose.toPose2d(),
+              pose.timestampSeconds,
+              camera.curStdDevs);
+        }
+        SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/x", pose.estimatedPose.getTranslation().getX());
+        SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/y", pose.estimatedPose.getTranslation().getY());
+        SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/Heading", pose.estimatedPose.toPose2d().getRotation().getDegrees());
+        SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/posetimestamp", pose.timestampSeconds);
       } else {
         SmartDashboard.putString(camera.name() + "/pose", "No Pose Estimation");
       }
@@ -318,8 +320,8 @@ public class Vision {
      */
     LEFT_CAM("Arducam_OV9281_USB_Camera",
         new Rotation3d(0, 0, Math.toRadians(13)),
-        new Translation3d(Units.inchesToMeters(11),
-            Units.inchesToMeters(-8.5),
+        new Translation3d(Units.inchesToMeters(10),
+            Units.inchesToMeters(-7.5),
             Units.inchesToMeters(8)),
         VecBuilder.fill(8, 8, 12), VecBuilder.fill(5, 5, 10)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
     /**

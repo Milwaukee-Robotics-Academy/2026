@@ -155,7 +155,7 @@ public class RobotContainer
   //  driverXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
   //  operatorXbox.a().whileTrue(m_fuelSubsystem.ejectCommand());
 
-    driverXbox.x().onTrue(Commands.run(m_drivebase::resetQuestNavPose).withName("reset QuestNav Pose"));
+    driverXbox.x().onTrue(Commands.runOnce(m_drivebase::resetQuestNavPose).withName("reset QuestNav Pose"));
 
  //   m_climberSubsystem.setDefaultCommand(m_climberSubsystem.run(() -> m_climberSubsystem.stop()));
     SmartDashboard.putBoolean("Odometry/VisionEnabled", false);
