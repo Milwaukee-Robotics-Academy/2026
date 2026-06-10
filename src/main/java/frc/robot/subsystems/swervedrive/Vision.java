@@ -31,7 +31,6 @@ import java.util.function.Supplier;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.PhotonUtils;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -323,7 +322,7 @@ public class Vision {
         new Translation3d(Units.inchesToMeters(10),
             Units.inchesToMeters(-7.5),
             Units.inchesToMeters(8)),
-        VecBuilder.fill(8, 8, 12), VecBuilder.fill(5, 5, 10)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
+        VecBuilder.fill(0.5, 0.5, 1), VecBuilder.fill(0.5, 0.5, .8)); //standard deviations for single tag and multi tag pose estimation, experiment and determine these values on an actual robot for better performance
     /**
      * Right Camera
      */
@@ -408,10 +407,8 @@ public class Vision {
       // https://docs.wpilib.org/en/stable/docs/software/basic-programming/coordinate-system.html
       robotToCamTransform = new Transform3d(robotToCamTranslation, robotToCamRotation);
 
-      poseEstimator = new PhotonPoseEstimator(Vision.fieldLayout,
-          PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-          robotToCamTransform);
-      poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+    // New PhotonPoseEstimator constructor (fieldLayout, robotToCamera)
+    poseEstimator = new PhotonPoseEstimator(Vision.fieldLayout, robotToCamTransform);
 
       this.singleTagStdDevs = singleTagStdDevs;
       this.multiTagStdDevs = multiTagStdDevsMatrix;
@@ -532,7 +529,13 @@ public class Vision {
     private void updateEstimatedGlobalPose() {
       Optional<EstimatedRobotPose> visionEst = Optional.empty();
       for (var change : resultsList) {
-        visionEst = poseEstimator.update(change);
+        // Prefer a coprocessor multi-tag solution if available
+        Optional<EstimatedRobotPose> est = poseEstimator.estimateCoprocMultiTagPose(change);
+        if (est.isEmpty()) {
+          // Fallback to lowest ambiguity estimate on the RIO
+          est = poseEstimator.estimateLowestAmbiguityPose(change);
+        }
+        visionEst = est;
         updateEstimationStdDevs(visionEst, change.getTargets());
       }
       estimatedRobotPose = visionEst;
