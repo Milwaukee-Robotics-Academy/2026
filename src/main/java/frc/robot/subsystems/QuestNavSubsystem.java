@@ -17,6 +17,8 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
@@ -132,6 +134,11 @@ public class QuestNavSubsystem {
         m_drivetrain.addVisionMeasurement(
             robotPose.toPose2d(), frame.dataTimestamp(), QUESTNAV_STD_DEVS);
       }
+      Field2d odField = (Field2d)SmartDashboard.getData("Odometry/Field");
+      FieldObject2d odFieldQuest = odField.getObject("Quest");
+      odFieldQuest.setPose(robotPose.toPose2d());
+      SmartDashboard.putData("Odometry/Field", odField);
+        
       SmartDashboard.putNumber("Odometry/quest/X", robotPose.getX());
       SmartDashboard.putNumber("Odometry/quest/Y", robotPose.getY()); 
       SmartDashboard.putNumber("Odometry/quest/Heading", Units.radiansToDegrees(robotPose.getRotation().getAngle()));

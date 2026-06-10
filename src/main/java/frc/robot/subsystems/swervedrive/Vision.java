@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import java.awt.Desktop;
@@ -146,10 +147,14 @@ public class Vision {
               pose.timestampSeconds,
               camera.curStdDevs);
         }
+        Field2d odField = (Field2d)SmartDashboard.getData("Odometry/Field");
+        FieldObject2d odFieldVision = odField.getObject("Vision");
+        odFieldVision.setPose(pose.estimatedPose.toPose2d());
+        SmartDashboard.putData("Odometry/Field", odField);
         SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/x", pose.estimatedPose.getTranslation().getX());
         SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/y", pose.estimatedPose.getTranslation().getY());
         SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/Heading", pose.estimatedPose.toPose2d().getRotation().getDegrees());
-        SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/posetimestamp", pose.timestampSeconds);
+        SmartDashboard.putNumber("Odometry/vision/" + camera.name() + "/z-posetimestamp", pose.timestampSeconds);
       } else {
         SmartDashboard.putString(camera.name() + "/pose", "No Pose Estimation");
       }
