@@ -134,6 +134,9 @@ public class RobotContainer
 public void periodic() {
     SmartDashboard.putData(CommandScheduler.getInstance());
     SmartDashboard.putData(m_drivebase);
+    SmartDashboard.putNumber("Odometry/Swerve/Heading", m_drivebase.getPose().getRotation().getDegrees());
+    SmartDashboard.putNumber("Odometry/Swerve/X", m_drivebase.getPose().getX());
+    SmartDashboard.putNumber("Odometry/Swerve/Y", m_drivebase.getPose().getY());
 }
 
 
